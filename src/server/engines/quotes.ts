@@ -31,7 +31,7 @@ export function estimateFees(db: DatabaseSync, deal: Row, arrangementFeeFils: nu
 }
 
 export function currentRuleVersion(db: DatabaseSync) {
-  const b = db.prepare('SELECT MAX(id) id FROM data_batches WHERE spec_no IN (3,4,5)').get() as { id: number | null };
+  const b = db.prepare('SELECT MAX(id) id FROM data_batches WHERE spec_no IN (1,3,4,5)').get() as { id: number | null };
   return b.id ? `RULES-B${b.id}` : 'RULES-BUILTIN-1';
 }
 

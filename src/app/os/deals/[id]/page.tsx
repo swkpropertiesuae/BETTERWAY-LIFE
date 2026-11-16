@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import { getDb } from '@/server/db';
 import { getActiveLang, requireStaffUser } from '@/server/auth/request';
 import { formatAed, formatBps, tr } from '@/lib/format';
+import { Avatar, Ring } from '@/components/ui';
 import { OsBanner } from '@/components/os-banner';
 import { STAGE_META, getDealWorkflow, pathFor, reasonCodes } from '@/server/engines/workflow-engine';
 import { milestonesFor } from '@/server/engines/milestones';
@@ -47,11 +48,15 @@ export default async function DealForm({ params, searchParams }: { params: Promi
       <div className="text-xs text-slate-500"><a className="underline" href="/os/deals">Pipeline</a> / {deal.deal_ref}</div>
 
       {/* control panel: title + action buttons + statusbar */}
-      <div className="bw-card p-4 space-y-3">
+      <div className="bw-card p-5 space-y-3 bw-rise">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h1 className="font-display text-xl font-bold text-[#021125]">{client}</h1>
+          <div className="flex items-center gap-3">
+            <Avatar name={String(client)} size={48} />
+            <div>
+            <h1 className="font-display text-2xl font-extrabold text-[#021125]">{client}</h1>
             <div className="text-xs text-slate-500">{deal.deal_ref} · {String(deal.transaction_type).replace('_', ' ')} · {deal.community_name} · Advisor {deal.advisor ?? '—'}</div>
+            </div>
+            <Ring size={52} value={(miles.filter((m) => m.state === 'done').length / 12) * 100} color="#5fc9a0">{miles.filter((m) => m.state === 'done').length}/12</Ring>
           </div>
           <div className="flex flex-wrap gap-2 items-center">
             {w.nextStage && (
@@ -97,8 +102,8 @@ export default async function DealForm({ params, searchParams }: { params: Promi
       </div>
       {w.alerts.map((a, i) => <div key={i} className={`rounded-lg border p-2.5 text-xs ${LEVEL[a.level]}`}><b>{a.code.replace('_', ' ')}</b> · {a.text}</div>)}
 
-      <div className="flex gap-1 border-b border-slate-200 text-xs overflow-x-auto">
-        {TABS.map((t) => <a key={t} href={`${back}?tab=${t}`} className={`px-3 py-2 capitalize shrink-0 ${tab === t ? 'border-b-2 border-[#D7B04E] font-semibold text-[#021125]' : 'text-slate-500 hover:text-slate-800'}`}>{t}{t === 'documents' && w.documents.missing.length ? ` (${w.documents.missing.length} missing)` : ''}</a>)}
+      <div className="flex gap-1 rounded-full bg-slate-100/80 p-1 w-fit max-w-full text-xs overflow-x-auto">
+        {TABS.map((t) => <a key={t} href={`${back}?tab=${t}`} className={`bw-pill capitalize shrink-0 ${tab === t ? 'bw-pill-active' : 'bw-pill-idle'}`}>{t}{t === 'documents' && w.documents.missing.length ? ` (${w.documents.missing.length} missing)` : ''}</a>)}
       </div>
 
       {tab === 'overview' && (
@@ -137,7 +142,7 @@ export default async function DealForm({ params, searchParams }: { params: Promi
                   )}
                 </div>
                 <table className="w-full mt-2"><thead><tr><th className="text-start">Bank / product</th><th className="text-end">Rate</th><th className="text-end">EMI</th><th className="text-end">Revert EMI</th><th className="text-end">DBR</th><th className="text-end">LTV</th><th className="text-end">Cash to close</th></tr></thead>
-                  <tbody>{offers.map((o, i) => <tr key={i} className="border-t border-slate-100"><td>{o.bankName} · {o.productCode}</td><td className="text-end">{formatBps(o.introRateBps)}</td><td className="text-end">{formatAed(o.introEmiFils)}</td><td className="text-end">{formatAed(o.revertEmiFils)}</td><td className="text-end">{formatBps(o.calculatedDbrBps)}</td><td className="text-end">{formatBps(o.calculatedLtvBps)}</td><td className="text-end">{formatAed(o.fees?.cashToCloseFils)}</td></tr>)}</tbody></table>
+                  <tbody>{offers.map((o, i) => <tr key={i} className="border-t border-slate-100"><td>{o.bankName} · {o.productCode}{o.rulesApplied?.length ? <span className="text-[10px] text-slate-400"> · rules {o.rulesApplied.join(', ')}</span> : null}</td><td className="text-end">{formatBps(o.introRateBps)}</td><td className="text-end">{formatAed(o.introEmiFils)}</td><td className="text-end">{formatAed(o.revertEmiFils)}</td><td className="text-end">{formatBps(o.calculatedDbrBps)}</td><td className="text-end">{formatBps(o.calculatedLtvBps)}</td><td className="text-end">{formatAed(o.fees?.cashToCloseFils)}</td></tr>)}</tbody></table>
                 {ko.length > 0 && <details className="mt-2"><summary className="cursor-pointer text-slate-500">{ko.length} banks not eligible (reason codes)</summary><ul className="list-disc ms-5 text-slate-600">{ko.map((k, i) => <li key={i}>{k.bank}: {k.reason}</li>)}</ul></details>}
                 {q.override_reason && <div className="text-amber-700 mt-1">Override: {q.override_reason}</div>}
               </div>

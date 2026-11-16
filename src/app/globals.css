@@ -109,3 +109,44 @@ main .bw-input { padding: 0.375rem 0.625rem; font-size: 0.8125rem; }
 main .bw-btn-gold, main .bw-btn-navy { padding-top: 0.375rem; padding-bottom: 0.375rem; font-size: 0.8125rem; }
 main table th { font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.04em; color: #64748b; }
 main table td { font-size: 0.75rem; }
+
+/* ---------- Lively theme: soft pastel shell, glass cards, colour tiles ---------- */
+.bw-backdrop {
+  background:
+    radial-gradient(900px 500px at 8% 0%, #fde3d3 0%, transparent 60%),
+    radial-gradient(800px 500px at 100% 10%, #dfe3ff 0%, transparent 55%),
+    radial-gradient(700px 500px at 50% 100%, #d9f3e8 0%, transparent 60%),
+    #f6f1ee;
+}
+.bw-panel {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 28px;
+  box-shadow: 0 30px 60px -30px rgba(2, 17, 37, 0.25);
+}
+.bw-card {
+  border-radius: 1.25rem;
+  border-color: rgba(226, 232, 240, 0.7);
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 6px 20px -12px rgba(2, 17, 37, 0.18);
+}
+.bw-tile { border-radius: 1.5rem; padding: 1rem 1.1rem; position: relative; overflow: hidden; transition: transform .15s ease, box-shadow .15s ease; }
+a.bw-tile:hover, .bw-lift:hover { transform: translateY(-2px); box-shadow: 0 14px 28px -14px rgba(2, 17, 37, 0.3); }
+.bw-tone-peach { background: linear-gradient(145deg, #fbe3c3, #f6cfa0); }
+.bw-tone-blue { background: linear-gradient(145deg, #cfe0fb, #a9c6f6); }
+.bw-tone-lilac { background: linear-gradient(145deg, #e3d6fb, #c9b3f5); }
+.bw-tone-pink { background: linear-gradient(145deg, #fbd3ea, #f4aedb); }
+.bw-tone-mint { background: linear-gradient(145deg, #d1f3e3, #a8e6c9); }
+.bw-tone-sand { background: linear-gradient(145deg, #f3ead2, #e8d9a8); }
+.bw-tone-coral { background: linear-gradient(145deg, #fcd8cf, #f6b3a3); }
+.bw-pill { display: inline-flex; align-items: center; gap: .35rem; border-radius: 9999px; padding: .4rem .9rem; font-size: .75rem; font-weight: 600; transition: background .15s; }
+.bw-pill-active { background: #fff; color: #021125; box-shadow: 0 4px 12px -4px rgba(2,17,37,.25); }
+.bw-pill-idle { color: #475569; }
+.bw-pill-idle:hover { background: rgba(255,255,255,.7); }
+@keyframes bw-rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.bw-rise { animation: bw-rise .45s ease both; }
+.bw-d1 { animation-delay: .05s; } .bw-d2 { animation-delay: .1s; } .bw-d3 { animation-delay: .15s; } .bw-d4 { animation-delay: .2s; }
+@media (prefers-reduced-motion: reduce) { .bw-rise { animation: none; } a.bw-tile:hover, .bw-lift:hover { transform: none; } }
+main .bw-input { border-radius: 0.75rem; }
+main .bw-btn-gold, main .bw-btn-navy { border-radius: 9999px; }

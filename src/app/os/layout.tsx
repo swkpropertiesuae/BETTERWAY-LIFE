@@ -10,22 +10,23 @@ export default async function InternalOsLayout({ children }: { children: React.R
   const open = (db.prepare("SELECT COUNT(*) c FROM ops_tasks WHERE status = 'OPEN' AND assigned_role = ?").get(user.role) as { c: number }).c;
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F8F9FA]">
-      <header className="bg-[#021125] text-white flex items-center gap-3 px-3 h-12 sticky top-0 z-30">
-        <img src="/brand/mark.svg" alt="Betterway" className="h-7 w-7 rounded shrink-0" />
+    <div className="min-h-screen bw-backdrop p-2 sm:p-4">
+      <div className="bw-panel min-h-[calc(100vh-2rem)] flex flex-col">
+      <header className="flex items-center gap-3 px-4 h-16 sticky top-0 z-30 bg-white/60 backdrop-blur border-b border-white/80">
+        <img src="/brand/mark.svg" alt="Betterway" className="h-8 w-8 rounded-lg shrink-0 hidden sm:block" />
         <TopNav lang={lang} />
         <div className="ms-auto flex items-center gap-2 shrink-0">
           <form action="/os/search" method="GET" className="hidden md:block">
-            <input name="q" placeholder={tr(lang, 'Search deals, clients, banks…', 'ابحث…')} className="rounded bg-white/10 border border-white/15 px-3 py-1 text-xs text-white placeholder:text-slate-400 w-56" />
+            <input name="q" placeholder={tr(lang, 'Search deals, clients, banks…', 'ابحث…')} className="rounded-full bg-white border border-slate-200 px-4 py-1.5 text-xs text-slate-800 placeholder:text-slate-400 w-56 shadow-sm" />
           </form>
-          <a href="/os/activities" className="relative text-xs px-2 py-1 rounded hover:bg-white/10" title="My activities">
+          <a href="/os/activities" className="relative text-xs px-3 py-1.5 rounded-full bg-white border border-slate-200 shadow-sm hover:shadow text-[#021125]" title="My activities">
             ✓ <span className="font-num">{open}</span>
           </a>
           <details className="relative">
-            <summary className="list-none cursor-pointer text-xs rounded px-2 py-1 hover:bg-white/10">
+            <summary className="list-none cursor-pointer text-xs rounded-full bg-white border border-slate-200 shadow-sm px-3 py-1.5 text-[#021125] font-semibold">
               {lang === 'ar' && user.full_name_ar ? user.full_name_ar : user.full_name_en} ▾
             </summary>
-            <div className="absolute end-0 mt-2 w-64 rounded-lg bg-[#09203f] border border-white/15 p-3 space-y-3 text-xs shadow-xl">
+            <div className="absolute end-0 mt-2 w-64 rounded-2xl bg-[#021125] border border-white/15 p-3 space-y-3 text-xs shadow-xl text-white">
               <div className="text-[#D7B04E]">{ROLE_LABELS[user.role]?.[lang] ?? user.role}{user.is_mlro === 1 ? ' · MLRO' : ''}{user.can_approve_rates === 1 ? ' · Checker' : ''}</div>
               <form method="POST" action="/api/v1/auth/quick-role" className="flex gap-1.5">
                 <input type="hidden" name="action" value="switch_role" />
@@ -61,7 +62,8 @@ export default async function InternalOsLayout({ children }: { children: React.R
           </details>
         </div>
       </header>
-      <main className="p-4 lg:p-6 flex-1">{children}</main>
+      <main className="p-4 lg:p-7 flex-1">{children}</main>
+      </div>
     </div>
   );
 }

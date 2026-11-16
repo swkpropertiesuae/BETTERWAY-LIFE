@@ -1,3 +1,4 @@
+import { loadImportedRules, segmentsFor } from './imported-rules';
 import type { DatabaseSync } from 'node:sqlite';
 import { ForbiddenError, writeAuditLog, type UserRecord } from '@/server/auth';
 
@@ -58,6 +59,7 @@ export function statutoryMaxLtvBps(params: {
 }
 
 export type EligibleBankOffer = {
+  rulesApplied?: string[];
   bankId: number;
   bankKey: string;
   bankName: string;
@@ -125,6 +127,8 @@ export function evaluateDealAcross24Banks(db: DatabaseSync, dealId: number) {
   const purchasePriceFils = Number(deal.purchase_price_fils);
   const estValFils = Number(deal.estimated_valuation_fils);
 
+  const imported = loadImportedRules(db);
+  const segments = segmentsFor(deal, applicants);
   const eligibleOffers: EligibleBankOffer[] = [];
   const knockouts: BankKnockout[] = [];
 
@@ -132,6 +136,20 @@ export function evaluateDealAcross24Banks(db: DatabaseSync, dealId: number) {
     const bankId = Number(bank.id);
     const bankKey = String(bank.bank_key);
     const bankName = String(bank.name_en);
+
+    const bankRef = { id: bankId, bank_key: bankKey, short_name: String(bank.short_name), name_en: bankName };
+    const rulesApplied: string[] = [];
+    const status = imported.bankStatus(bankRef);
+    if (status && status !== 'ACTIVE') {
+      knockouts.push({ bankId, bankKey, bankName, reason: `${bankName} is ${status} in Bank_Master` });
+      continue;
+    }
+    const bankLimits = imported.eligibility(bankRef, segments);
+    rulesApplied.push(...bankLimits.ids);
+    if (bankLimits.maxTenorMonths && tenureMonths > bankLimits.maxTenorMonths) {
+      knockouts.push({ bankId, bankKey, bankName, reason: `Requested tenor ${tenureMonths}m exceeds ${bankName} rule limit ${bankLimits.maxTenorMonths}m` });
+      continue;
+    }
 
     // Preference filter
     if (deal.finance_preference === 'ISLAMIC_ONLY' && bank.structure === 'CONVENTIONAL') {
@@ -197,7 +215,7 @@ export function evaluateDealAcross24Banks(db: DatabaseSync, dealId: number) {
       valuationBaseFils: baseValFils,
       nonResidentBankMaxBps: Number(bank.non_resident_max_ltv_bps || 6000),
     });
-    const maxAllowedLtvBps = aplMaxLtvBps !== null ? Math.min(statCapBps, aplMaxLtvBps) : statCapBps;
+    const maxAllowedLtvBps = Math.min(aplMaxLtvBps !== null ? Math.min(statCapBps, aplMaxLtvBps) : statCapBps, bankLimits.maxLtvBps ?? 10_000);
     const calculatedLtvBps = baseValFils > 0 ? Math.round((netLoanNeededFils * 10_000) / baseValFils) : 10_000;
 
     if (calculatedLtvBps > maxAllowedLtvBps) {
@@ -215,6 +233,24 @@ export function evaluateDealAcross24Banks(db: DatabaseSync, dealId: number) {
     const rentalKeepRatio = (10_000 - Number(bank.rental_haircut_bps || 2500)) / 10_000;
     let totalMonthlyIncomeFils = 0;
 
+    const bankPolicies = imported.policies(bankRef);
+    let policyKnockout: string | null = null;
+    const policyPct = (app: Record<string, unknown>, incomeType: string, fallback: number) => {
+      const p = bankPolicies.find((x) => (!x.employer_category || x.employer_category.toUpperCase() === String(app.employer_tier)) && x.income_type.toUpperCase() === incomeType && x.accepted_income_pct);
+      if (p) rulesApplied.push(p.policy_id);
+      return p ? Math.min(100, Number(p.accepted_income_pct)) / 100 : fallback;
+    };
+    for (const app of applicants) {
+      for (const p of bankPolicies) {
+        if (p.employer_category && p.employer_category.toUpperCase() !== String(app.employer_tier)) continue;
+        if (p.employment_tenure_months && Number(app.length_of_service_months) < Number(p.employment_tenure_months)) policyKnockout = `Service ${app.length_of_service_months}m is below ${bankName} policy minimum ${p.employment_tenure_months}m (${p.policy_id})`;
+        if (/required|mandatory/i.test(p.salary_transfer_rule) && Number(app.stl_preference) === 0) policyKnockout = `${bankName} requires salary transfer (${p.policy_id})`;
+      }
+    }
+    if (policyKnockout) {
+      knockouts.push({ bankId, bankKey, bankName, reason: policyKnockout });
+      continue;
+    }
     for (const app of applicants) {
       const fxMult = (Number(app.fx_rate_to_aed_bps || 10_000) / 10_000) * ((10_000 - Number(app.fx_haircut_bps || 0)) / 10_000);
       if (app.employment_type === 'SELF_EMPLOYED') {
@@ -222,11 +258,17 @@ export function evaluateDealAcross24Banks(db: DatabaseSync, dealId: number) {
         const ownerMonthly = (avgAnnualProfit / 12) * (Number(app.ownership_bps || 10_000) / 10_000);
         totalMonthlyIncomeFils += Math.round(ownerMonthly * fxMult);
       } else {
-        const baseMonthly = Number(app.basic_salary_fils) + Number(app.allowances_fils) + Number(app.commission_monthly_avg_fils);
-        const bonusMonthly = (Number(app.bonus_annual_avg_fils) / 12) * bonusKeepRatio;
-        const rentalMonthly = (Number(app.rental_income_annual_fils) / 12) * rentalKeepRatio;
+        const baseMonthly = Number(app.basic_salary_fils) * policyPct(app, 'SALARY', 1) + Number(app.allowances_fils) * policyPct(app, 'ALLOWANCES', 1) + Number(app.commission_monthly_avg_fils) * policyPct(app, 'COMMISSION', 1);
+        const bonusMonthly = (Number(app.bonus_annual_avg_fils) / 12) * policyPct(app, 'BONUS', bonusKeepRatio);
+        const rentalMonthly = (Number(app.rental_income_annual_fils) / 12) * policyPct(app, 'RENTAL', rentalKeepRatio);
         totalMonthlyIncomeFils += Math.round((baseMonthly + bonusMonthly + rentalMonthly) * fxMult);
       }
+    }
+
+    if (bankLimits.incomeFactor) totalMonthlyIncomeFils = Math.round(totalMonthlyIncomeFils * bankLimits.incomeFactor);
+    if (bankLimits.minIncomeFils && totalMonthlyIncomeFils < bankLimits.minIncomeFils) {
+      knockouts.push({ bankId, bankKey, bankName, reason: `Household income below ${bankName} rule minimum (AED ${(bankLimits.minIncomeFils / 100).toFixed(0)}/month)` });
+      continue;
     }
 
     // Liabilities & card-limit obligation (3% vs 5%)
@@ -245,17 +287,32 @@ export function evaluateDealAcross24Banks(db: DatabaseSync, dealId: number) {
     const calculatedDbrBps =
       totalMonthlyIncomeFils > 0 ? Math.round((totalStressedDebtFils * 10_000) / totalMonthlyIncomeFils) : 10_000;
 
-    if (calculatedDbrBps > 5000) {
+    const dbrCapBps = Math.min(5000, bankLimits.maxDbrBps ?? 5000);
+    if (calculatedDbrBps > dbrCapBps) {
       knockouts.push({
         bankId,
         bankKey,
         bankName,
-        reason: `Stressed DBR (${(calculatedDbrBps / 100).toFixed(2)}%) exceeds statutory 50.00% CBUAE ceiling`,
+        reason: `Stressed DBR (${(calculatedDbrBps / 100).toFixed(2)}%) exceeds ${dbrCapBps === 5000 ? 'statutory 50.00% CBUAE' : `rule ${(dbrCapBps / 100).toFixed(2)}%`} ceiling`,
       });
       continue;
     }
 
-    const bankCards = activeCards.filter((c) => Number(c.bank_id) === bankId);
+    const importedProducts = imported.products(bankRef);
+    const bankCards = activeCards
+      .filter((c) => Number(c.bank_id) === bankId)
+      .flatMap((c) => {
+        if (!importedProducts) return [c];
+        const o = importedProducts.get(String(c.product_code).trim().toLowerCase().replace(/[\s-]+/g, '_'));
+        if (!o) return []; // import is the source of truth for this bank
+        rulesApplied.push(`PRODUCT:${o.product_id}`);
+        return [{ ...c,
+          ...(o.fixed_rate_pct ? { intro_rate_bps: Math.round(Number(o.fixed_rate_pct) * 100) } : {}),
+          ...(o.revert_margin_pct ? { revert_margin_bps: Math.round(Number(o.revert_margin_pct) * 100) } : {}),
+          ...(o.floor_pct ? { floor_rate_bps: Math.round(Number(o.floor_pct) * 100) } : {}),
+          ...(o.fixed_months ? { fixed_years: Number(o.fixed_months) / 12 } : {}),
+          ...(['1M', '3M', '6M'].includes(o.benchmark_tenor?.toUpperCase()) ? { eibor_tenor: o.benchmark_tenor.toUpperCase() } : {}) }];
+      });
     if (bankCards.length === 0) {
       knockouts.push({ bankId, bankKey, bankName, reason: 'No active approved rate card on file' });
       continue;
@@ -266,6 +323,10 @@ export function evaluateDealAcross24Banks(db: DatabaseSync, dealId: number) {
     const evaluatedCards = bankCards
       .filter((c) => {
         if (totalMonthlyIncomeFils < Number(c.min_salary_fils)) return false;
+        const pl = imported.eligibility(bankRef, segments, String(c.product_code));
+        if (pl.minIncomeFils && totalMonthlyIncomeFils < pl.minIncomeFils) return false;
+        if (pl.maxLtvBps && calculatedLtvBps > pl.maxLtvBps) return false;
+        if (pl.maxDbrBps && calculatedDbrBps > pl.maxDbrBps) return false;
         const scope = String(c.residency_scope || 'ALL');
         if (scope === 'UAE_NATIONAL_ONLY' && primary.residency_type !== 'UAE_NATIONAL') return false;
         if (scope === 'RESIDENT_ONLY' && hasNonResident) return false;
@@ -330,6 +391,7 @@ export function evaluateDealAcross24Banks(db: DatabaseSync, dealId: number) {
           calculatedLtvBps,
           maxAllowedLtvBps,
           assessableHouseholdIncomeFils: totalMonthlyIncomeFils,
+          rulesApplied: [...new Set(rulesApplied)],
         } satisfies EligibleBankOffer;
       })
       .sort((a, b) => a.fiveYearTotalCostFils - b.fiveYearTotalCostFils);
