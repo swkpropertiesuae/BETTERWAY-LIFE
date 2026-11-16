@@ -49,8 +49,8 @@ export async function POST(req: Request) {
   const isJson = (req.headers.get('content-type') || '').includes('application/json');
   const body = isJson ? await req.json() : Object.fromEntries((await req.formData()).entries());
   const action = String(body.action || '');
-  const rawReturnTo = String(body.returnTo || '/os/command');
-  const returnTo = rawReturnTo.startsWith('/') && !rawReturnTo.startsWith('//') ? rawReturnTo : '/os/command';
+  const rawReturnTo = String(body.returnTo || '/os');
+  const returnTo = rawReturnTo.startsWith('/') && !rawReturnTo.startsWith('//') ? rawReturnTo : '/os';
 
   const respondOk = (notice: string, extra?: Record<string, unknown>) => {
     if (isJson) return NextResponse.json({ ok: true, notice, ...extra });
@@ -310,13 +310,10 @@ export async function POST(req: Request) {
         const sub = db.prepare('SELECT deal_id, bank_id, rate_card_id FROM deal_submissions WHERE id = ?').get(subId) as
           | { deal_id: number; bank_id: number; rate_card_id: number }
           | undefined;
+        // Bank decisions only update the submission and chosen bank; the deal stage moves through the guarded workflow (Deal Desk).
         if (sub && (status === 'IPA_APPROVED' || status === 'FOL_ISSUED' || status === 'FOL_SIGNED')) {
-          db.prepare('UPDATE deals SET stage = ?, selected_bank_id = ?, selected_rate_card_id = ? WHERE id = ?').run(
-            status,
-            sub.bank_id,
-            sub.rate_card_id,
-            sub.deal_id,
-          );
+          db.prepare('UPDATE deals SET selected_bank_id = ?, selected_rate_card_id = ? WHERE id = ?').run(sub.bank_id, sub.rate_card_id, sub.deal_id);
+          writeAuditLog(db, user, 'deals', sub.deal_id, `BANK_${status}`, null, { submissionId: subId });
         }
         return respondOk(`Bank submission updated to ${status}`);
       }

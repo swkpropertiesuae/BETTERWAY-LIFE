@@ -23,7 +23,7 @@ export async function getActiveLang(user?: UserRecord | null): Promise<Lang> {
 export function defaultHomeForRole(role: UserRole): string {
   if (role === 'CLIENT') return '/portal';
   if (role === 'PARTNER_AGENCY_ADMIN' || role === 'PARTNER_AGENT') return '/partners';
-  return '/os/command';
+  return '/os';
 }
 
 export async function requireStaffUser(): Promise<UserRecord> {

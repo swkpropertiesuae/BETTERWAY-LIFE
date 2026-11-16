@@ -13,7 +13,7 @@ export async function POST(req: Request) {
   if (action === 'set_lang') {
     const lang = String(form.get('lang') || 'en') === 'ar' ? 'ar' : 'en';
     const referer = req.headers.get('referer') || '';
-    let fallbackDest = '/os/command';
+    let fallbackDest = '/os';
     try {
       if (referer) {
         const refUrl = new URL(referer);
@@ -23,7 +23,7 @@ export async function POST(req: Request) {
         }
       }
     } catch {
-      fallbackDest = '/os/command';
+      fallbackDest = '/os';
     }
     const dest = safeReturnTo || fallbackDest;
     const res = NextResponse.redirect(new URL(dest, req.url), 303);
