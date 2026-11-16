@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getDb } from '@/server/db';
 import { createSession, SESSION_COOKIE_NAME, verifyPassword, writeAuditLog, type UserRole } from '@/server/auth';
 import { defaultHomeForRole } from '@/server/auth/request';
+import { verifyTotp } from '@/server/auth/totp';
 import { registerPartnerAgent, registerPortalBorrower } from '@/server/services/os-service';
 
 export async function POST(req: Request) {
@@ -51,8 +52,8 @@ export async function POST(req: Request) {
       const email = String(body.email || '').trim().toLowerCase();
       const password = String(body.password || '');
       const row = db
-        .prepare('SELECT id, role, password_hash, status FROM users WHERE email = ?')
-        .get(email) as { id: number; role: UserRole; password_hash: string; status: string } | undefined;
+        .prepare('SELECT id, role, password_hash, status, mfa_enabled, totp_secret FROM users WHERE email = ?')
+        .get(email) as { id: number; role: UserRole; password_hash: string; status: string; mfa_enabled: number; totp_secret: string } | undefined;
 
       if (!row || row.status !== 'ACTIVE' || !verifyPassword(password, row.password_hash)) {
         if (isJson) {
@@ -60,9 +61,14 @@ export async function POST(req: Request) {
         }
         return NextResponse.redirect(new URL('/login?error=Invalid+email+or+password', req.url), 303);
       }
+      if (row.mfa_enabled === 1 && !verifyTotp(row.totp_secret, String(body.otp || ''))) {
+        writeAuditLog(db, { id: row.id, role: row.role }, 'sessions', row.id, 'USER_LOGIN_MFA_FAILED', null, { email });
+        if (isJson) return NextResponse.json({ error: 'Authenticator code required or wrong' }, { status: 401 });
+        return NextResponse.redirect(new URL('/login?error=Authenticator+code+required+or+wrong', req.url), 303);
+      }
       userId = row.id;
       role = row.role;
-      writeAuditLog(db, { id: userId, role }, 'sessions', userId, 'USER_LOGIN', null, { email });
+      writeAuditLog(db, { id: userId, role }, 'sessions', userId, 'USER_LOGIN', null, { email, mfa: row.mfa_enabled === 1 });
     }
 
     const token = createSession(db, userId, '127.0.0.1', req.headers.get('user-agent') || '');

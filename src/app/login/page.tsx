@@ -146,6 +146,10 @@ export default async function LoginPage({
                 <label className="block text-xs font-semibold text-slate-700 mb-1">Password</label>
                 <input name="password" type="password" required defaultValue="Betterway#2026" className="bw-input" />
               </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">Authenticator code <span className="font-normal text-slate-400">(only if MFA is on)</span></label>
+                <input name="otp" inputMode="numeric" autoComplete="one-time-code" maxLength={6} placeholder="123456" className="bw-input font-num" />
+              </div>
               <button type="submit" className="bw-btn-gold w-full">
                 {tr(lang, 'Authenticate & Enter Workspace', 'دخول آمن إلى مساحة العمل')}
               </button>

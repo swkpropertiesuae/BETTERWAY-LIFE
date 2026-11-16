@@ -12,7 +12,7 @@ export default async function InternalOsLayout({ children }: { children: React.R
   return (
     <div className="min-h-screen bw-backdrop p-2 sm:p-4">
       <div className="bw-panel min-h-[calc(100vh-2rem)] flex flex-col">
-      <header className="flex items-center gap-3 px-4 h-16 sticky top-0 z-30 bg-white/60 backdrop-blur border-b border-white/80">
+      <header className="flex flex-wrap items-center gap-2 md:gap-3 px-3 md:px-4 py-2 min-h-16 sticky top-0 z-30 bg-white/60 backdrop-blur border-b border-white/80">
         <img src="/brand/mark.svg" alt="Betterway" className="h-8 w-8 rounded-lg shrink-0 hidden sm:block" />
         <TopNav lang={lang} />
         <div className="ms-auto flex items-center gap-2 shrink-0">

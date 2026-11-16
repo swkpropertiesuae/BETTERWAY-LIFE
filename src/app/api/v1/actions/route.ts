@@ -32,6 +32,10 @@ import {
 import { createPintAeTaxInvoice, postJournalEntry, recordVendorBill } from '@/server/engines/ledger-tax-engine';
 import { importLegacyBackbookCsv } from '@/server/engines/backbook-importer';
 import { runMonthlyWpsPayroll } from '@/server/engines/wps-gratuity-engine';
+import { assertWithinApprovalLimit } from '@/server/engines/approvals';
+import { runBackupAndRestoreTest } from '@/server/ops/backup';
+import { recordPartnerPayout, reversePartnerPayout } from '@/server/engines/payouts';
+import { startMfa, confirmMfa, disableMfa, openIncident, closeIncident, purgeRetention } from '@/server/engines/privacy';
 import { saveQuote, approveQuote } from '@/server/engines/quotes';
 import { reviewBatch } from '@/server/data-hub/import';
 import { generateUatCases } from '@/server/data-hub/uat';
@@ -82,7 +86,7 @@ export async function POST(req: Request) {
     switch (action) {
       case 'create_lead': {
         assertRole(user, ['SUPER_ADMIN', 'SALES_ADVISOR', 'CREDIT_UNDERWRITER', 'PROGRESSION_MANAGER']);
-        intakeExternalLead(db, user, {
+        const made = intakeExternalLead(db, user, {
           contactName: String(body.contactName || ''),
           contactPhone: String(body.contactPhone || ''),
           contactEmail: String(body.contactEmail || ''),
@@ -92,17 +96,19 @@ export async function POST(req: Request) {
           desk: String(body.desk || 'RESIDENT_DESK'),
           initialMessage: body.notes ? String(body.notes) : undefined,
         });
-        return respondOk('Omnichannel lead logged with 5-minute GST SLA timer');
+        return respondOk(made.duplicateOf ? `Already in CRM as lead #${made.duplicateOf}. Your note was added to it, no new lead created.` : 'Omnichannel lead logged with 5-minute GST SLA timer');
       }
 
       case 'update_lead_stage': {
         assertRole(user, STAFF_ROLES);
         const leadId = Number(body.leadId);
         const stage = String(body.stage || 'CONTACTED');
+        const lost = String(body.lostReason || '').trim();
+        if (stage === 'DISQUALIFIED' && !lost) throw new Error('A lost reason is required to disqualify a lead');
         db.prepare(
-          `UPDATE leads SET stage = ?, first_responded_at = COALESCE(first_responded_at, datetime('now')) WHERE id = ?`,
-        ).run(stage, leadId);
-        writeAuditLog(db, user, 'leads', leadId, 'UPDATE_LEAD_STAGE', null, { stage });
+          `UPDATE leads SET stage = ?, lost_reason = CASE WHEN ? != '' THEN ? ELSE lost_reason END, first_responded_at = COALESCE(first_responded_at, datetime('now')) WHERE id = ?`,
+        ).run(stage, lost, lost, leadId);
+        writeAuditLog(db, user, 'leads', leadId, 'UPDATE_LEAD_STAGE', null, { stage, lostReason: lost || null });
         return respondOk(`Lead #${leadId} updated to ${stage}`);
       }
 
@@ -450,6 +456,7 @@ export async function POST(req: Request) {
 
       case 'record_disbursal': {
         assertRole(user, ['SUPER_ADMIN', 'FINANCE_ADMIN']);
+        assertWithinApprovalLimit(db, user, 'DISBURSAL', Math.round(Number(body.disbursedLoanAed || 0) * 100));
         recordDealDisbursal(db, user, {
           dealId: Number(body.dealId),
           disbursedLoanFils: Math.round(Number(body.disbursedLoanAed || 0) * 100),
@@ -461,6 +468,7 @@ export async function POST(req: Request) {
 
       case 'record_bordereau_cash': {
         assertRole(user, ['SUPER_ADMIN', 'FINANCE_ADMIN']);
+        assertWithinApprovalLimit(db, user, 'BORDEREAU', Math.round(Number(body.receivedSubventionExVatAed || 0) * 100));
         const settled = recordBankBordereauReceipt(db, user, {
           dealId: Number(body.dealId),
           receivedSubventionExVatFils: Math.round(Number(body.receivedSubventionExVatAed || 0) * 100),
@@ -811,6 +819,63 @@ export async function POST(req: Request) {
       case 'generate_uat': {
         const n = generateUatCases(db, user);
         return respondOk(`${n} UAT cases generated from playbooks`);
+      }
+
+      case 'record_partner_payout': {
+        recordPartnerPayout(db, user, { settlementId: Number(body.settlementId), amountFils: Math.round(Number(body.amountAed || 0) * 100), paymentRef: String(body.paymentRef || ''), approvalRef: String(body.approvalRef || ''), approvedByUserId: Number(body.approvedBy) });
+        return respondOk('Partner payout recorded with approval evidence');
+      }
+
+      case 'reverse_partner_payout': {
+        reversePartnerPayout(db, user, Number(body.payoutId), String(body.reversalRef || ''));
+        return respondOk('Partner payout reversed');
+      }
+
+      case 'mfa_start': { startMfa(db, user); return respondOk('Add the secret to your authenticator app, then enter a code to switch MFA on'); }
+      case 'mfa_confirm': { confirmMfa(db, user, String(body.code || '')); return respondOk('MFA is on. You will be asked for a code at every sign-in'); }
+      case 'mfa_disable': { disableMfa(db, user, Number(body.userId || user.id), String(body.code || '')); return respondOk('MFA turned off'); }
+      case 'open_incident': {
+        const r = openIncident(db, user, { kind: String(body.kind) === 'DATA_REQUEST' ? 'DATA_REQUEST' : 'INCIDENT', subtype: String(body.subtype || 'OTHER'), severity: (String(body.severity || 'NORMAL') as 'NORMAL'), subject: String(body.subject || ''), description: String(body.description || '') });
+        return respondOk(`${r.ref} opened, due ${r.dueAt}`);
+      }
+      case 'close_incident': { closeIncident(db, user, Number(body.incidentId), String(body.closureRef || '')); return respondOk('Closed with evidence'); }
+      case 'retention_purge': {
+        const ids = String(body.ids || '').split(',').map(Number).filter(Boolean);
+        const r = purgeRetention(db, user, { recordType: String(body.recordType) === 'LEAD' ? 'LEAD' : 'VAULT_DOCUMENT', ids, approvalRef: String(body.approvalRef || '') });
+        return respondOk(`${r.purged} record(s) deleted per retention rules${r.skipped ? `, ${r.skipped} skipped (not due or on hold)` : ''}`);
+      }
+
+      case 'notification_sent':
+      case 'notification_skip': {
+        assertRole(user, STAFF_ROLES);
+        db.prepare("UPDATE notifications SET status = ?, sent_at = CASE WHEN ? = 'SENT' THEN datetime('now') ELSE sent_at END, note = ? WHERE id = ? AND status = 'QUEUED'").run(action === 'notification_sent' ? 'SENT' : 'SKIPPED', action === 'notification_sent' ? 'SENT' : '', `by ${user.full_name_en}`, Number(body.notificationId));
+        return respondOk(action === 'notification_sent' ? 'Marked as sent' : 'Skipped');
+      }
+
+      case 'golive_update': {
+        assertRole(user, ['SUPER_ADMIN']);
+        if (!String(body.evidence || '').trim()) throw new Error('Evidence is required to close an item');
+        db.prepare("UPDATE go_live_items SET status = ?, evidence = ?, updated_at = datetime('now') WHERE id = ?").run(String(body.status) === 'NOT_APPLICABLE' ? 'NOT_APPLICABLE' : 'DONE', String(body.evidence).trim(), Number(body.itemId));
+        writeAuditLog(db, user, 'go_live_items', Number(body.itemId), 'GOLIVE_ITEM_CLOSED', null, { evidence: body.evidence });
+        return respondOk('Checklist item closed');
+      }
+      case 'add_holiday': {
+        assertRole(user, ['SUPER_ADMIN', 'PROGRESSION_MANAGER', 'CREDIT_UNDERWRITER']);
+        const day = String(body.day || '');
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) throw new Error('Pick a date');
+        db.prepare('INSERT OR REPLACE INTO public_holidays (day, name) VALUES (?, ?)').run(day, String(body.name || 'Holiday'));
+        return respondOk('Holiday added');
+      }
+      case 'remove_holiday': {
+        assertRole(user, ['SUPER_ADMIN', 'PROGRESSION_MANAGER', 'CREDIT_UNDERWRITER']);
+        db.prepare('DELETE FROM public_holidays WHERE day = ?').run(String(body.day));
+        return respondOk('Holiday removed');
+      }
+
+      case 'run_dr_test': {
+        const r = runBackupAndRestoreTest(db, user);
+        if (r.status === 'FAIL') throw new Error(`Backup drill FAILED: ${r.problems.join('; ')}`);
+        return respondOk(`Backup and restore drill passed in ${r.seconds}s. Evidence logged (sha256 ${r.sha256.slice(0, 12)}…)`);
       }
 
       default:

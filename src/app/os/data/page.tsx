@@ -4,6 +4,7 @@ import { OsBanner } from '@/components/os-banner';
 import { PageHeader } from '@/components/page-header';
 import { SPECS, specByNo, rolesFor, type SpecType } from '@/server/data-hub/specs';
 import { EXPORTABLE } from '@/server/data-hub/exports';
+import { CONNECTORS, connectorState } from '@/lib/connectors';
 
 type R = Record<string, any>;
 const TYPES: SpecType[] = ['Setup', 'Migration', 'Export', 'Test'];
@@ -22,6 +23,7 @@ export default async function DataHub({ searchParams }: { searchParams: Promise<
   const batches = sel ? (db.prepare('SELECT b.*, u.full_name_en reviewer FROM data_batches b LEFT JOIN users u ON u.id = b.reviewer_id WHERE b.spec_no = ? ORDER BY b.id DESC LIMIT 10').all(sel.no) as R[]) : [];
   const problem = sel ? (db.prepare("SELECT * FROM data_rows WHERE spec_no = ? AND status IN ('HELD_FOR_REVIEW','REJECTED') ORDER BY id DESC LIMIT 25").all(sel.no) as R[]) : [];
   const good = sel ? (db.prepare("SELECT * FROM data_rows WHERE spec_no = ? AND status = 'ACCEPTED' ORDER BY id DESC LIMIT 15").all(sel.no) as R[]) : [];
+  const outbox = db.prepare('SELECT * FROM notifications ORDER BY id DESC LIMIT 8').all() as R[];
   const exportsLog = db.prepare('SELECT * FROM data_exports ORDER BY id DESC LIMIT 8').all() as R[];
   const can = (no: number) => rolesFor(specByNo(no)!).includes(user.role);
 
@@ -72,6 +74,12 @@ export default async function DataHub({ searchParams }: { searchParams: Promise<
               <div className="bw-card p-4 text-xs">
                 <h2 className="font-bold">{sel.file}</h2>
                 <div className="text-slate-500 mt-1 leading-relaxed">{sel.columns.join(' · ')}</div>
+                {sel.no === 35 && can(35) && (
+                  <form method="POST" action="/api/v1/actions" className="mt-3">
+                    <input type="hidden" name="action" value="run_dr_test" /><input type="hidden" name="returnTo" value="/os/data?spec=35" />
+                    <button className="bw-btn-navy">Run backup + restore drill now</button>
+                  </form>
+                )}
                 {sel.no === 34 && can(34) && (
                   <form method="POST" action="/api/v1/actions" className="mt-3">
                     <input type="hidden" name="action" value="generate_uat" /><input type="hidden" name="returnTo" value="/os/data?spec=34" />
@@ -107,6 +115,16 @@ export default async function DataHub({ searchParams }: { searchParams: Promise<
               )}
             </>
           ) : <div className="bw-card p-4 text-xs text-slate-500">Select a file to see its columns, batches and rejected rows.</div>}
+          <div className="bw-card p-4 text-xs"><h2 className="font-bold mb-2">Notification outbox</h2>
+            {outbox.length === 0 && <div className="text-slate-500">Empty. Messages appear when an approved template (Templates_and_Notification_Rules) matches a stage change.</div>}
+            {outbox.map((n) => (
+              <div key={n.id} className="py-1.5 border-b border-slate-100">
+                <b>{n.status}</b> · {n.channel} · {n.recipient || '—'} · {n.trigger}<div className="text-slate-600 truncate">{n.body}</div>
+                {n.status === 'QUEUED' && <form method="POST" action="/api/v1/actions" className="inline-flex gap-1 mt-1"><input type="hidden" name="notificationId" value={n.id} /><input type="hidden" name="returnTo" value="/os/data" /><button name="action" value="notification_sent" className="underline">Mark sent</button><button name="action" value="notification_skip" className="underline">Skip</button></form>}
+              </div>
+            ))}</div>
+          <div className="bw-card p-4 text-xs"><h2 className="font-bold mb-2">Connectors</h2>
+            {CONNECTORS.map((c) => <div key={c.key} className="py-1.5 border-b border-slate-100"><b>{c.name}</b> · {connectorState(c)}<div className="text-slate-500">Manual path: {c.manual}</div><div className="text-slate-400">{c.note}{c.env.length ? ` Env: ${c.env.join(', ')}` : ''}</div></div>)}</div>
           <div className="bw-card p-4 text-xs"><h2 className="font-bold mb-2">Recent exports</h2>
             {exportsLog.length === 0 && <div className="text-slate-500">None yet.</div>}
             {exportsLog.map((e) => <div key={e.id} className="py-1 border-b border-slate-100">spec {e.spec_no} · {e.actor_role} · {e.row_count} rows · “{e.purpose}” <span className="text-slate-400">{e.created_at}</span></div>)}</div>

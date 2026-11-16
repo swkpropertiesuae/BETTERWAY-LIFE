@@ -46,3 +46,17 @@ Catalog: `src/server/data-hub/specs.ts` (exact columns). Screen: `/os/data`.
 - AML scope (DNFBP) depends on actual licensed activities; spec 46-47 are conditional.
 - Commercial/SME and ancillary referrals need service scope sign-off.
 - The business owner must supply the real setup data (bank products, rules, fees, APL). The OS holds uncertain rows until sourced and approved.
+
+## Pending list, status after the last build
+
+| # | Item | Status |
+|---|---|---|
+| 1 | Migration files 17-22 become live records | Done. Cases (with stage, type, outcome, owner), borrowers, property data, tasks, document index, receivables. Files can arrive in any order; rows wait for their case. Borrower names are placeholders ("Legacy party X") because file 17 carries no name. |
+| 2 | Setup files used by the engines | Done for 9 (money limits), 10 (lead routing), 11 (project list + overdue review), 12 (partner share), 14 (notification outbox), 15 (opening balances journal), 36 (non-resident country/FX), 37 (valuation provider alert), 38 (EIBOR). 13 drives retention. 39 (website content) is stored only: no website is connected. |
+| 3 | Reports | Done. All 18 export files in the register are generated. |
+| 4 | Disaster recovery | Backup + restore drill built and run: copy, integrity check, table-by-table compare, vault file check, evidence logged. Run it on the real server and keep the backup copy off the machine. |
+| 5 | Integrations | WhatsApp inbound webhook (signed, idempotent) and manual sanctions-list import are built. The notification outbox is the manual send path. AECB, UAE PASS, e-sign, OCR, Peppol provider and lender APIs need accounts: listed under Connectors with manual fallbacks. Not built. |
+| 6 | Security | TOTP MFA (login + enrolment + admin reset), retention job with MLRO-approved deletion and complaint hold, incident and data-request register. MFA is not forced: the Go-live page shows who still lacks it. |
+| 7 | CRM / finance | Repeat enquiries merge, lost reason required to disqualify, partner payouts with approval ref, different approver, duplicate and overpayment guards, reversal. Calls are logged as CALL_LOG messages. |
+| 8 | Business decisions | Tracked on the Go-live checklist (16 items, evidence required to close). They are Betterway's to make; the OS cannot decide them. |
+| 9 | Small gaps | Public holidays table, backup-bank SLA clock, mobile and RTL checked (no horizontal overflow). New screens are English-only labels for now. |

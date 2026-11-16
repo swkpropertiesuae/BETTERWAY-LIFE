@@ -188,8 +188,30 @@ export default async function DealForm({ params, searchParams }: { params: Promi
       )}
 
       {tab === 'money' && (
-        <div className="bw-card p-4 text-xs">{settle.length === 0 ? <div className="text-slate-500">Nothing booked until disbursal.</div> : settle.map((s) => (
-          <div key={s.id} className="grid grid-cols-2 md:grid-cols-4 gap-2 py-1"><span>Expected {formatAed(s.expected_subvention_ex_vat_fils)}</span><span>Received {formatAed(s.received_subvention_ex_vat_fils)}</span><span>{s.reconciliation_status}</span><span>Partner: {s.partner_payout_status}</span></div>))}</div>
+        <div className="space-y-3">
+          {settle.length === 0 && <div className="bw-card p-4 text-xs text-slate-500">Nothing booked until disbursal.</div>}
+          {settle.map((s) => {
+            const pays = db.prepare('SELECT p.*, u.full_name_en who FROM partner_payouts p LEFT JOIN users u ON u.id = p.approved_by WHERE p.settlement_id = ? ORDER BY p.id').all(s.id) as R[];
+            const paid = pays.filter((p) => !p.reversal_ref).reduce((a, p) => a + p.amount_fils, 0);
+            const due = s.partner_released_ex_vat_fils + s.partner_input_vat_fils - paid;
+            const approvers = db.prepare("SELECT id, full_name_en FROM users WHERE role IN ('SUPER_ADMIN','FINANCE_ADMIN') AND status = 'ACTIVE' AND id != ?").all(user.id) as R[];
+            return (
+              <div key={s.id} className="bw-card p-4 text-xs space-y-2">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2"><span>Expected {formatAed(s.expected_subvention_ex_vat_fils)}</span><span>Received {formatAed(s.received_subvention_ex_vat_fils)}</span><span>{s.reconciliation_status}</span><span>Partner: {s.partner_payout_status}</span></div>
+                {pays.map((p) => <div key={p.id} className="flex flex-wrap justify-between gap-2 border-t border-slate-100 pt-1"><span>{formatAed(p.amount_fils)} · {p.payment_ref} · approved {p.approval_ref} by {p.who}{p.reversal_ref ? ` · REVERSED ${p.reversal_ref}` : ''}</span>
+                  {!p.reversal_ref && <form method="POST" action="/api/v1/actions" className="flex gap-1"><input type="hidden" name="action" value="reverse_partner_payout" /><input type="hidden" name="payoutId" value={p.id} /><input type="hidden" name="returnTo" value={`${back}?tab=money`} /><input name="reversalRef" required placeholder="Reversal ref" className="bw-input !w-32" /><button className="bw-btn-navy">Reverse</button></form>}</div>)}
+                {s.partner_payout_status === 'PAYABLE_READY' && due > 0 && (
+                  <form method="POST" action="/api/v1/actions" className="flex flex-wrap gap-1 border-t border-slate-100 pt-2">
+                    <input type="hidden" name="action" value="record_partner_payout" /><input type="hidden" name="settlementId" value={s.id} /><input type="hidden" name="returnTo" value={`${back}?tab=money`} />
+                    <input name="amountAed" required defaultValue={(due / 100).toFixed(2)} className="bw-input !w-28" /><input name="paymentRef" required placeholder="Payment ref" className="bw-input !w-36" /><input name="approvalRef" required placeholder="Approval ref" className="bw-input !w-36" />
+                    <select name="approvedBy" required className="bw-input !w-40"><option value="">Approved by…</option>{approvers.map((a) => <option key={a.id} value={a.id}>{a.full_name_en}</option>)}</select>
+                    <button className="bw-btn-gold">Record payout (AED {(due / 100).toFixed(2)} due)</button>
+                  </form>
+                )}
+              </div>
+            );
+          })}
+        </div>
       )}
 
       {tab === 'activity' && (

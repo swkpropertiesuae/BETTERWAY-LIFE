@@ -19,6 +19,7 @@ export function loadImportedRules(db: DatabaseSync, asOf?: string) {
   const products = activeRows(db, 3, asOf);
   const elig = activeRows(db, 4, asOf);
   const pol = activeRows(db, 5, asOf);
+  const nonRes = activeRows(db, 36, asOf);
   const any = master.length + products.length + elig.length + pol.length > 0;
 
   return {
@@ -48,6 +49,20 @@ export function loadImportedRules(db: DatabaseSync, asOf?: string) {
         if (r.income_factor) out.incomeFactor = Math.min(out.incomeFactor ?? 1, Number(r.income_factor)); // never above 1
       }
       return out;
+    },
+    matchesBank: (b: BankRef, v: unknown) => isBank(b, v),
+    matchesProject(db2: DatabaseSync, projectId: unknown, v: string) {
+      const p = db2.prepare('SELECT id, slug, name FROM projects WHERE id = ?').get(Number(projectId)) as { id: number; slug: string; name: string } | undefined;
+      return !!p && [String(p.id), p.slug, p.name].map(norm).includes(norm(v));
+    },
+    /** NonResident_Countries_Documents_and_FX (spec 36). null = no imported rules for this bank (built-in non-resident policy applies). */
+    nonResident(b: BankRef, country: string, currency: string): { allowed: boolean; haircutBps: number } | null {
+      const rows = nonRes.filter((r) => isBank(b, r.bank_id));
+      if (!rows.length) return null;
+      const m = rows.filter((r) => norm(r.country_code) === norm(country) || ALL.has(norm(r.country_code)));
+      if (!m.length) return { allowed: false, haircutBps: 0 };
+      const cur = m.filter((r) => !r.accepted_income_currency || norm(r.accepted_income_currency) === norm(currency));
+      return cur.length ? { allowed: true, haircutBps: Math.max(...cur.map((r) => (r.fx_haircut_pct ? pctToBps(r.fx_haircut_pct) : 0))) } : { allowed: false, haircutBps: 0 };
     },
     policies(b: BankRef) {
       return pol.filter((p) => isBank(b, p.bank_id));

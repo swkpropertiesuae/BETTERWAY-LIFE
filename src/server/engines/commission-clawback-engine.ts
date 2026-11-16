@@ -1,3 +1,4 @@
+import { activeRows } from '@/server/data-hub/import';
 import type { DatabaseSync } from 'node:sqlite';
 import { writeAuditLog, type UserRecord } from '@/server/auth';
 import { createPintAeTaxInvoice, postJournalEntry } from './ledger-tax-engine';
@@ -142,6 +143,10 @@ export function recordDealDisbursal(
     if (partnerRow) {
       partnerAgencyId = partnerRow.agency_id;
       partnerSplitBps = partnerRow.split_override_bps ?? partnerRow.default_split_bps;
+      // Partner_Master_and_Commission_Rules (spec 12): an approved agreement row sets the subvention share
+      const orn = String((db.prepare('SELECT rera_orn FROM partner_agencies WHERE id = ?').get(partnerRow.agency_id) as { rera_orn: string }).rera_orn).toLowerCase();
+      const agree = activeRows(db, 12).find((r) => [String(partnerRow.agency_id), orn].includes(r.partner_id.toLowerCase()) && r.share_pct && /subvention|bank/i.test(r.commission_basis || 'subvention'));
+      if (agree) partnerSplitBps = Math.round(Number(agree.share_pct) * 100);
       partnerEntitledExVatFils = Math.round((expectedSubventionExVatFils * partnerSplitBps) / 10_000);
       partnerPayoutStatus = 'AWAITING_BANK_CASH';
     }

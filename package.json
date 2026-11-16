@@ -7,7 +7,7 @@
     "dev": "next dev -p 3001",
     "build": "next build",
     "start": "next start -p 3001",
-    "test": "node --experimental-strip-types --import ./scripts/alias.mjs --test src/server/**/*.test.ts",
+    "test": "node --experimental-strip-types --import ./scripts/alias.mjs --test \"src/server/**/*.test.ts\"",
     "lint": "next lint"
   },
   "dependencies": {

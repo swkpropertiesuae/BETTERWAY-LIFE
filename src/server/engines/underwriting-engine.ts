@@ -1,3 +1,4 @@
+import { activeRows } from '@/server/data-hub/import';
 import { loadImportedRules, segmentsFor } from './imported-rules';
 import type { DatabaseSync } from 'node:sqlite';
 import { ForbiddenError, writeAuditLog, type UserRecord } from '@/server/auth';
@@ -168,6 +169,15 @@ export function evaluateDealAcross24Banks(db: DatabaseSync, dealId: number) {
       continue;
     }
 
+    // Imported non-resident country / income-currency rules (tighten only: a bank with rules accepts only what they list)
+    let nrReason: string | null = null;
+    for (const app of applicants) {
+      if (app.residency_type !== 'NON_RESIDENT') continue;
+      const r = imported.nonResident(bankRef, String(app.residence_country), String(app.currency_code || 'AED'));
+      if (r && !r.allowed) nrReason = `${bankName} has no verified rule for ${app.residence_country} residents earning in ${app.currency_code || 'AED'}`;
+    }
+    if (nrReason) { knockouts.push({ bankId, bankKey, bankName, reason: nrReason }); continue; }
+
     // Age-at-maturity check (CBUAE / bank policy: 65 salaried, 70 self-employed)
     const nowYear = new Date().getUTCFullYear();
     const tenureYears = tenureMonths / 12;
@@ -196,6 +206,11 @@ export function evaluateDealAcross24Banks(db: DatabaseSync, dealId: number) {
       if (apl) {
         if (apl.apl_status === 'BLOCKED') {
           knockouts.push({ bankId, bankKey, bankName, reason: `Selected tower is BLOCKED on ${bankName}'s Approved Project List (APL)` });
+          continue;
+        }
+        const review = activeRows(db, 11).find((r) => imported.matchesBank(bankRef, r.bank_id) && imported.matchesProject(db, deal.project_id, r.project_id) && r.next_review_at);
+        if (review && review.next_review_at < new Date().toISOString().slice(0, 10)) {
+          knockouts.push({ bankId, bankKey, bankName, reason: `${bankName} eligibility for this project was due for review on ${review.next_review_at}: manual review required` });
           continue;
         }
         aplMaxLtvBps = Number(apl.max_ltv_bps);
@@ -252,7 +267,9 @@ export function evaluateDealAcross24Banks(db: DatabaseSync, dealId: number) {
       continue;
     }
     for (const app of applicants) {
-      const fxMult = (Number(app.fx_rate_to_aed_bps || 10_000) / 10_000) * ((10_000 - Number(app.fx_haircut_bps || 0)) / 10_000);
+      const nr = app.residency_type === 'NON_RESIDENT' ? imported.nonResident(bankRef, String(app.residence_country), String(app.currency_code || 'AED')) : null;
+      const haircutBps = Math.max(Number(app.fx_haircut_bps || 0), nr?.haircutBps ?? 0);
+      const fxMult = (Number(app.fx_rate_to_aed_bps || 10_000) / 10_000) * ((10_000 - haircutBps) / 10_000);
       if (app.employment_type === 'SELF_EMPLOYED') {
         const avgAnnualProfit = (Number(app.net_profit_yr1_fils) + Number(app.net_profit_yr2_fils)) / 2;
         const ownerMonthly = (avgAnnualProfit / 12) * (Number(app.ownership_bps || 10_000) / 10_000);

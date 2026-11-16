@@ -70,7 +70,7 @@ test('every export builder returns rows that match the PDF columns; restricted e
   }
   assert.throws(() => buildExport(db, admin, 31, ' '), /purpose/);
   assert.throws(() => buildExport(db, u(db, 'tariq.advisor@betterwaymortgages.com'), 31, 'x'), /not permitted/);
-  assert.throws(() => buildExport(db, admin, 45, 'x'), /not generated/);
+  assert.equal(EXPORTABLE.length, SPECS.filter((x) => x.type === 'Export').length); // every export file in the register is generated
   assert.ok((db.prepare('SELECT COUNT(*) c FROM data_exports').get() as { c: number }).c >= EXPORTABLE.length);
   assert.ok(buildExport(db, admin, 33, 'audit').rows.some((r) => r[3] === 'DATA_EXPORT'));
 });

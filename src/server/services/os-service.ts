@@ -1,3 +1,4 @@
+import { activeRows } from '@/server/data-hub/import';
 import { openStageTask } from '@/server/engines/workflow-engine';
 import { randomBytes, randomUUID } from 'node:crypto';
 import path from 'node:path';
@@ -317,6 +318,19 @@ export function registerPortalBorrower(
   }
 }
 
+/** Lead_Sources_and_Consent (spec 10) routing_rule: ROUND_ROBIN, or a user id / email. */
+export function routeLead(db: DatabaseSync, channel: string): number | null {
+  const row = activeRows(db, 10).find((r) => r.channel.toUpperCase().replace(/[\s-]+/g, '_') === channel);
+  if (!row?.routing_rule) return null;
+  if (/round.?robin/i.test(row.routing_rule)) {
+    const a = db.prepare(`SELECT u.id FROM users u WHERE u.role = 'SALES_ADVISOR' AND u.status = 'ACTIVE'
+      ORDER BY (SELECT COUNT(*) FROM leads l WHERE l.assigned_advisor_id = u.id AND l.stage IN ('NEW','CONTACTED')) ASC, u.id ASC LIMIT 1`).get() as { id: number } | undefined;
+    return a?.id ?? null;
+  }
+  const u = db.prepare("SELECT id FROM users WHERE status = 'ACTIVE' AND (CAST(id AS TEXT) = ? OR lower(email) = lower(?))").get(row.routing_rule, row.routing_rule) as { id: number } | undefined;
+  return u?.id ?? null;
+}
+
 export function intakeExternalLead(
   db: DatabaseSync,
   actor: UserRecord | null,
@@ -342,11 +356,23 @@ export function intakeExternalLead(
     initialMessage?: string;
   },
 ) {
+  // One active lead history per inquiry: a repeat enquiry (same phone or email) is added to the existing lead.
+  const digits = input.contactPhone.replace(/\D/g, '').slice(-9);
+  const email = (input.contactEmail ?? '').trim().toLowerCase();
+  const dup = db.prepare("SELECT id, contact_phone, contact_email FROM leads WHERE stage NOT IN ('DISQUALIFIED')").all() as { id: number; contact_phone: string; contact_email: string }[];
+  const existing = dup.find((l) => (digits.length >= 7 && l.contact_phone.replace(/\D/g, '').slice(-9) === digits) || (email && l.contact_email.toLowerCase() === email));
+  if (existing) {
+    db.prepare("INSERT INTO comm_messages (lead_id, channel, direction, sender_name, body, internal_only) VALUES (?, 'INTERNAL_NOTE', 'INTERNAL', ?, ?, 1)")
+      .run(existing.id, input.contactName.trim(), `Repeat enquiry via ${input.sourceChannel ?? 'WEBSITE_CALC'}${input.initialMessage ? `: ${input.initialMessage.trim()}` : ''}`);
+    writeAuditLog(db, actor, 'leads', existing.id, 'LEAD_REPEAT_ENQUIRY', null, { channel: input.sourceChannel });
+    return { leadId: existing.id, duplicateOf: existing.id };
+  }
+
   const defaultAdvisor = db
     .prepare("SELECT id FROM users WHERE role = 'SALES_ADVISOR' AND status = 'ACTIVE' ORDER BY id ASC LIMIT 1")
     .get() as { id: number } | undefined;
 
-  const assignedAdvisorId = actor?.role === 'SALES_ADVISOR' ? actor.id : defaultAdvisor?.id ?? null;
+  const assignedAdvisorId = actor?.role === 'SALES_ADVISOR' ? actor.id : routeLead(db, input.sourceChannel ?? 'WEBSITE_CALC') ?? defaultAdvisor?.id ?? null;
   const dueAt = new Date(Date.now() + 5 * 60_000).toISOString();
   const txType = input.transactionType ?? 'READY_PURCHASE';
   const desk = input.desk || (txType === 'COMMERCIAL' ? 'COMMERCIAL_DESK' : 'RESIDENT_DESK');
@@ -382,7 +408,7 @@ export function intakeExternalLead(
   }
 
   writeAuditLog(db, actor, 'leads', leadId, 'LEAD_INTAKE', null, { channel, contactName: input.contactName });
-  return { leadId };
+  return { leadId, duplicateOf: null as number | null };
 }
 
 export function convertLeadToDeal(

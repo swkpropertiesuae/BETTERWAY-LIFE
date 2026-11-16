@@ -4,17 +4,19 @@ import { activeRows } from '@/server/data-hub/import';
 import { isBank, type BankRef } from './imported-rules';
 
 const iso = (d: Date) => d.toISOString().slice(0, 10);
-const isWorkday = (d: Date) => ![0, 6].includes(d.getUTCDay());
+/** Weekend is Saturday and Sunday; public holidays come from the public_holidays table (maintained by staff, dates move with moon sighting). */
+const isWorkday = (d: Date, off: ReadonlySet<string>) => ![0, 6].includes(d.getUTCDay()) && !off.has(iso(d));
+export const holidaySet = (db: DatabaseSync): Set<string> => new Set((db.prepare('SELECT day FROM public_holidays').all() as { day: string }[]).map((r) => r.day));
 
-export function addBusinessDays(from: string, n: number): string {
+export function addBusinessDays(from: string, n: number, off: ReadonlySet<string> = new Set()): string {
   const d = new Date(`${from.slice(0, 10)}T00:00:00Z`);
-  for (let left = n; left > 0; ) { d.setUTCDate(d.getUTCDate() + 1); if (isWorkday(d)) left--; }
+  for (let left = n; left > 0; ) { d.setUTCDate(d.getUTCDate() + 1); if (isWorkday(d, off)) left--; }
   return iso(d);
 }
-export function businessDaysBetween(from: string, to: string): number {
+export function businessDaysBetween(from: string, to: string, off: ReadonlySet<string> = new Set()): number {
   const d = new Date(`${from.slice(0, 10)}T00:00:00Z`), end = new Date(`${to.slice(0, 10)}T00:00:00Z`);
   let n = 0;
-  while (d < end) { d.setUTCDate(d.getUTCDate() + 1); if (isWorkday(d)) n++; }
+  while (d < end) { d.setUTCDate(d.getUTCDate() + 1); if (isWorkday(d, off)) n++; }
   return n;
 }
 

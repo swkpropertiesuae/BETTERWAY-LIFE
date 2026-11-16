@@ -4,6 +4,8 @@ import { assertRole, writeAuditLog, type UserRecord } from '@/server/auth';
 import { specByNo, rolesFor, type Spec } from './specs';
 import { tableToCsv, type Cell } from './xlsx';
 import { fileToTable } from './files';
+import { applyPending } from './apply';
+import { applySetup } from './apply-setup';
 
 // Natural key (defaults to first column).
 const KEYS: Record<number, string[]> = {
@@ -15,6 +17,8 @@ const KEYS: Record<number, string[]> = {
   37: ['provider_id', 'service_type'], 38: ['rate_code', 'tenor_or_currency_pair', 'observation_date'], 39: ['page_id', 'locale'],
   48: ['product_id', 'bank_id', 'collateral_type'], 49: ['provider_id', 'service_type'],
 };
+// key parts that may be blank (a blank stage_code means "any stage", opening balances need no case) as long as the key is not entirely empty
+const OPTIONAL_KEY: Record<number, string[]> = { 2: ['stage_code'], 8: ['stage_code', 'next_stage', 'reason_code'], 15: ['case_id'], 21: ['vault_ref'] };
 const REQUIRED: Record<number, string[]> = { 16: ['contact_name', 'phone'] };
 const keyCols = (s: Spec) => KEYS[s.no] ?? [s.columns[0]];
 
@@ -61,7 +65,8 @@ export function validateRows(spec: Spec, table: Cell[][]): { rows: RowResult[]; 
       if (v && c === 'email' && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)) errors.push('email: invalid');
       data[c] = v;
     }
-    for (const k of [...keys, ...(REQUIRED[spec.no] ?? [])]) if (!data[k]) errors.push(`${k}: required`);
+    for (const k of [...keys.filter((k) => !(OPTIONAL_KEY[spec.no] ?? []).includes(k)), ...(REQUIRED[spec.no] ?? [])]) if (!data[k]) errors.push(`${k}: required`);
+    if (keys.every((k) => !data[k])) errors.push('key columns are all empty');
     const key = keys.map((k) => data[k]).join('|');
     const from = data.effective_from || data.active_from || null;
     const to = data.effective_to || data.active_to || null;
@@ -116,6 +121,8 @@ export async function importFile(
       if (status === 'ACCEPTED') acc++; else if (status === 'HELD_FOR_REVIEW') held++; else rej++;
     }
     const applied = spec.no === 16 ? applyLeads(db, batchId) : { created: 0, duplicates: 0, noConsent: 0 };
+    if (spec.type === 'Migration' && spec.no >= 17 && spec.no <= 22) { const c = applyPending(db); applied.created = c[spec.no]; }
+    if (spec.type === 'Setup') applied.created = applySetup(db, actor, spec.no, batchId);
     db.prepare('UPDATE data_batches SET accepted_rows = ?, held_rows = ?, rejected_rows = ?, applied_rows = ? WHERE id = ?').run(acc, held, rej, applied.created, batchId);
     writeAuditLog(db, actor, 'data_batches', batchId, 'DATA_IMPORT', null, { spec: spec.no, file: input.fileName, source: rows.length, accepted: acc, held, rejected: rej, applied });
     db.exec('COMMIT');

@@ -135,6 +135,7 @@ export default async function CrmPage({
                             <option value="NURTURE">NURTURE</option>
                             <option value="DISQUALIFIED">DISQUALIFIED</option>
                           </select>
+                          <input name="lostReason" defaultValue={String(l.lost_reason ?? '')} placeholder="Lost reason (needed to disqualify)" className="rounded border border-slate-300 px-1.5 py-1 text-[11px] w-44" />
                           <button type="submit" className="rounded bg-slate-800 text-white px-2 py-1 text-[10px] cursor-pointer">
                             Save
                           </button>

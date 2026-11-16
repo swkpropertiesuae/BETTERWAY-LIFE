@@ -106,7 +106,8 @@ export function runApplicantAmlScreening(
   if (!applicant) throw new Error('Applicant not found');
 
   const upperName = String(applicant.full_name_en).toUpperCase();
-  const isSanctionsHit = SANCTIONS_WATCHLIST.some((w) => upperName.includes(w));
+  const imported = db.prepare('SELECT name_upper FROM sanctions_list_entries').all() as { name_upper: string }[];
+  const isSanctionsHit = SANCTIONS_WATCHLIST.some((w) => upperName.includes(w)) || imported.some((w) => upperName.replace(/\s+/g, ' ').includes(w.name_upper));
   const isHighRiskCountry =
     HIGH_RISK_COUNTRIES.has(String(applicant.nationality_code)) || HIGH_RISK_COUNTRIES.has(String(applicant.residence_country));
   const isPep = Number(applicant.is_pep) === 1;

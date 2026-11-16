@@ -198,6 +198,16 @@ export default async function ComplianceAndMlroPage({
         )}
       </div>
 
+      {user.role === 'COMPLIANCE_MLRO' && (
+        <form method="POST" action="/api/v1/compliance/sanctions-import" encType="multipart/form-data" className="bw-card p-4 flex flex-wrap items-end gap-2 text-xs">
+          <div className="font-bold text-sm w-full">Update sanctions / watchlist</div>
+          <input name="listName" placeholder="List name (e.g. UN 1267, Local list)" className="bw-input !w-64" />
+          <input type="file" name="file" required accept=".csv,.xlsx,.tsv,.txt,.json" className="text-[11px]" />
+          <button className="bw-btn-navy">Import names</button>
+          <span className="text-slate-500">Needs a column called name. Screening uses it together with the built-in list.</span>
+        </form>
+      )}
+
       {/* Sanadak Ombudsman SLA Register + Append-Only Audit Logs */}
       <div className="grid lg:grid-cols-12 gap-6 text-xs">
         <div className="lg:col-span-5 bw-card p-5 space-y-3">

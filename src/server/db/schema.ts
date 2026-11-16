@@ -33,6 +33,8 @@ CREATE TABLE IF NOT EXISTS users (
   can_approve_rates INTEGER NOT NULL DEFAULT 0 CHECK (can_approve_rates IN (0,1)),
   preferred_lang TEXT NOT NULL DEFAULT 'en' CHECK (preferred_lang IN ('en','ar')),
   status TEXT NOT NULL DEFAULT 'ACTIVE' CHECK (status IN ('ACTIVE','SUSPENDED')),
+  totp_secret TEXT NOT NULL DEFAULT '',
+  mfa_enabled INTEGER NOT NULL DEFAULT 0,
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
@@ -183,6 +185,7 @@ CREATE TABLE IF NOT EXISTS leads (
   first_response_due_at TEXT NOT NULL,
   first_responded_at TEXT,
   client_consent_logged_at TEXT,
+  lost_reason TEXT NOT NULL DEFAULT '',
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
@@ -783,7 +786,8 @@ CREATE TABLE IF NOT EXISTS data_rows (
   status TEXT NOT NULL CHECK (status IN ('ACCEPTED','HELD_FOR_REVIEW','REJECTED','SUPERSEDED')),
   errors_json TEXT NOT NULL DEFAULT '[]',
   effective_from TEXT,
-  effective_to TEXT
+  effective_to TEXT,
+  applied INTEGER NOT NULL DEFAULT 0
 );
 CREATE INDEX IF NOT EXISTS idx_data_rows_spec ON data_rows(spec_no, status);
 
@@ -814,5 +818,112 @@ CREATE TABLE IF NOT EXISTS deal_quotes (
   created_by INTEGER REFERENCES users(id),
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
   UNIQUE (deal_id, version)
+);
+
+CREATE TABLE IF NOT EXISTS legacy_links (
+  entity_type TEXT NOT NULL,
+  legacy_id TEXT NOT NULL,
+  entity_id INTEGER NOT NULL,
+  PRIMARY KEY (entity_type, legacy_id)
+);
+
+CREATE TABLE IF NOT EXISTS document_index (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  deal_id INTEGER NOT NULL REFERENCES deals(id) ON DELETE CASCADE,
+  applicant_id INTEGER REFERENCES applicants(id) ON DELETE SET NULL,
+  document_type TEXT NOT NULL,
+  vault_ref TEXT NOT NULL DEFAULT '',
+  received_at TEXT,
+  expiry_at TEXT,
+  verification_status TEXT NOT NULL DEFAULT '',
+  access_class TEXT NOT NULL DEFAULT ''
+);
+
+CREATE TABLE IF NOT EXISTS legacy_receivables (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  deal_id INTEGER NOT NULL REFERENCES deals(id) ON DELETE CASCADE,
+  counterparty_id TEXT NOT NULL DEFAULT '',
+  invoice_ref TEXT NOT NULL UNIQUE,
+  accrued_fils INTEGER NOT NULL DEFAULT 0,
+  paid_fils INTEGER NOT NULL DEFAULT 0,
+  outstanding_fils INTEGER NOT NULL DEFAULT 0,
+  due_date TEXT,
+  reconciliation_status TEXT NOT NULL DEFAULT ''
+);
+
+CREATE TABLE IF NOT EXISTS notifications (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  deal_id INTEGER REFERENCES deals(id) ON DELETE SET NULL,
+  template_id TEXT NOT NULL,
+  channel TEXT NOT NULL,
+  locale TEXT NOT NULL DEFAULT 'en',
+  recipient TEXT NOT NULL DEFAULT '',
+  trigger TEXT NOT NULL,
+  body TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'QUEUED' CHECK (status IN ('QUEUED','SENT','SKIPPED','FAILED')),
+  note TEXT NOT NULL DEFAULT '',
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  sent_at TEXT
+);
+
+CREATE TABLE IF NOT EXISTS sanctions_list_entries (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  list_name TEXT NOT NULL,
+  name_upper TEXT NOT NULL,
+  source_ref TEXT NOT NULL DEFAULT '',
+  imported_at TEXT NOT NULL DEFAULT (datetime('now')),
+  UNIQUE (list_name, name_upper)
+);
+
+CREATE TABLE IF NOT EXISTS retention_log (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  record_type TEXT NOT NULL,
+  entity_id TEXT NOT NULL,
+  action TEXT NOT NULL,
+  approved_by INTEGER REFERENCES users(id),
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS incidents (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  ref TEXT NOT NULL UNIQUE,
+  kind TEXT NOT NULL CHECK (kind IN ('INCIDENT','DATA_REQUEST')),
+  subtype TEXT NOT NULL,
+  severity TEXT NOT NULL DEFAULT 'NORMAL' CHECK (severity IN ('LOW','NORMAL','HIGH','CRITICAL')),
+  subject TEXT NOT NULL DEFAULT '',
+  description TEXT NOT NULL,
+  owner_role TEXT NOT NULL DEFAULT 'COMPLIANCE_MLRO',
+  status TEXT NOT NULL DEFAULT 'OPEN' CHECK (status IN ('OPEN','IN_PROGRESS','CLOSED')),
+  opened_at TEXT NOT NULL DEFAULT (datetime('now')),
+  due_at TEXT NOT NULL,
+  closed_at TEXT,
+  closure_ref TEXT NOT NULL DEFAULT ''
+);
+
+CREATE TABLE IF NOT EXISTS partner_payouts (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  settlement_id INTEGER NOT NULL REFERENCES commission_settlements(id),
+  amount_fils INTEGER NOT NULL CHECK (amount_fils > 0),
+  payment_ref TEXT NOT NULL UNIQUE,
+  approval_ref TEXT NOT NULL,
+  approved_by INTEGER REFERENCES users(id),
+  paid_by INTEGER REFERENCES users(id),
+  paid_at TEXT NOT NULL DEFAULT (datetime('now')),
+  reversal_ref TEXT NOT NULL DEFAULT ''
+);
+
+CREATE TABLE IF NOT EXISTS public_holidays (
+  day TEXT PRIMARY KEY,
+  name TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS go_live_items (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  area TEXT NOT NULL,
+  item TEXT NOT NULL UNIQUE,
+  owner TEXT NOT NULL DEFAULT '',
+  status TEXT NOT NULL DEFAULT 'OPEN' CHECK (status IN ('OPEN','DONE','NOT_APPLICABLE')),
+  evidence TEXT NOT NULL DEFAULT '',
+  updated_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 `;

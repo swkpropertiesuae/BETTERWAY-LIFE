@@ -7,7 +7,8 @@ import { evaluateDealAcross24Banks } from './underwriting-engine';
 import { PLAYBOOKS, type Playbook } from './scenarios';
 import { activeRows } from '@/server/data-hub/import';
 import { approvedQuote } from './quotes';
-import { addBusinessDays, bankSla, businessDaysBetween } from './bank-sla';
+import { queueNotifications } from './notifications';
+import { addBusinessDays, bankSla, businessDaysBetween, holidaySet } from './bank-sla';
 
 export const STAGES = [
   'FACT_FIND', 'KFS_PENDING', 'DOC_COLLECTION', 'UNDERWRITING_READY',
@@ -155,8 +156,11 @@ function missingDocs(db: DatabaseSync, dealId: number, needs: DocNeed[]): string
   const docs = db
     .prepare("SELECT doc_category, applicant_id FROM vault_documents WHERE deal_id = ? AND ocr_validation_status != 'REJECTED'")
     .all(dealId) as Row[];
+  // migrated documents (Document_Index_Import) count as present unless rejected
+  const indexed = db.prepare("SELECT document_type, applicant_id FROM document_index WHERE deal_id = ? AND upper(verification_status) NOT LIKE 'REJECT%'").all(dealId) as Row[];
   return needs
     .filter((n) => !docs.some((d) => d.doc_category === n.category && (n.applicantId === null || d.applicant_id === n.applicantId || d.applicant_id === null)))
+    .filter((n) => !indexed.some((d) => d.document_type === n.category && (n.applicantId === null || d.applicant_id === n.applicantId || d.applicant_id === null)))
     .map((n) => n.label);
 }
 
@@ -286,6 +290,11 @@ export function getDealWorkflow(db: DatabaseSync, dealId: number, asOf = new Dat
   if (!closed && conv && conv.valuation_amount_fils > 0 && conv.valuation_amount_fils < deal.purchase_price_fils)
     alerts.push({ level: conv.valuation_shortfall_action === 'NONE' ? 'CRITICAL' : 'INFO', code: 'DOWN_VALUATION', playbook: 'P43',
       text: conv.valuation_shortfall_action === 'NONE' ? 'Valuation is below price. Choose an action.' : `Valuation below price. Action: ${conv.valuation_shortfall_action}.` });
+  if (!closed && conv?.valuation_firm) {
+    const prov = activeRows(db, 37).filter((r) => /valuation/i.test(r.service_type) && /^(approved|active|yes)$/i.test(r.approved_status));
+    if (prov.length && !prov.some((r) => r.provider_id.toLowerCase() === String(conv.valuation_firm).toLowerCase()))
+      alerts.push({ level: 'WARN', code: 'VALUATION_PROVIDER_UNAPPROVED', text: `${conv.valuation_firm} is not on the approved valuation provider list (Valuation_Insurance_and_Service_Providers).` });
+  }
   if (!closed && conv?.liability_letter_expires_at && conv.liability_letter_expires_at < asOf && curIdx < path.indexOf('TRANSFERRED_DISBURSED'))
     alerts.push({ level: 'WARN', code: 'LIABILITY_LETTER_EXPIRED', playbook: 'P33', text: 'Seller liability letter has expired.' });
   if (!closed && tags.includes('COMPLIANCE_HOLD'))
@@ -297,10 +306,19 @@ export function getDealWorkflow(db: DatabaseSync, dealId: number, asOf = new Dat
     if (sla?.days) {
       const e = db.prepare("SELECT created_at FROM audit_logs WHERE entity_type = 'deals' AND entity_id = ? AND (action LIKE 'WORKFLOW%' OR action = 'SUBMIT_DUAL_BANK_IPA' OR action LIKE 'BANK_%') ORDER BY id DESC LIMIT 1").get(String(dealId)) as Row | undefined;
       const entered = String(e?.created_at ?? deal.created_at).slice(0, 10);
-      const dueBy = addBusinessDays(entered, sla.days);
+      const dueBy = addBusinessDays(entered, sla.days, holidaySet(db));
       bankClock = { bank: sla.bankName, days: sla.days, dueBy, contacts: sla.contacts };
       if (dueBy < asOf)
-        alerts.push({ level: 'WARN', code: 'BANK_SLA_BREACH', text: `${sla.bankName} is ${businessDaysBetween(dueBy, asOf)} business day(s) past its ${sla.days}-day SLA for this stage (due ${dueBy}). Chase via ${sla.contacts[0]?.channel || 'bank desk'}.` });
+        alerts.push({ level: 'WARN', code: 'BANK_SLA_BREACH', text: `${sla.bankName} is ${businessDaysBetween(dueBy, asOf, holidaySet(db))} business day(s) past its ${sla.days}-day SLA for this stage (due ${dueBy}). Chase via ${sla.contacts[0]?.channel || 'bank desk'}.` });
+    }
+  }
+  // Backup-bank submissions run their own clock from the day they were submitted
+  if (!closed && stage === 'IPA_SUBMITTED') {
+    for (const sub of subs.filter((x) => x.priority === 'BACKUP' && ['SUBMITTED', 'QUERY_RAISED'].includes(x.status))) {
+      const sla = bankSla(db, Number(sub.bank_id), 'IPA_SUBMITTED', asOf);
+      if (!sla?.days) continue;
+      const dueBy = addBusinessDays(String(sub.created_at), sla.days, holidaySet(db));
+      if (dueBy < asOf) alerts.push({ level: 'WARN', code: 'BANK_SLA_BREACH', text: `Backup bank ${sla.bankName} is past its ${sla.days}-day IPA SLA (due ${dueBy}). Chase via ${sla.contacts[0]?.channel || 'bank desk'}.` });
     }
   }
   if (tags.includes('APL_RESTRICTED')) alerts.push({ level: 'WARN', code: 'APL_RESTRICTED', playbook: 'P32', text: 'Project is restricted on the selected bank.' });
@@ -373,7 +391,7 @@ export function openStageTask(db: DatabaseSync, dealId: number, to: Stage) {
   const rule = stageRule(db, to);
   const deal = db.prepare('SELECT selected_bank_id FROM deals WHERE id = ?').get(dealId) as { selected_bank_id: number | null };
   const sla = deal.selected_bank_id ? bankSla(db, deal.selected_bank_id, to) : null;
-  const bankDue = sla?.days ? addBusinessDays(new Date().toISOString(), sla.days) : null;
+  const bankDue = sla?.days ? addBusinessDays(new Date().toISOString(), sla.days, holidaySet(db)) : null;
   const title = bankDue ? `${WF}${m.label}: chase ${sla!.bankName} via ${sla!.contacts[0]?.channel || 'bank desk'} (SLA ${sla!.days} business days)` : `${WF}${m.label}: ${m.action}`;
   const due = bankDue ? `${bankDue}T14:00:00.000Z` : new Date(Date.now() + rule.slaHours * 3_600_000).toISOString();
   db.prepare('INSERT INTO ops_tasks (deal_id, assigned_role, priority, title, due_at) VALUES (?, ?, ?, ?, ?)').run(
@@ -386,6 +404,7 @@ function setStage(db: DatabaseSync, actor: UserRecord, dealId: number, to: AnySt
   db.prepare("UPDATE ops_tasks SET status = 'COMPLETED' WHERE deal_id = ? AND status = 'OPEN' AND title LIKE ?").run(dealId, `${WF}%`);
   if (to !== 'TRANSFERRED_DISBURSED' && to !== 'DECLINED' && to !== 'WITHDRAWN') openStageTask(db, dealId, to as Stage);
   writeAuditLog(db, actor, 'deals', dealId, action, { stage: before.stage }, { stage: to, ...(meta as object) });
+  queueNotifications(db, `STAGE_${to}`, dealId);
 }
 
 export function advanceDeal(db: DatabaseSync, actor: UserRecord, dealId: number) {
