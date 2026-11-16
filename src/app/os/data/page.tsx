@@ -57,7 +57,7 @@ export default async function DataHub({ searchParams }: { searchParams: Promise<
                 ) : can(s.no) ? (
                   <form action="/api/v1/data/import" method="POST" encType="multipart/form-data" className="flex gap-1 items-center">
                     <input type="hidden" name="spec" value={s.no} />
-                    <input type="file" name="file" accept=".xlsx,.csv" required className="text-[11px] w-44" />
+                    <input type="file" name="file" accept=".xlsx,.xlsm,.csv,.tsv,.txt,.json" required className="text-[11px] w-44" />
                     <button className="bw-btn-gold">Import</button>
                   </form>
                 ) : <span className="text-slate-400">No access</span>}
@@ -85,6 +85,7 @@ export default async function DataHub({ searchParams }: { searchParams: Promise<
                   {batches.map((b) => (
                     <div key={b.id} className="border-b border-slate-100 pb-2">
                       <div className="flex justify-between"><b>#{b.id} {b.file_name}</b><span className="text-slate-400">{b.created_at}</span></div>
+                      <div><a className="underline" href={`/api/v1/data/batch/${b.id}`}>Stored CSV ↓</a>{b.applied_rows > 0 && <span className="text-emerald-700"> · {b.applied_rows} records created in the OS</span>}</div>
                       <div>{b.source_rows} source = <span className="text-emerald-700">{b.accepted_rows} accepted</span> + <span className="text-amber-700">{b.held_rows} held</span> + <span className="text-red-700">{b.rejected_rows} rejected</span></div>
                       {b.reviewer_id ? <div className="text-slate-500">Signed off by {b.reviewer} · evidence {b.evidence_ref}</div> : can(sel.no) && (
                         <form method="POST" action="/api/v1/actions" className="flex gap-1 mt-1">

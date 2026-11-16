@@ -26,7 +26,7 @@ export async function readXlsx(buf: Buffer): Promise<Cell[][]> {
   return rows;
 }
 
-export function parseCsv(text: string): string[][] {
+export function parseCsv(text: string, delim = ','): string[][] {
   const rows: string[][] = [];
   let row: string[] = [], cur = '', q = false;
   const t = text.replace(/^﻿/, '');
@@ -37,7 +37,7 @@ export function parseCsv(text: string): string[][] {
       else if (c === '"') q = false;
       else cur += c;
     } else if (c === '"') q = true;
-    else if (c === ',') { row.push(cur); cur = ''; }
+    else if (c === delim) { row.push(cur); cur = ''; }
     else if (c === '\n' || c === '\r') {
       if (c === '\r' && t[i + 1] === '\n') i++;
       row.push(cur); cur = '';
@@ -60,3 +60,10 @@ export async function writeXlsx(sheetName: string, columns: string[], rows: Cell
   if (guide) { const g = wb.addWorksheet('Guide'); guide.forEach((r) => g.addRow(r)); g.getColumn(1).width = 28; g.getColumn(2).width = 90; }
   return Buffer.from(await wb.xlsx.writeBuffer());
 }
+
+const csvCell = (v: Cell): string => {
+  const t = v instanceof Date ? v.toISOString().slice(0, 10) : v == null ? '' : String(v);
+  return /[",\n\r]/.test(t) ? `"${t.replace(/"/g, '""')}"` : t;
+};
+/** Canonical CSV (RFC 4180, LF line ends) - the form every imported file is stored in. */
+export const tableToCsv = (table: Cell[][]): string => table.map((r) => r.map(csvCell).join(',')).join('\n') + '\n';

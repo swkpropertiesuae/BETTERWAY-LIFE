@@ -110,3 +110,35 @@ test('quote: versioned, approved by advisor, required before underwriting; reaso
   applyException(db, advisor, dealId, 'WITHDRAW', { reason: 'x', reasonCode: 'PRICE_TOO_HIGH' });
   assert.equal(getDealWorkflow(db, dealId).stage, 'WITHDRAWN');
 });
+
+test('any supported file format imports and is stored as CSV; leads land in CRM with consent + dedupe; unsupported types are refused', async () => {
+  const db = createTestDb();
+  const admin = u(db, 'md@betterwaymortgages.com');
+  const cols = specByNo(16)!.columns;
+  const rec = (id: string, name: string, phone: string, email: string, consent: string) => ({ legacy_lead_id: id, legacy_contact_id: 'c' + id, contact_name: name, phone, email, source_id: 'Bayut', owner_id: '', consent_status: consent, captured_at: '2026-05-01' });
+  const rows = [rec('1', 'Aisha Khan', '+971 50 111 2233', 'aisha@x.ae', 'Y'), rec('2', 'No Consent', '0501112244', '', 'N'), rec('3', 'Aisha Again', '050-111-2233', '', 'Y')];
+
+  // xlsx (headers written with spaces and capitals) -> CSV
+  const xl = await writeXlsx('Leads', cols.map((c) => c.replace(/_/g, ' ').toUpperCase()), rows.map((r) => cols.map((c) => (r as Record<string, string>)[c] ?? '')));
+  const a = await importFile(db, admin, { specNo: 16, fileName: 'leads.xlsx', bytes: xl });
+  assert.deepEqual([a.accepted, a.applied.created, a.applied.duplicates, a.applied.noConsent], [3, 1, 1, 1]);
+  const lead = db.prepare("SELECT * FROM leads WHERE contact_name = 'Aisha Khan'").get() as Record<string, string>;
+  assert.deepEqual([lead.stage, lead.source_channel], ['NURTURE', 'BAYUT']);
+  assert.equal((db.prepare("SELECT COUNT(*) c FROM leads WHERE contact_name IN ('No Consent','Aisha Again')").get() as { c: number }).c, 0);
+
+  const stored = (db.prepare('SELECT csv_content FROM data_batches WHERE id = ?').get(a.batchId) as { csv_content: string }).csv_content;
+  assert.ok(stored.startsWith('legacy_lead_id,legacy_contact_id,contact_name'));
+  assert.ok(stored.includes('+971 50 111 2233'));
+
+  // other formats parse to the same shape (new ids so nothing is a duplicate id; same phones are duplicates of the CRM lead)
+  const recs = (p: string) => rows.map((r) => ({ ...r, legacy_lead_id: p + r.legacy_lead_id }));
+  const asCsv = (sep: string, p: string) => Buffer.from([cols.join(sep), ...recs(p).map((r) => cols.map((c) => (r as Record<string, string>)[c]).join(sep))].join('\n'));
+  for (const [name, bytes] of [['a.tsv', asCsv('\t', 't')], ['b.txt', asCsv(';', 's')], ['c.json', Buffer.from(JSON.stringify(recs('j')))], ['d.csv', asCsv(',', 'c')]] as [string, Buffer][]) {
+    const r = await importFile(db, admin, { specNo: 16, fileName: name, bytes });
+    assert.equal(r.accepted, 3, name);
+    assert.equal(r.applied.created, 0, name); // all duplicates / no consent
+    assert.ok((db.prepare('SELECT csv_content c FROM data_batches WHERE id = ?').get(r.batchId) as { c: string }).c.includes('Aisha Khan'), name);
+  }
+  await assert.rejects(importFile(db, admin, { specNo: 16, fileName: 'scan.pdf', bytes: Buffer.from('%PDF') }), /cannot be read as a table/);
+  await assert.rejects(importFile(db, admin, { specNo: 16, fileName: 'x.json', bytes: Buffer.from('{"a":1}') }), /array of row objects/);
+});

@@ -9,6 +9,10 @@ let singletonDb: DatabaseSync | null = null;
 export function initializeDatabase(db: DatabaseSync, shouldSeed = true): DatabaseSync {
   db.exec('PRAGMA foreign_keys = ON;');
   db.exec(UNIFIED_SCHEMA_SQL);
+  // Databases created before these columns existed.
+  const cols = (db.prepare("PRAGMA table_info('data_batches')").all() as { name: string }[]).map((c) => c.name);
+  if (!cols.includes('csv_content')) db.exec("ALTER TABLE data_batches ADD COLUMN csv_content TEXT NOT NULL DEFAULT ''");
+  if (!cols.includes('applied_rows')) db.exec('ALTER TABLE data_batches ADD COLUMN applied_rows INTEGER NOT NULL DEFAULT 0');
   if (shouldSeed) {
     seedInitialData(db);
   }

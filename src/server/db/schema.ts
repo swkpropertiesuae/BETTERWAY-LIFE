@@ -765,6 +765,8 @@ CREATE TABLE IF NOT EXISTS data_batches (
   accepted_rows INTEGER NOT NULL DEFAULT 0,
   held_rows INTEGER NOT NULL DEFAULT 0,
   rejected_rows INTEGER NOT NULL DEFAULT 0,
+  applied_rows INTEGER NOT NULL DEFAULT 0,
+  csv_content TEXT NOT NULL DEFAULT '',
   reviewer_id INTEGER REFERENCES users(id),
   evidence_ref TEXT NOT NULL DEFAULT '',
   created_by INTEGER REFERENCES users(id),
