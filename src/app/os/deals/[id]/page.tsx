@@ -3,10 +3,11 @@ import { getDb } from '@/server/db';
 import { getActiveLang, requireStaffUser } from '@/server/auth/request';
 import { formatAed, formatBps, tr } from '@/lib/format';
 import { OsBanner } from '@/components/os-banner';
-import { STAGE_META, getDealWorkflow, pathFor } from '@/server/engines/workflow-engine';
+import { STAGE_META, getDealWorkflow, pathFor, reasonCodes } from '@/server/engines/workflow-engine';
+import { milestonesFor } from '@/server/engines/milestones';
 
 type R = Record<string, any>;
-const TABS = ['overview', 'borrowers', 'documents', 'banks', 'property', 'money', 'activity'] as const;
+const TABS = ['overview', 'quote', 'borrowers', 'documents', 'banks', 'property', 'money', 'activity'] as const;
 const LEVEL: Record<string, string> = { CRITICAL: 'bg-red-50 text-red-800 border-red-200', WARN: 'bg-amber-50 text-amber-800 border-amber-200', INFO: 'bg-slate-50 text-slate-700 border-slate-200' };
 
 const Field = ({ k, v }: { k: string; v: React.ReactNode }) => (
@@ -32,6 +33,9 @@ export default async function DealForm({ params, searchParams }: { params: Promi
   const kfs = db.prepare('SELECT applicant_id FROM kfs_acknowledgements WHERE deal_id = ?').all(dealId) as R[];
   const tasks = db.prepare("SELECT * FROM ops_tasks WHERE deal_id = ? ORDER BY id DESC LIMIT 20").all(dealId) as R[];
   const logs = db.prepare("SELECT l.*, u.full_name_en who FROM audit_logs l LEFT JOIN users u ON u.id=l.actor_user_id WHERE l.entity_type='deals' AND l.entity_id = ? ORDER BY l.id DESC LIMIT 30").all(String(dealId)) as R[];
+  const quotes = db.prepare('SELECT * FROM deal_quotes WHERE deal_id = ? ORDER BY version DESC').all(dealId) as R[];
+  const miles = milestonesFor(db, dealId);
+  const codes = reasonCodes(db);
   const client = apps.find((a) => a.applicant_role === 'PRIMARY')?.full_name_en ?? deal.deal_ref;
   const back = `/os/deals/${dealId}`;
   const real = w.blockers.filter((b) => !b.startsWith('Use "'));
@@ -66,12 +70,17 @@ export default async function DealForm({ params, searchParams }: { params: Promi
                 <select name="kind" className="bw-input w-full">{w.exceptions.filter((e) => e.allowed).map((e) => <option key={e.kind} value={e.kind}>{e.label}</option>)}</select>
                 <select name="targetStage" className="bw-input w-full"><option value="">Target stage (step back / reopen)</option>
                   {pathFor(deal.transaction_type).slice(0, -1).map((s) => <option key={s} value={s}>{STAGE_META[s].label}</option>)}</select>
+                {codes.length > 0 && <select name="reasonCode" className="bw-input w-full"><option value="">Reason code (withdraw / decline)</option>{codes.map((c) => <option key={c} value={c}>{c}</option>)}</select>}
                 <input name="reason" required placeholder="Reason (required)" className="bw-input w-full" />
                 <button className="bw-btn-navy w-full">Apply</button>
               </form>
             </details>
           </div>
         </div>
+        <div className="flex gap-0.5" title="12 case milestones">
+          {miles.map((m) => <div key={m.no} title={`${m.no} ${m.label} · ${m.owner}`} className={`h-1.5 flex-1 rounded ${m.state === 'done' ? 'bg-emerald-500' : m.state === 'current' ? 'bg-[#D7B04E]' : m.state === 'closed' ? 'bg-red-300' : 'bg-slate-200'}`} />)}
+        </div>
+        <div className="text-[10px] text-slate-500">Milestone {miles.find((m) => m.state === 'current')?.no ?? '12'} of 12 · {miles.find((m) => m.state === 'current')?.label ?? 'Complete'} · owner {miles.find((m) => m.state === 'current')?.owner ?? '—'}</div>
         <div className="flex flex-wrap gap-1">
           {w.track.map((t) => (
             <div key={t.stage} className={`px-2.5 py-1 text-[11px] rounded-full border ${t.state === 'done' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : t.state === 'current' ? 'bg-[#021125] border-[#021125] text-white font-semibold' : 'bg-white border-slate-200 text-slate-400'}`}>{t.label}</div>
@@ -103,6 +112,37 @@ export default async function DealForm({ params, searchParams }: { params: Promi
             <h2 className="font-bold text-sm mb-1">Playbooks ({w.playbooks.length})</h2>
             {w.playbooks.slice(0, 6).map((p) => <details key={p.id} className="text-xs py-1"><summary className="cursor-pointer font-medium">{p.title}</summary><ol className="list-decimal ms-5 mt-1 text-slate-600">{p.steps.map((s) => <li key={s}>{s}</li>)}</ol></details>)}
             <a className="text-xs underline" href="/os/workflow?view=playbooks">All playbooks</a></div>
+        </div>
+      )}
+
+      {tab === 'quote' && (
+        <div className="space-y-3">
+          <form method="POST" action="/api/v1/actions" className="flex gap-2 items-center text-xs">
+            <input type="hidden" name="action" value="save_quote" /><input type="hidden" name="dealId" value={dealId} /><input type="hidden" name="returnTo" value={`${back}?tab=quote`} />
+            <button className="bw-btn-gold">Run eligibility and save new quote</button><span className="text-slate-500">Saves inputs, rule version, offers and cash to close. Advisor approval is required before documents are reviewed.</span>
+          </form>
+          {quotes.length === 0 && <div className="bw-card p-4 text-xs text-slate-500">No quote yet.</div>}
+          {quotes.map((q) => {
+            const offers = JSON.parse(q.offers_json) as R[];
+            const ko = JSON.parse(q.knockouts_json) as R[];
+            return (
+              <div key={q.id} className="bw-card p-4 text-xs">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div><b>Quote v{q.version}</b> <span className="bw-badge">{q.status}</span> <span className="text-slate-500">rule {q.rule_version} · expires {q.expires_at} · cash to close {formatAed(q.cash_to_close_fils)}</span></div>
+                  {q.status === 'DRAFT' && (
+                    <form method="POST" action="/api/v1/actions" className="flex gap-1">
+                      <input type="hidden" name="action" value="approve_quote" /><input type="hidden" name="quoteId" value={q.id} /><input type="hidden" name="returnTo" value={`${back}?tab=quote`} />
+                      <input name="overrideReason" placeholder="Override reason (only if terms changed)" className="bw-input !w-64" /><button className="bw-btn-navy">Approve quote</button>
+                    </form>
+                  )}
+                </div>
+                <table className="w-full mt-2"><thead><tr><th className="text-start">Bank / product</th><th className="text-end">Rate</th><th className="text-end">EMI</th><th className="text-end">Revert EMI</th><th className="text-end">DBR</th><th className="text-end">LTV</th><th className="text-end">Cash to close</th></tr></thead>
+                  <tbody>{offers.map((o, i) => <tr key={i} className="border-t border-slate-100"><td>{o.bankName} · {o.productCode}</td><td className="text-end">{formatBps(o.introRateBps)}</td><td className="text-end">{formatAed(o.introEmiFils)}</td><td className="text-end">{formatAed(o.revertEmiFils)}</td><td className="text-end">{formatBps(o.calculatedDbrBps)}</td><td className="text-end">{formatBps(o.calculatedLtvBps)}</td><td className="text-end">{formatAed(o.fees?.cashToCloseFils)}</td></tr>)}</tbody></table>
+                {ko.length > 0 && <details className="mt-2"><summary className="cursor-pointer text-slate-500">{ko.length} banks not eligible (reason codes)</summary><ul className="list-disc ms-5 text-slate-600">{ko.map((k, i) => <li key={i}>{k.bank}: {k.reason}</li>)}</ul></details>}
+                {q.override_reason && <div className="text-amber-700 mt-1">Override: {q.override_reason}</div>}
+              </div>
+            );
+          })}
         </div>
       )}
 

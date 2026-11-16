@@ -5,6 +5,8 @@ import { assertRole, writeAuditLog, type UserRecord, type UserRole } from '@/ser
 import { checkBankSubmissionGate } from './compliance-aml-engine';
 import { evaluateDealAcross24Banks } from './underwriting-engine';
 import { PLAYBOOKS, type Playbook } from './scenarios';
+import { activeRows } from '@/server/data-hub/import';
+import { approvedQuote } from './quotes';
 
 export const STAGES = [
   'FACT_FIND', 'KFS_PENDING', 'DOC_COLLECTION', 'UNDERWRITING_READY',
@@ -31,6 +33,15 @@ export const STAGE_META: Record<Stage, { label: string; owner: UserRole; slaHour
   CHEQUES_READY: { label: 'Cheques ready', owner: 'PROGRESSION_MANAGER', slaHours: 48, action: 'Issue 72-hour trustee cheques; attend transfer.' },
   TRANSFERRED_DISBURSED: { label: 'Disbursed', owner: 'FINANCE_ADMIN', slaHours: 120, action: 'Record disbursal; chase bank bordereau cash.' },
 };
+
+// Case_Stages_SLAs_and_Reason_Codes (spec 08) can override SLA hours and owner per stage.
+function stageRule(db: DatabaseSync, stage: Stage) {
+  const r = activeRows(db, 8).find((x) => x.stage_code === stage && x.sla_hours);
+  return { slaHours: r ? Number(r.sla_hours) : STAGE_META[stage].slaHours, owner: (r?.owner_role as UserRole) || STAGE_META[stage].owner };
+}
+export function reasonCodes(db: DatabaseSync): string[] {
+  return [...new Set(activeRows(db, 8).map((r) => r.reason_code).filter(Boolean))];
+}
 
 const STAFF: UserRole[] = ['SUPER_ADMIN', 'SALES_ADVISOR', 'CREDIT_UNDERWRITER', 'PROGRESSION_MANAGER'];
 const OBLIGATED = ['PRIMARY', 'CO_BORROWER', 'GUARANTOR'];
@@ -114,6 +125,20 @@ export function requiredDocs(db: DatabaseSync, dealId: number, tags: string[], s
     else if (a.employment_type === 'SELF_EMPLOYED') { add('TRADE_LICENCE'); add('AUDIT_FINANCIALS'); add('BANK_STATEMENTS_6M'); }
     else add('BANK_STATEMENTS_6M');
   }
+  // Document_Checklist_Rules (spec 06): configured mandatory documents add to the defaults.
+  const VAULT = ['PASSPORT', 'EMIRATES_ID', 'VISA', 'SALARY_CERT', 'PAYSLIPS_6M', 'BANK_STATEMENTS_6M', 'AUDIT_FINANCIALS', 'TRADE_LICENCE', 'AECB_REPORT', 'FORM_F', 'KFS_SIGNED', 'FOL_SIGNED', 'TITLE_DEED', 'TAKAFUL_POLICY'];
+  for (const r of activeRows(db, 6)) {
+    const doc = r.document_type.toUpperCase();
+    if (r.mandatory_flag !== 'Y' || !VAULT.includes(doc)) continue;
+    if (r.case_type && r.case_type !== '*' && r.case_type !== deal.transaction_type) continue;
+    if (r.bank_id && Number(r.bank_id) !== deal.selected_bank_id) continue;
+    if (r.stage_code && STAGES.indexOf(r.stage_code as Stage) > STAGES.indexOf(stage)) continue;
+    for (const a of apps) {
+      const t = (r.applicant_type || '').toUpperCase();
+      if (t && t !== 'ALL' && t !== a.applicant_role && t !== a.employment_type && t !== a.residency_type) continue;
+      if (!needs.some((n) => n.category === doc && n.applicantId === a.id)) needs.push({ category: doc, applicantId: a.id, label: `${doc} (${a.full_name_en})` });
+    }
+  }
   const idx = STAGES.indexOf(stage);
   const dealLevel = (category: string) => needs.push({ category, applicantId: null, label: category });
   if (idx >= STAGES.indexOf('MOU_SIGNED') && pathFor(deal.transaction_type).includes('MOU_SIGNED')) dealLevel('FORM_F');
@@ -155,6 +180,7 @@ function guardsForward(db: DatabaseSync, c: Ctx, from: Stage, to: Stage): string
       break;
     }
     case 'UNDERWRITING_READY': {
+      if (!approvedQuote(db, deal.id, c.asOf)) b.push('Approved, unexpired quote required (Quote tab on the deal form)');
       const m = missingDocs(db, deal.id, requiredDocs(db, deal.id, c.tags, 'UNDERWRITING_READY'));
       m.forEach((x) => b.push(`Missing document: ${x}`));
       const rejected = db.prepare("SELECT COUNT(*) c FROM vault_documents WHERE deal_id = ? AND ocr_validation_status = 'REJECTED'").get(deal.id) as { c: number };
@@ -303,8 +329,8 @@ export function getDealWorkflow(db: DatabaseSync, dealId: number, asOf = new Dat
     : crit
       ? { owner: PLAYBOOKS.find((p) => p.id === crit.playbook)?.owner ?? owner, text: crit.text, slaHours: 4 }
       : progressBlockers.length
-        ? { owner, text: `Resolve: ${progressBlockers[0]}${progressBlockers.length > 1 ? ` (+${progressBlockers.length - 1} more)` : ''}`, slaHours: STAGE_META[stage as Stage].slaHours }
-        : { owner, text: STAGE_META[stage as Stage].action, slaHours: STAGE_META[stage as Stage].slaHours };
+        ? { owner, text: `Resolve: ${progressBlockers[0]}${progressBlockers.length > 1 ? ` (+${progressBlockers.length - 1} more)` : ''}`, slaHours: stageRule(db, stage as Stage).slaHours }
+        : { owner, text: STAGE_META[stage as Stage].action, slaHours: stageRule(db, stage as Stage).slaHours };
 
   const exceptions: { kind: ExceptionKind; label: string; allowed: boolean; why?: string }[] = [];
   if (!closed && stage !== 'TRANSFERRED_DISBURSED') {
@@ -334,9 +360,10 @@ function setStage(db: DatabaseSync, actor: UserRecord, dealId: number, to: AnySt
   db.prepare("UPDATE ops_tasks SET status = 'COMPLETED' WHERE deal_id = ? AND status = 'OPEN' AND title LIKE ?").run(dealId, `${WF}%`);
   if (to !== 'TRANSFERRED_DISBURSED' && to !== 'DECLINED' && to !== 'WITHDRAWN') {
     const m = STAGE_META[to as Stage];
+    const rule = stageRule(db, to as Stage);
     db.prepare('INSERT INTO ops_tasks (deal_id, assigned_role, priority, title, due_at) VALUES (?, ?, ?, ?, ?)').run(
-      dealId, m.owner, m.slaHours <= 24 ? 'HIGH' : 'NORMAL', `${WF}${m.label}: ${m.action}`,
-      new Date(Date.now() + m.slaHours * 3_600_000).toISOString(),
+      dealId, rule.owner, rule.slaHours <= 24 ? 'HIGH' : 'NORMAL', `${WF}${m.label}: ${m.action}`,
+      new Date(Date.now() + rule.slaHours * 3_600_000).toISOString(),
     );
   }
   writeAuditLog(db, actor, 'deals', dealId, action, { stage: before.stage }, { stage: to, ...(meta as object) });
@@ -360,11 +387,13 @@ export type ExceptionKind = 'PROMOTE_BACKUP' | 'STEP_BACK' | 'WITHDRAW' | 'DECLI
 
 export function applyException(
   db: DatabaseSync, actor: UserRecord, dealId: number, kind: ExceptionKind,
-  input: { reason: string; targetStage?: Stage },
+  input: { reason: string; targetStage?: Stage; reasonCode?: string },
 ) {
   assertRole(actor, STAFF);
   const reason = (input.reason || '').trim();
   if (!reason) throw new Error('A reason is required');
+  const codes = reasonCodes(db);
+  if ((kind === 'WITHDRAW' || kind === 'DECLINE') && codes.length && !codes.includes(input.reasonCode ?? '')) throw new Error(`Choose a reason code: ${codes.join(', ')}`);
   const deal = db.prepare('SELECT * FROM deals WHERE id = ?').get(dealId) as Row | undefined;
   if (!deal) throw new Error(`Deal ${dealId} not found`);
   const path = pathFor(deal.transaction_type);
@@ -404,7 +433,7 @@ export function applyException(
       result = to;
     }
 
-    setStage(db, actor, dealId, result, `WORKFLOW_${kind}`, { reason });
+    setStage(db, actor, dealId, result, `WORKFLOW_${kind}`, { reason, reasonCode: input.reasonCode ?? null });
 
     if (kind === 'WITHDRAW' || kind === 'DECLINE') {
       db.prepare('INSERT INTO ops_tasks (deal_id, assigned_role, priority, title, due_at) VALUES (?, ?, ?, ?, ?)').run(

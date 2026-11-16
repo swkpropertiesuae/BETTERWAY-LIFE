@@ -756,4 +756,61 @@ CREATE TABLE IF NOT EXISTS ops_tasks (
   status TEXT NOT NULL DEFAULT 'OPEN' CHECK (status IN ('OPEN','COMPLETED')),
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
+
+CREATE TABLE IF NOT EXISTS data_batches (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  spec_no INTEGER NOT NULL,
+  file_name TEXT NOT NULL,
+  source_rows INTEGER NOT NULL DEFAULT 0,
+  accepted_rows INTEGER NOT NULL DEFAULT 0,
+  held_rows INTEGER NOT NULL DEFAULT 0,
+  rejected_rows INTEGER NOT NULL DEFAULT 0,
+  reviewer_id INTEGER REFERENCES users(id),
+  evidence_ref TEXT NOT NULL DEFAULT '',
+  created_by INTEGER REFERENCES users(id),
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS data_rows (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  batch_id INTEGER NOT NULL REFERENCES data_batches(id) ON DELETE CASCADE,
+  spec_no INTEGER NOT NULL,
+  row_no INTEGER NOT NULL,
+  external_id TEXT NOT NULL DEFAULT '',
+  data_json TEXT NOT NULL,
+  status TEXT NOT NULL CHECK (status IN ('ACCEPTED','HELD_FOR_REVIEW','REJECTED','SUPERSEDED')),
+  errors_json TEXT NOT NULL DEFAULT '[]',
+  effective_from TEXT,
+  effective_to TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_data_rows_spec ON data_rows(spec_no, status);
+
+CREATE TABLE IF NOT EXISTS data_exports (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  spec_no INTEGER NOT NULL,
+  actor_user_id INTEGER REFERENCES users(id),
+  actor_role TEXT NOT NULL,
+  purpose TEXT NOT NULL,
+  row_count INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS deal_quotes (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  deal_id INTEGER NOT NULL REFERENCES deals(id) ON DELETE CASCADE,
+  version INTEGER NOT NULL,
+  inputs_json TEXT NOT NULL,
+  offers_json TEXT NOT NULL,
+  knockouts_json TEXT NOT NULL DEFAULT '[]',
+  rule_version TEXT NOT NULL,
+  cash_to_close_fils INTEGER NOT NULL DEFAULT 0,
+  expires_at TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'DRAFT' CHECK (status IN ('DRAFT','APPROVED','SUPERSEDED')),
+  override_reason TEXT NOT NULL DEFAULT '',
+  approved_by INTEGER REFERENCES users(id),
+  approved_at TEXT,
+  created_by INTEGER REFERENCES users(id),
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  UNIQUE (deal_id, version)
+);
 `;

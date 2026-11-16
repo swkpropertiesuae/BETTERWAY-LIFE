@@ -12,7 +12,7 @@ registerHooks({
       const target = tryExt(path.join(src, spec.slice(2)));
       if (target) return next(pathToFileURL(target).href, ctx);
     }
-    if (spec.startsWith('.') && ctx.parentURL?.startsWith('file:')) {
+    if (spec.startsWith('.') && ctx.parentURL?.startsWith('file:') && !ctx.parentURL.includes('/node_modules/')) {
       const target = tryExt(path.resolve(path.dirname(fileURLToPath(ctx.parentURL)), spec));
       if (target) return next(pathToFileURL(target).href, ctx);
     }

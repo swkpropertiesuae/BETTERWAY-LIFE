@@ -19,6 +19,8 @@ export const APPS: AppDef[] = [
     roles: ['SUPER_ADMIN', 'COMPLIANCE_MLRO', 'CREDIT_UNDERWRITER'], menus: [{ en: 'Compliance', ar: 'الامتثال', href: '/os/compliance' }] },
   { key: 'activities', en: 'Activities', ar: 'المهام', blurb: 'My tasks and SLA wall', color: '#0369A1', glyph: 'T', home: '/os/activities',
     menus: [{ en: 'My Activities', ar: 'مهامي', href: '/os/activities' }, { en: 'Command Board', ar: 'غرفة العمليات', href: '/os/command' }] },
+  { key: 'data', en: 'Data Hub', ar: 'مركز البيانات', blurb: 'Excel setup, imports, exports', color: '#475569', glyph: 'D', home: '/os/data',
+    menus: [{ en: 'Setup', ar: 'الإعداد', href: '/os/data?type=Setup' }, { en: 'Migration', ar: 'الترحيل', href: '/os/data?type=Migration' }, { en: 'Exports', ar: 'التقارير', href: '/os/data?type=Export' }, { en: 'Tests', ar: 'الاختبارات', href: '/os/data?type=Test' }] },
   { key: 'knowledge', en: 'Knowledge', ar: 'المعرفة', blurb: 'Bank policies and templates', color: '#4D7C0F', glyph: 'W', home: '/os/wiki',
     menus: [{ en: 'Wiki', ar: 'الموسوعة', href: '/os/wiki' }] },
   { key: 'reporting', en: 'Reporting', ar: 'التقارير', blurb: 'Forecast, BI, co-pilot', color: '#9A3412', glyph: 'R', home: '/os/bi-copilot',

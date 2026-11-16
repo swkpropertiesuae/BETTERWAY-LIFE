@@ -32,6 +32,9 @@ import {
 import { createPintAeTaxInvoice, postJournalEntry, recordVendorBill } from '@/server/engines/ledger-tax-engine';
 import { importLegacyBackbookCsv } from '@/server/engines/backbook-importer';
 import { runMonthlyWpsPayroll } from '@/server/engines/wps-gratuity-engine';
+import { saveQuote, approveQuote } from '@/server/engines/quotes';
+import { reviewBatch } from '@/server/data-hub/import';
+import { generateUatCases } from '@/server/data-hub/uat';
 import { advanceDeal, applyException, type ExceptionKind, type Stage } from '@/server/engines/workflow-engine';
 
 const STAFF_ROLES: UserRole[] = [
@@ -785,8 +788,29 @@ export async function POST(req: Request) {
         const r = applyException(db, user, Number(body.dealId), String(body.kind) as ExceptionKind, {
           reason: String(body.reason || ''),
           targetStage: body.targetStage ? (String(body.targetStage) as Stage) : undefined,
+          reasonCode: body.reasonCode ? String(body.reasonCode) : undefined,
         });
         return respondOk(`Deal is now ${r.stage}`, r);
+      }
+
+      case 'save_quote': {
+        const r = saveQuote(db, user, Number(body.dealId));
+        return respondOk(`Quote v${r.version} saved as draft`, r);
+      }
+
+      case 'approve_quote': {
+        approveQuote(db, user, Number(body.quoteId), String(body.overrideReason || ''));
+        return respondOk('Quote approved');
+      }
+
+      case 'review_batch': {
+        reviewBatch(db, user, Number(body.batchId), String(body.evidenceRef || ''));
+        return respondOk('Batch signed off');
+      }
+
+      case 'generate_uat': {
+        const n = generateUatCases(db, user);
+        return respondOk(`${n} UAT cases generated from playbooks`);
       }
 
       default:
