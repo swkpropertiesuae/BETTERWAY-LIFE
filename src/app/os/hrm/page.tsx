@@ -1,6 +1,7 @@
 import { getDb } from '@/server/db';
 import { getActiveLang, requireStaffUser } from '@/server/auth/request';
 import { formatAed, tr } from '@/lib/format';
+import { PageHeader } from '@/components/page-header';
 import { OsBanner } from '@/components/os-banner';
 import {
   calculateUaeGratuityFils,
@@ -34,17 +35,10 @@ export default async function HrmAndWpsPage({
   const nowMs = Date.now();
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 max-w-7xl mx-auto">
       <OsBanner notice={sp.notice} error={sp.error} />
 
-      <div>
-        <div className="text-xs font-semibold uppercase tracking-wider text-[#8A6518]">
-          {tr(lang, 'Module 09 · UAE HRM, MOHRE WPS .SIF Generator, Statutory EOSB & Nafis/GPSSA', 'الوحدة 09 · الموارد البشرية وحماية الأجور ومكافأة نهاية الخدمة ونافس')}
-        </div>
-        <h1 className="font-display text-2xl font-bold text-[#021125] mt-1">
-          {tr(lang, 'UAE Workforce Roster, Recoverable Advisor Draws & Wage Protection System', 'سجل الموظفين، السلف المستردة للمستشارين ونظام حماية الأجور')}
-        </h1>
-      </div>
+      <PageHeader app="Employees" appHref="/os/hrm" title="Staff & Payroll" sub={tr(lang, 'UAE Workforce Roster, Recoverable Advisor Draws & Wage Protection System', 'سجل الموظفين، السلف المستردة للمستشارين ونظام حماية الأجور')} />
 
       {/* Nafis + WPS Summary */}
       <div className="grid md:grid-cols-3 gap-4 text-xs">

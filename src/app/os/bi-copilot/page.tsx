@@ -1,3 +1,4 @@
+import { PageHeader } from '@/components/page-header';
 import { getDb } from '@/server/db';
 import { getActiveLang, requireStaffUser } from '@/server/auth/request';
 import { formatAed, tr } from '@/lib/format';
@@ -50,15 +51,8 @@ export default async function BiAndCopilotPage({
   const stmtAnalysis = analyzeBankStatementLines(parseStatementText(stmtRaw));
 
   return (
-    <div className="space-y-6">
-      <div>
-        <div className="text-xs font-semibold uppercase tracking-wider text-[#8A6518]">
-          {tr(lang, 'Module 12 · Executive Cash Forecast, Unit Economics BI & Deterministic Co-Pilot', 'الوحدة 12 · التوقعات المالية وذكاء الأعمال ومحلل كشوف الحساب')}
-        </div>
-        <h1 className="font-display text-2xl font-bold text-[#021125] mt-1">
-          {tr(lang, 'Clawback-Adjusted Treasury Forecast, Statement Parser & Policy Co-Pilot', 'توقعات الخزينة المعدلة، كاشف الالتزامات ومساعد السياسات الموثق')}
-        </h1>
-      </div>
+    <div className="space-y-5 max-w-7xl mx-auto">
+      <PageHeader app="Reporting" appHref="/os/bi-copilot" title="Executive BI" sub={tr(lang, 'Clawback-Adjusted Treasury Forecast, Statement Parser & Policy Co-Pilot', 'توقعات الخزينة المعدلة، كاشف الالتزامات ومساعد السياسات الموثق')} />
 
       {/* Stage-Weighted Forecast Cards */}
       <div className="grid md:grid-cols-3 gap-4">

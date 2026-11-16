@@ -1,6 +1,7 @@
 import { getDb } from '@/server/db';
 import { getActiveLang, requireStaffUser } from '@/server/auth/request';
 import { DEAL_STAGE_LABELS, formatAed, formatMicroPct, tr } from '@/lib/format';
+import { PageHeader } from '@/components/page-header';
 import { OsBanner } from '@/components/os-banner';
 import { getDocumentExpiryWatchlist } from '@/server/engines/wps-gratuity-engine';
 import { computeExecutiveForecastAndBi } from '@/server/engines/statement-and-policy-copilot';
@@ -73,18 +74,11 @@ export default async function CommandBoardPage({
   }[];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 max-w-7xl mx-auto">
       <OsBanner notice={sp.notice} error={sp.error} />
 
       <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <div className="text-xs font-semibold uppercase tracking-wider text-[#8A6518]">
-            {tr(lang, 'Module 11 · Executive Command & Morning Standup', 'الوحدة 11 · غرفة القيادة والمتابعة الصباحية')}
-          </div>
-          <h1 className="font-display text-2xl font-bold text-[#021125] mt-1">
-            {tr(lang, 'Betterway Operations & SLA Breach Wall', 'لوحة العمليات ومراقبة اتفاقيات مستوى الخدمة')}
-          </h1>
-        </div>
+        <PageHeader app="Activities" appHref="/os/activities" title="Command Board" sub={tr(lang, 'Betterway Operations & SLA Breach Wall', 'لوحة العمليات ومراقبة اتفاقيات مستوى الخدمة')} />
         {latestEibor && (
           <div className="bw-card px-4 py-2.5 flex items-center gap-4 text-xs">
             <span className="font-semibold text-[#021125]">CBUAE 3M EIBOR ({String(latestEibor.fixing_date)}):</span>

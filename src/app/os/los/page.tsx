@@ -1,6 +1,7 @@
 import { getDb } from '@/server/db';
 import { getActiveLang, requireStaffUser } from '@/server/auth/request';
 import { DEAL_STAGE_LABELS, formatAed, formatBps, tr } from '@/lib/format';
+import { PageHeader } from '@/components/page-header';
 import { OsBanner } from '@/components/os-banner';
 import { evaluateDealAcross24Banks } from '@/server/engines/underwriting-engine';
 import { checkBankSubmissionGate } from '@/server/engines/compliance-aml-engine';
@@ -61,18 +62,11 @@ export default async function LosUnderwritingPage({
   const banks = db.prepare('SELECT id, name_en FROM banks ORDER BY id ASC').all() as { id: number; name_en: string }[];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 max-w-7xl mx-auto">
       <OsBanner notice={sp.notice} error={sp.error} />
 
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <div className="text-xs font-semibold uppercase tracking-wider text-[#8A6518]">
-            {tr(lang, 'Module 02 · 24-Bank CBUAE Underwriting LOS & Proposal Studio', 'الوحدة 02 · نظام الائتمان والمقارنة بين 24 بنكاً')}
-          </div>
-          <h1 className="font-display text-2xl font-bold text-[#021125] mt-1">
-            {String(deal.deal_ref)} — {String(deal.primary_name)} ({DEAL_STAGE_LABELS[String(deal.stage)]?.[lang] ?? String(deal.stage)})
-          </h1>
-        </div>
+        <PageHeader app="Mortgage Desk" appHref="/os/deals" title={<>{String(deal.deal_ref)} — {String(deal.primary_name)} ({DEAL_STAGE_LABELS[String(deal.stage)]?.[lang] ?? String(deal.stage)})</>} sub={tr(lang, 'Module 02 · 24-Bank CBUAE Underwriting LOS & Proposal Studio', 'الوحدة 02 · نظام الائتمان والمقارنة بين 24 بنكاً')}><a className="bw-btn-navy" href={`/os/deals/${deal.id}`}>Deal form →</a></PageHeader>
 
         <div className="flex flex-wrap gap-2">
           {deals.map((d) => (

@@ -100,3 +100,12 @@ h1, h2, h3, .font-display {
   font-weight: 600;
   letter-spacing: 0.01em;
 }
+
+/* Unified density: older module screens inherit the new Odoo-style look. */
+main .bw-card h2 { font-size: 0.875rem; line-height: 1.25rem; }
+main .bw-card h2 + p { font-size: 0.75rem; }
+main .bw-card.p-5, main .bw-card.p-6 { padding: 1rem; }
+main .bw-input { padding: 0.375rem 0.625rem; font-size: 0.8125rem; }
+main .bw-btn-gold, main .bw-btn-navy { padding-top: 0.375rem; padding-bottom: 0.375rem; font-size: 0.8125rem; }
+main table th { font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.04em; color: #64748b; }
+main table td { font-size: 0.75rem; }

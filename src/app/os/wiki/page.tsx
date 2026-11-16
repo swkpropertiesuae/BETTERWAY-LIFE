@@ -1,6 +1,7 @@
 import { getDb } from '@/server/db';
 import { getActiveLang, requireStaffUser } from '@/server/auth/request';
 import { tr } from '@/lib/format';
+import { PageHeader } from '@/components/page-header';
 import { OsBanner } from '@/components/os-banner';
 
 export default async function PolicyWikiPage({
@@ -25,17 +26,10 @@ export default async function PolicyWikiPage({
   const banks = db.prepare('SELECT id, name_en FROM banks ORDER BY id ASC').all() as { id: number; name_en: string }[];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 max-w-7xl mx-auto">
       <OsBanner notice={sp.notice} error={sp.error} />
 
-      <div>
-        <div className="text-xs font-semibold uppercase tracking-wider text-[#8A6518]">
-          {tr(lang, 'Module 11B · Bank Credit Policy Wiki & Bilingual EN/AR Template Studio', 'الوحدة 11ب · موسوعة السياسات المصرفية واستوديو القوالب')}
-        </div>
-        <h1 className="font-display text-2xl font-bold text-[#021125] mt-1">
-          {tr(lang, 'Versioned Underwriting SOPs, Clause References & Client Templates', 'أدلة السياسات الائتمانية الموثقة وقوالب التواصل الثنائية')}
-        </h1>
-      </div>
+      <PageHeader app="Knowledge" appHref="/os/wiki" title="Wiki & Templates" sub={tr(lang, 'Versioned Underwriting SOPs, Clause References & Client Templates', 'أدلة السياسات الائتمانية الموثقة وقوالب التواصل الثنائية')} />
 
       <div className="grid lg:grid-cols-12 gap-6">
         <div className="lg:col-span-7 space-y-4">

@@ -1,6 +1,7 @@
 import { getDb } from '@/server/db';
 import { getActiveLang, requireStaffUser } from '@/server/auth/request';
 import { formatAed, tr } from '@/lib/format';
+import { PageHeader } from '@/components/page-header';
 import { OsBanner } from '@/components/os-banner';
 import { computeCommercialDscr } from '@/server/engines/underwriting-engine';
 
@@ -46,17 +47,10 @@ export default async function CrossSellAndCommercialPage({
     .all() as Record<string, unknown>[];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 max-w-7xl mx-auto">
       <OsBanner notice={sp.notice} error={sp.error} />
 
-      <div>
-        <div className="text-xs font-semibold uppercase tracking-wider text-[#8A6518]">
-          {tr(lang, 'Module 07 · Commercial DSCR, HNW/SPV & 360° Ancillary Cross-Sell', 'الوحدة 07 · التمويل التجاري وخدمات القيمة المضافة')}
-        </div>
-        <h1 className="font-display text-2xl font-bold text-[#021125] mt-1">
-          {tr(lang, 'Commercial Lease-Roll DSCR & External Life / DIFC Wills / FX / Golden Visa Desk', 'حاسبة التغطية التجارية والتأمين والوصايا والإقامة الذهبية')}
-        </h1>
-      </div>
+      <PageHeader app="Sales" appHref="/os/crm" title="Cross-sell & Commercial" sub={tr(lang, 'Commercial Lease-Roll DSCR & External Life / DIFC Wills / FX / Golden Visa Desk', 'حاسبة التغطية التجارية والتأمين والوصايا والإقامة الذهبية')} />
 
       <div className="grid lg:grid-cols-12 gap-6">
         <div className="lg:col-span-6 bw-card p-5 space-y-4">

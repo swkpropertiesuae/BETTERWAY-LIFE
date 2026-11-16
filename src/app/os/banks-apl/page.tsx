@@ -1,6 +1,7 @@
 import { getDb } from '@/server/db';
 import { getActiveLang, requireStaffUser } from '@/server/auth/request';
 import { formatBps, formatMicroPct, tr } from '@/lib/format';
+import { PageHeader } from '@/components/page-header';
 import { OsBanner } from '@/components/os-banner';
 
 export default async function BanksAndAplPage({
@@ -57,18 +58,11 @@ export default async function BanksAndAplPage({
     .all() as Record<string, unknown>[];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 max-w-7xl mx-auto">
       <OsBanner notice={sp.notice} error={sp.error} />
 
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <div className="text-xs font-semibold uppercase tracking-wider text-[#8A6518]">
-            {tr(lang, 'Module 03 · 24-Bank Rate Maker-Checker, EIBOR & 80-Project Tower APL', 'الوحدة 03 · حوكمة أسعار الفائدة وقوائم الأبراج المعتمدة')}
-          </div>
-          <h1 className="font-display text-2xl font-bold text-[#021125] mt-1">
-            {tr(lang, 'Lender Product Intelligence & Approved Project Matrix', 'ذكاء المنتجات المصرفية ومصفوفة المشاريع المعتمدة')}
-          </h1>
-        </div>
+        <PageHeader app="Mortgage Desk" appHref="/os/deals" title="Banks & Rates" sub={tr(lang, 'Lender Product Intelligence & Approved Project Matrix', 'ذكاء المنتجات المصرفية ومصفوفة المشاريع المعتمدة')} />
 
         <form method="POST" action="/api/v1/eibor/sync">
           <button type="submit" className="bw-btn-gold">

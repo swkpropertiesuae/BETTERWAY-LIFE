@@ -1,6 +1,7 @@
 import { getDb } from '@/server/db';
 import { getActiveLang, requireStaffUser } from '@/server/auth/request';
 import { tr } from '@/lib/format';
+import { PageHeader } from '@/components/page-header';
 import { OsBanner } from '@/components/os-banner';
 import { checkBankSubmissionGate, listGoAmlReports } from '@/server/engines/compliance-aml-engine';
 
@@ -56,18 +57,11 @@ export default async function ComplianceAndMlroPage({
   const auditLogs = db.prepare(user.is_mlro === 1 ? 'SELECT * FROM audit_logs ORDER BY id DESC LIMIT 20' : "SELECT * FROM audit_logs WHERE entity_type != 'goaml_reports' ORDER BY id DESC LIMIT 20").all() as Record<string, unknown>[];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 max-w-7xl mx-auto">
       <OsBanner notice={sp.notice} error={sp.error} />
 
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <div className="text-xs font-semibold uppercase tracking-wider text-[#8A6518]">
-            {tr(lang, 'Module 10 · CBUAE Consumer Protection, Sanadak SLA & MLRO goAML Vault', 'الوحدة 10 · حماية المستهلك ومكافحة غسل الأموال')}
-          </div>
-          <h1 className="font-display text-2xl font-bold text-[#021125] mt-1">
-            {tr(lang, 'Multi-Applicant KFS Gate, AML/CDD & Sealed FIU Reporting', 'بوابة بيان الحقائق المشترك، فحص المخاطر وخزنة وحدة المعلومات المالية')}
-          </h1>
-        </div>
+        <PageHeader app="Compliance" appHref="/os/compliance" title="Compliance" sub={tr(lang, 'Multi-Applicant KFS Gate, AML/CDD & Sealed FIU Reporting', 'بوابة بيان الحقائق المشترك، فحص المخاطر وخزنة وحدة المعلومات المالية')} />
 
         <div className="flex flex-wrap gap-2">
           {deals.map((d) => (

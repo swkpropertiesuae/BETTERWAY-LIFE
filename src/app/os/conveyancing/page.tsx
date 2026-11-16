@@ -1,6 +1,7 @@
 import { getDb } from '@/server/db';
 import { getActiveLang, requireStaffUser } from '@/server/auth/request';
 import { formatAed, tr } from '@/lib/format';
+import { PageHeader } from '@/components/page-header';
 import { OsBanner } from '@/components/os-banner';
 import { computeConveyancingPack, generateFormFSpecialConditions } from '@/server/engines/conveyancing-engine';
 
@@ -40,18 +41,11 @@ export default async function ConveyancingPage({
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 max-w-7xl mx-auto">
       <OsBanner notice={sp.notice} error={sp.error} />
 
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <div className="text-xs font-semibold uppercase tracking-wider text-[#8A6518]">
-            {tr(lang, 'Module 04 · RERA Conveyancing, Valuation Rescue & 72h Cheque Splitter', 'الوحدة 04 · نقل الملكية وعقد إف وتقسيم شيكات أمين التسجيل')}
-          </div>
-          <h1 className="font-display text-2xl font-bold text-[#021125] mt-1">
-            {pack.dealRef} — {String(deal.primary_name)} · DLD Trustee Settlement Desk
-          </h1>
-        </div>
+        <PageHeader app="Conveyancing" appHref="/os/conveyancing" title={<>{pack.dealRef} — {String(deal.primary_name)} · DLD Trustee Settlement Desk</>} sub={tr(lang, 'Module 04 · RERA Conveyancing, Valuation Rescue & 72h Cheque Splitter', 'الوحدة 04 · نقل الملكية وعقد إف وتقسيم شيكات أمين التسجيل')}><a className="bw-btn-navy" href={`/os/deals/${deal.id}`}>Deal form →</a></PageHeader>
 
         <div className="flex flex-wrap gap-2">
           {deals.map((d) => (

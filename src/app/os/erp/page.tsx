@@ -1,6 +1,7 @@
 import { getDb } from '@/server/db';
 import { getActiveLang, requireStaffUser } from '@/server/auth/request';
 import { formatAed, formatBps, tr } from '@/lib/format';
+import { PageHeader } from '@/components/page-header';
 import { OsBanner } from '@/components/os-banner';
 import { computeCorporateTaxSummary, computeVat201Summary, getTrialBalance } from '@/server/engines/ledger-tax-engine';
 
@@ -51,17 +52,10 @@ export default async function ErpFinancePage({
   const invoices = db.prepare('SELECT * FROM tax_invoices ORDER BY id DESC').all() as Record<string, unknown>[];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 max-w-7xl mx-auto">
       <OsBanner notice={sp.notice} error={sp.error} />
 
-      <div>
-        <div className="text-xs font-semibold uppercase tracking-wider text-[#8A6518]">
-          {tr(lang, 'Module 08 · Double-Entry UAE ERP, Pay-When-Paid Commissions, Clawbacks & FTA Tax', 'الوحدة 08 · المحاسبة المزدوجة والعمولات والفوترة الإلكترونية')}
-        </div>
-        <h1 className="font-display text-2xl font-bold text-[#021125] mt-1">
-          {tr(lang, 'Brokerage Treasury, Subvention Bordereau, FTA VAT 201 / 9% CT & Peppol PINT-AE', 'الخزينة، تسوية البنوك، ضريبة القيمة المضافة والشركات وفواتير PINT-AE')}
-        </h1>
-      </div>
+      <PageHeader app="Accounting" appHref="/os/erp" title="Ledger & Commissions" sub={tr(lang, 'Brokerage Treasury, Subvention Bordereau, FTA VAT 201 / 9% CT & Peppol PINT-AE', 'الخزينة، تسوية البنوك، ضريبة القيمة المضافة والشركات وفواتير PINT-AE')} />
 
       {/* FTA VAT 201 + 9% Corporate Tax Summary Cards */}
       <div className="grid md:grid-cols-2 gap-6">

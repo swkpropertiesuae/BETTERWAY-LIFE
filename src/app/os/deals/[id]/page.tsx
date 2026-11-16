@@ -38,7 +38,7 @@ export default async function DealForm({ params, searchParams }: { params: Promi
   const hint = w.blockers.find((b) => b.startsWith('Use "'));
 
   return (
-    <div className="max-w-6xl mx-auto space-y-4">
+    <div className="max-w-7xl mx-auto space-y-4">
       <OsBanner notice={sp.notice} error={sp.error} />
       <div className="text-xs text-slate-500"><a className="underline" href="/os/deals">Pipeline</a> / {deal.deal_ref}</div>
 

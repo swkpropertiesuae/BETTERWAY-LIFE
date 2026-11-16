@@ -1,6 +1,7 @@
 import { getDb } from '@/server/db';
 import { getActiveLang, requireStaffUser } from '@/server/auth/request';
 import { formatAed, tr } from '@/lib/format';
+import { PageHeader } from '@/components/page-header';
 import { OsBanner } from '@/components/os-banner';
 
 export default async function CrmPage({
@@ -36,17 +37,10 @@ export default async function CrmPage({
   const banks = db.prepare('SELECT id, name_en FROM banks ORDER BY id ASC').all() as { id: number; name_en: string }[];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 max-w-7xl mx-auto">
       <OsBanner notice={sp.notice} error={sp.error} />
 
-      <div>
-        <div className="text-xs font-semibold uppercase tracking-wider text-[#8A6518]">
-          {tr(lang, 'Module 01 · Omnichannel Lead Engine & 5-Minute GST SLA', 'الوحدة 01 · إدارة العملاء المحتملين متعددة القنوات')}
-        </div>
-        <h1 className="font-display text-2xl font-bold text-[#021125] mt-1">
-          {tr(lang, 'Mortgage Lead Pipeline, Desk Routing & Unified Threader', 'خط أنابيب العملاء وتوجيه المكاتب والمحادثات الموحدة')}
-        </h1>
-      </div>
+      <PageHeader app="Sales" appHref="/os/crm" title="Leads" sub={tr(lang, 'Mortgage Lead Pipeline, Desk Routing & Unified Threader', 'خط أنابيب العملاء وتوجيه المكاتب والمحادثات الموحدة')} />
 
       <div className="bw-card p-5">
         <h2 className="font-display font-bold text-sm text-[#021125] mb-3">
