@@ -2,31 +2,30 @@
 import type { DatabaseSync } from 'node:sqlite';
 import { assertRole, writeAuditLog, type UserRecord } from '@/server/auth';
 import { evaluateDealAcross24Banks } from './underwriting-engine';
-import { activeRows } from '@/server/data-hub/import';
+import { configuredFees } from './fees';
 
 type Row = Record<string, any>;
 const QUOTE_ROLES = ['SUPER_ADMIN', 'SALES_ADVISOR', 'CREDIT_UNDERWRITER'] as const;
-const fils = (aed: string | number) => Math.round(Number(aed) * 100);
 
-/** Closing costs: configured Fees_and_Closing_Costs rows when present, else Dubai defaults (DLD 4% transfer, 0.25% + AED 290 mortgage registration). */
+/** Closing costs: configured Fees_and_Closing_Costs rows win; missing DLD transfer / mortgage registration fall back to Dubai defaults. */
 export function estimateFees(db: DatabaseSync, deal: Row, arrangementFeeFils: number) {
   const price = Number(deal.purchase_price_fils), loan = Number(deal.target_loan_fils);
-  const cfg = activeRows(db, 7).filter((r) => (!r.emirate || r.emirate.toLowerCase() === String(deal.emirate).toLowerCase()) && (!r.transaction_type || r.transaction_type === deal.transaction_type || r.transaction_type === '*'));
-  let govFees = 0;
+  const cfg = configuredFees(db, deal);
   const lines: { name: string; fils: number }[] = [];
-  if (cfg.length) {
-    for (const r of cfg) {
-      const f = (r.rate_pct ? Math.round((price * Number(r.rate_pct) * 100) / 10_000) : 0) + (r.fixed_amount_aed ? fils(r.fixed_amount_aed) : 0);
-      if (r.payer && !/buyer|client|borrower/i.test(r.payer)) continue;
-      lines.push({ name: `${r.authority || ''} ${r.fee_type}`.trim(), fils: f }); govFees += f;
-    }
-  } else {
-    const dld = Math.round(price * 0.04), mort = Math.round(loan * 0.0025) + 29_000;
-    lines.push({ name: 'DLD transfer 4% (default)', fils: dld }, { name: 'Mortgage registration 0.25% + AED 290 (default)', fils: mort });
-    govFees = dld + mort;
+  let gov = 0;
+  const known = (type: string, fallbackName: string, fallback: number) => {
+    const c = cfg.get(type);
+    const fils = c ? (c.buyerPays ? c.fils : 0) : fallback;
+    lines.push({ name: c ? c.name : fallbackName, fils }); gov += fils;
+  };
+  known('DLD_TRANSFER', 'DLD transfer 4% (default)', Math.round(price * 0.04));
+  known('MORTGAGE_REGISTRATION', 'Mortgage registration 0.25% + AED 290 (default)', Math.round(loan * 0.0025) + 29_000);
+  for (const c of cfg.values()) {
+    if (['DLD_TRANSFER', 'MORTGAGE_REGISTRATION'].includes(c.type) || !c.buyerPays) continue; // trustee/agency/other buyer costs
+    lines.push({ name: c.name, fils: c.fils }); gov += c.fils;
   }
   lines.push({ name: 'Bank arrangement fee', fils: arrangementFeeFils }, { name: 'Broker fee (client)', fils: Number(deal.direct_client_fee_fils) });
-  const total = govFees + arrangementFeeFils + Number(deal.direct_client_fee_fils);
+  const total = gov + arrangementFeeFils + Number(deal.direct_client_fee_fils);
   return { lines, cashToCloseFils: Math.max(0, price - loan) + total, downPaymentFils: Math.max(0, price - loan), feesFils: total };
 }
 

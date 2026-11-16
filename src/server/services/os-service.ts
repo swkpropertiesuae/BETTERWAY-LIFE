@@ -1,3 +1,4 @@
+import { openStageTask } from '@/server/engines/workflow-engine';
 import { randomBytes, randomUUID } from 'node:crypto';
 import path from 'node:path';
 import type { DatabaseSync } from 'node:sqlite';
@@ -755,6 +756,7 @@ export function submitDealToBanks(
        WHERE id = ?`,
     ).run(input.primaryBankId, primaryCardId, actor.id, input.dealId);
 
+    openStageTask(db, input.dealId, 'IPA_SUBMITTED');
     writeAuditLog(db, actor, 'deals', input.dealId, 'SUBMIT_DUAL_BANK_IPA', null, {
       primaryBankId: input.primaryBankId,
       backupBankId: input.backupBankId ?? null,

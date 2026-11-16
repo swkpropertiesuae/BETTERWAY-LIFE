@@ -7,6 +7,7 @@ import { evaluateDealAcross24Banks } from './underwriting-engine';
 import { PLAYBOOKS, type Playbook } from './scenarios';
 import { activeRows } from '@/server/data-hub/import';
 import { approvedQuote } from './quotes';
+import { addBusinessDays, bankSla, businessDaysBetween } from './bank-sla';
 
 export const STAGES = [
   'FACT_FIND', 'KFS_PENDING', 'DOC_COLLECTION', 'UNDERWRITING_READY',
@@ -290,6 +291,18 @@ export function getDealWorkflow(db: DatabaseSync, dealId: number, asOf = new Dat
   if (!closed && tags.includes('COMPLIANCE_HOLD'))
     alerts.push({ level: 'CRITICAL', code: 'COMPLIANCE_HOLD', playbook: 'P16', text: 'Compliance hold. Refer to MLRO. Do not discuss with client.' });
   if (!closed && tags.includes('PEP')) alerts.push({ level: 'WARN', code: 'PEP', playbook: 'P15', text: 'PEP applicant: EDD and senior approval required.' });
+  let bankClock: { bank: string; days: number; dueBy: string; contacts: { role: string; channel: string }[] } | null = null;
+  if (!closed && deal.selected_bank_id && stage !== 'TRANSFERRED_DISBURSED') {
+    const sla = bankSla(db, Number(deal.selected_bank_id), String(stage), asOf);
+    if (sla?.days) {
+      const e = db.prepare("SELECT created_at FROM audit_logs WHERE entity_type = 'deals' AND entity_id = ? AND (action LIKE 'WORKFLOW%' OR action = 'SUBMIT_DUAL_BANK_IPA' OR action LIKE 'BANK_%') ORDER BY id DESC LIMIT 1").get(String(dealId)) as Row | undefined;
+      const entered = String(e?.created_at ?? deal.created_at).slice(0, 10);
+      const dueBy = addBusinessDays(entered, sla.days);
+      bankClock = { bank: sla.bankName, days: sla.days, dueBy, contacts: sla.contacts };
+      if (dueBy < asOf)
+        alerts.push({ level: 'WARN', code: 'BANK_SLA_BREACH', text: `${sla.bankName} is ${businessDaysBetween(dueBy, asOf)} business day(s) past its ${sla.days}-day SLA for this stage (due ${dueBy}). Chase via ${sla.contacts[0]?.channel || 'bank desk'}.` });
+    }
+  }
   if (tags.includes('APL_RESTRICTED')) alerts.push({ level: 'WARN', code: 'APL_RESTRICTED', playbook: 'P32', text: 'Project is restricted on the selected bank.' });
 
   const apps = db.prepare("SELECT * FROM applicants WHERE household_id = ? AND applicant_role IN ('PRIMARY','CO_BORROWER','GUARANTOR')").all(deal.household_id) as Row[];
@@ -347,25 +360,31 @@ export function getDealWorkflow(db: DatabaseSync, dealId: number, asOf = new Dat
 
   return {
     dealId, dealRef: deal.deal_ref as string, stage, closed, tags: [...new Set(tags)], track, nextStage, blockers,
-    alerts, nextAction, exceptions, playbooks,
+    alerts, nextAction, exceptions, playbooks, bankClock,
     documents: { required: need.map((n) => n.label), missing: missingDocs(db, dealId, need) },
   };
 }
 
 // ---------- write side ----------
 const WF = '[WF] ';
+/** Opens the owner's task for a stage. If the selected bank has an imported SLA for the stage, the task is a bank chase due in business days. */
+export function openStageTask(db: DatabaseSync, dealId: number, to: Stage) {
+  const m = STAGE_META[to];
+  const rule = stageRule(db, to);
+  const deal = db.prepare('SELECT selected_bank_id FROM deals WHERE id = ?').get(dealId) as { selected_bank_id: number | null };
+  const sla = deal.selected_bank_id ? bankSla(db, deal.selected_bank_id, to) : null;
+  const bankDue = sla?.days ? addBusinessDays(new Date().toISOString(), sla.days) : null;
+  const title = bankDue ? `${WF}${m.label}: chase ${sla!.bankName} via ${sla!.contacts[0]?.channel || 'bank desk'} (SLA ${sla!.days} business days)` : `${WF}${m.label}: ${m.action}`;
+  const due = bankDue ? `${bankDue}T14:00:00.000Z` : new Date(Date.now() + rule.slaHours * 3_600_000).toISOString();
+  db.prepare('INSERT INTO ops_tasks (deal_id, assigned_role, priority, title, due_at) VALUES (?, ?, ?, ?, ?)').run(
+    dealId, rule.owner, rule.slaHours <= 24 ? 'HIGH' : 'NORMAL', title, due);
+}
+
 function setStage(db: DatabaseSync, actor: UserRecord, dealId: number, to: AnyStage, action: string, meta: unknown) {
   const before = db.prepare('SELECT stage FROM deals WHERE id = ?').get(dealId) as { stage: string };
   db.prepare('UPDATE deals SET stage = ? WHERE id = ?').run(to, dealId);
   db.prepare("UPDATE ops_tasks SET status = 'COMPLETED' WHERE deal_id = ? AND status = 'OPEN' AND title LIKE ?").run(dealId, `${WF}%`);
-  if (to !== 'TRANSFERRED_DISBURSED' && to !== 'DECLINED' && to !== 'WITHDRAWN') {
-    const m = STAGE_META[to as Stage];
-    const rule = stageRule(db, to as Stage);
-    db.prepare('INSERT INTO ops_tasks (deal_id, assigned_role, priority, title, due_at) VALUES (?, ?, ?, ?, ?)').run(
-      dealId, rule.owner, rule.slaHours <= 24 ? 'HIGH' : 'NORMAL', `${WF}${m.label}: ${m.action}`,
-      new Date(Date.now() + rule.slaHours * 3_600_000).toISOString(),
-    );
-  }
+  if (to !== 'TRANSFERRED_DISBURSED' && to !== 'DECLINED' && to !== 'WITHDRAWN') openStageTask(db, dealId, to as Stage);
   writeAuditLog(db, actor, 'deals', dealId, action, { stage: before.stage }, { stage: to, ...(meta as object) });
 }
 

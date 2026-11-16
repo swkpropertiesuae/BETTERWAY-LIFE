@@ -8,7 +8,7 @@ export type BankRef = { id: number; bank_key: string; short_name: string; name_e
 
 const norm = (s: unknown) => String(s ?? '').trim().toLowerCase().replace(/[\s-]+/g, '_');
 const ALL = new Set(['', 'all', '*', 'global', 'regulatory', 'cbuae']);
-const isBank = (b: BankRef, v: unknown) => [String(b.id), b.bank_key, b.short_name, b.name_en].map(norm).includes(norm(v));
+export const isBank = (b: BankRef, v: unknown) => [String(b.id), b.bank_key, b.short_name, b.name_en].map(norm).includes(norm(v));
 const pctToBps = (v: string) => Math.round(Number(v) * 100);
 
 export type Segments = Set<string>;

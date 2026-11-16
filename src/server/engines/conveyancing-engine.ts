@@ -1,4 +1,5 @@
 import type { DatabaseSync } from 'node:sqlite';
+import { configuredFees } from './fees';
 
 export type ConveyancingPack = {
   dealId: number;
@@ -48,14 +49,16 @@ export function computeConveyancingPack(db: DatabaseSync, dealId: number, buffer
 
   // Statutory DLD fees in integer fils:
   // Ready purchase: 4% of price + AED 580 (58,000 fils); Off-plan handover (Oqood already paid): AED 580 title deed issuance
-  const dldTransferFils = isHandover ? 58_000 : Math.round(priceFils * 0.04) + 58_000;
+  // Any of these can be replaced by Fees_and_Closing_Costs rows (Data Hub); defaults apply when none is configured.
+  const cfg = configuredFees(db, deal);
+  const dldTransferFils = cfg.get('DLD_TRANSFER')?.fils ?? (isHandover ? 58_000 : Math.round(priceFils * 0.04) + 58_000);
   // Mortgage registration: 0.25% of loan + AED 290 (29,000 fils)
-  const mortgageRegFils = loanFils > 0 ? Math.round(loanFils * 0.0025) + 29_000 : 0;
+  const mortgageRegFils = cfg.get('MORTGAGE_REGISTRATION')?.fils ?? (loanFils > 0 ? Math.round(loanFils * 0.0025) + 29_000 : 0);
   // Trustee fee: AED 4,200 (420,000 fils) for price >= AED 500k, else AED 2,100 (210,000 fils)
-  const trusteeFeeFils = priceFils >= 50_000_000 ? 420_000 : 210_000;
+  const trusteeFeeFils = cfg.get('TRUSTEE')?.fils ?? (priceFils >= 50_000_000 ? 420_000 : 210_000);
   // Agency commission: 2% + 5% VAT (= 2.1%) on secondary purchase when enabled
   const includeAgency = !isHandover && Number(conv.include_agency_fee ?? 1) === 1;
-  const agencyFeeInclVatFils = includeAgency ? Math.round(priceFils * 0.021) : 0;
+  const agencyFeeInclVatFils = includeAgency ? (cfg.get('AGENCY')?.fils ?? Math.round(priceFils * 0.021)) : 0;
 
   const totalManagerChequesFils =
     sellerBankPayoffFils + sellerNetFils + dldTransferFils + mortgageRegFils + trusteeFeeFils + agencyFeeInclVatFils;

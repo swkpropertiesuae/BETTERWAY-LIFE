@@ -172,7 +172,9 @@ export default async function DealForm({ params, searchParams }: { params: Promi
       )}
 
       {tab === 'banks' && (
-        <div className="bw-card p-4 text-xs"><h2 className="font-bold text-sm mb-2">Bank submissions</h2>
+        <div className="bw-card p-4 text-xs">
+          {w.bankClock && <div className="mb-3 rounded-2xl bg-[#e8f3ff] p-3"><b>{w.bankClock.bank}</b> SLA {w.bankClock.days} business days for this stage · due by <b>{w.bankClock.dueBy}</b>{w.bankClock.contacts.length > 0 && <span> · contacts: {w.bankClock.contacts.map((c) => `${c.role} (${c.channel})`).join(', ')}</span>}</div>}
+          <h2 className="font-bold text-sm mb-2">Bank submissions</h2>
           {subs.length === 0 ? <div className="text-slate-500">Not submitted yet. <a className="underline" href={`/os/los?dealId=${dealId}`}>Open underwriting</a></div> : subs.map((s) => (
             <div key={s.id} className="py-2 border-b border-slate-100 grid grid-cols-2 md:grid-cols-6 gap-2"><b>{s.bank}</b><span>{s.priority}</span><span>{s.status}</span><span>DBR {formatBps(s.calculated_dbr_bps)}</span><span>LTV {formatBps(s.calculated_ltv_bps)}</span><span>IPA {s.ipa_ref || '—'} {s.ipa_expires_at ? `exp ${s.ipa_expires_at}` : ''}</span></div>))}</div>
       )}

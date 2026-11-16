@@ -37,7 +37,7 @@ Mapped onto the 14 OS stages by `milestones.ts` and shown as a 12-segment bar on
 Catalog: `src/server/data-hub/specs.ts` (exact columns). Screen: `/os/data`.
 
 - **Setup (21 files) and Migration (8) and Test (2):** blank template download (with guide sheet), CSV or XLSX import, per-row validation (types, dates, percentages, duplicates, effective window), rows without source/approver held and never used, new setup version supersedes old, batch reconciliation (source = accepted + held + rejected) and sign-off with evidence.
-- **Engines that already read imported setup:** 06 Document checklist (adds mandatory docs), 07 Fees (cash-to-close), 08 Stage SLAs, owners and reason codes (withdraw/decline then needs a code). Others stored only.
+- **Engines that read imported setup:** 01 Bank master, 03 Products and rates, 04 Eligibility rules, 05 Employer/income policies (underwriting, tighten-only), 02 Bank contacts and SLAs (due dates, chase tasks, breach alerts, contacts on the deal), 06 Document checklist, 07 Fees (quote cash-to-close and the cheque pack), 08 Stage SLAs, owners and reason codes. Others stored only.
 - **Exports built (15):** 24-33, 41, 43, 44, plus audit of every export. Restricted files (26, 31, 32, 33, 45, 47, 50) need role and purpose. Not generated yet: 36-39 are setup (import), 40, 42, 45, 47, 50 (template only).
 - **Test:** 34 UAT cases generated from the 37 playbooks. 35 DR log is import-only; the actual restore test has not been run.
 

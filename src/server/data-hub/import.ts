@@ -139,6 +139,8 @@ export function activeRows(db: DatabaseSync, specNo: number, asOf = new Date().t
 
 export function templateGuide(spec: Spec): string[][] {
   const g: string[][] = [['File', spec.file], ['Type', `${spec.type} · ${spec.phase}${spec.restricted ? ' · restricted' : ''}`], ['Area', spec.area], ['Key (must be unique)', keyCols(spec).join(' + ')], ['Dates', 'YYYY-MM-DD'], ['Amounts / percentages', '*_aed and *_pct: plain numbers, percentages 0-100'], ['Flags', 'Y or N']];
+  if (spec.no === 7) g.push(['fee_type values', 'DLD_TRANSFER, MORTGAGE_REGISTRATION, TRUSTEE, AGENCY, TITLE_DEED (others count as extra buyer costs). rate_pct applies to price (loan for MORTGAGE_REGISTRATION) plus fixed_amount_aed. vat_treatment EXCLUSIVE adds 5%. payer BUYER or SELLER. Row with exact transaction_type beats a blank one.']);
+  if (spec.no === 2) g.push(['stage_code', 'OS stage name (e.g. IPA_SUBMITTED, FOL_ISSUED) or blank for any stage. sla_business_days counts Monday to Friday. contact_role + secure_channel appear on the deal Banks tab.']);
   if (spec.type === 'Setup') g.push(['Hold rule', 'Rows without source_ref / approver / last_verified_at are held for review and not used by the OS']);
   if (spec.type === 'Migration') g.push(['Duplicates', 'Rows whose external ID was already imported are rejected; reconcile accepted vs rejected after import']);
   return g;
