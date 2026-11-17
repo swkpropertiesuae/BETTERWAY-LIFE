@@ -1,4 +1,4 @@
-import { createHash, randomBytes, scryptSync, timingSafeEqual } from 'node:crypto';
+import { createHash, createHmac, randomBytes, scryptSync, timingSafeEqual } from 'node:crypto';
 import type { DatabaseSync } from 'node:sqlite';
 
 export type UserRole =
@@ -62,7 +62,15 @@ export function verifyPassword(password: string, stored: string): boolean {
 
 const sha256Hex = (input: string) => createHash('sha256').update(input).digest('hex');
 
+// shortcut: on Vercel the sqlite db is per-instance, so sessions are signed tokens (no server-side revoke); use a hosted DB for real use
+const signSession = (userId: number, exp: number) =>
+  createHmac('sha256', process.env.BW_VAULT_MASTER_KEY || 'demo').update(`${userId}.${exp}`).digest('hex');
+
 export function createSession(db: DatabaseSync, userId: number, ip = '127.0.0.1', userAgent = ''): string {
+  if (process.env.VERCEL) {
+    const exp = Date.now() + 14 * 86_400_000;
+    return `v1.${userId}.${exp}.${signSession(userId, exp)}`;
+  }
   const rawToken = randomBytes(32).toString('hex');
   const tokenHash = sha256Hex(rawToken);
   const expiresAt = new Date(Date.now() + 14 * 86_400_000).toISOString();
@@ -75,6 +83,20 @@ export function createSession(db: DatabaseSync, userId: number, ip = '127.0.0.1'
 
 export function resolveSession(db: DatabaseSync, rawToken?: string | null): UserRecord | null {
   if (!rawToken) return null;
+  if (process.env.VERCEL) {
+    const [v, id, exp, sig] = rawToken.split('.');
+    if (v !== 'v1' || !sig || Number(exp) <= Date.now()) return null;
+    const good = Buffer.from(signSession(Number(id), Number(exp)));
+    const got = Buffer.from(sig);
+    if (good.length !== got.length || !timingSafeEqual(good, got)) return null;
+    const u = db
+      .prepare(
+        `SELECT id, email, phone, full_name_en, full_name_ar, role, is_mlro, can_approve_rates, preferred_lang, status
+         FROM users WHERE id = ? AND status = 'ACTIVE'`,
+      )
+      .get(Number(id)) as UserRecord | undefined;
+    return u ?? null;
+  }
   const tokenHash = sha256Hex(rawToken);
   const row = db
     .prepare(
