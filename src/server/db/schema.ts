@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS company_settings (
   peppol_endpoint_id TEXT NOT NULL,
   office_address TEXT NOT NULL,
   house_clawback_provision_bps INTEGER NOT NULL DEFAULT 1000,
+  production_lock_enabled INTEGER NOT NULL DEFAULT 0 CHECK (production_lock_enabled IN (0,1)),
   updated_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
@@ -393,7 +394,10 @@ CREATE TABLE IF NOT EXISTS conveyancing_cases (
   trustee_office TEXT NOT NULL DEFAULT '',
   transfer_appointment_at TEXT,
   cheque_split_json TEXT,
-  title_deed_no TEXT NOT NULL DEFAULT ''
+  title_deed_no TEXT NOT NULL DEFAULT '',
+  valuation_access_status TEXT NOT NULL DEFAULT 'ACCESS_CONFIRMED',
+  developer_portal_name TEXT NOT NULL DEFAULT 'Emaar Sakani Portal',
+  dld_blocking_stage TEXT NOT NULL DEFAULT 'NOT_REQUIRED'
 );
 
 CREATE TABLE IF NOT EXISTS vault_documents (
@@ -584,6 +588,8 @@ CREATE TABLE IF NOT EXISTS vendor_bills (
   input_vat_fils INTEGER NOT NULL DEFAULT 0,
   input_vat_category TEXT NOT NULL DEFAULT 'DIRECT_TAXABLE' CHECK (input_vat_category IN ('DIRECT_TAXABLE','DIRECT_EXEMPT','RESIDUAL_OVERHEAD')),
   ct_deductibility TEXT NOT NULL DEFAULT 'FULL_100' CHECK (ct_deductibility IN ('FULL_100','ENTERTAINMENT_50','NON_DEDUCTIBLE_0')),
+  approval_status TEXT NOT NULL DEFAULT 'APPROVED' CHECK (approval_status IN ('PENDING_OWNER_APPROVAL','APPROVED','REJECTED')),
+  approved_by_user_id INTEGER REFERENCES users(id),
   gl_entry_id INTEGER REFERENCES gl_journal_entries(id),
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
@@ -925,5 +931,199 @@ CREATE TABLE IF NOT EXISTS go_live_items (
   status TEXT NOT NULL DEFAULT 'OPEN' CHECK (status IN ('OPEN','DONE','NOT_APPLICABLE')),
   evidence TEXT NOT NULL DEFAULT '',
   updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS recycle_bin_requests (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  entity_type TEXT NOT NULL,
+  entity_id TEXT NOT NULL,
+  record_title TEXT NOT NULL,
+  snapshot_json TEXT NOT NULL DEFAULT '{}',
+  delete_reason TEXT NOT NULL,
+  requested_by_user_id INTEGER REFERENCES users(id),
+  requested_by_name TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'PENDING' CHECK (status IN ('PENDING','APPROVED_DELETED','REJECTED_RESTORED')),
+  owner_notes TEXT NOT NULL DEFAULT '',
+  decided_by_user_id INTEGER REFERENCES users(id),
+  decided_at TEXT,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS manager_admin_decisions (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  decision_ref TEXT NOT NULL UNIQUE,
+  subject TEXT NOT NULL,
+  category TEXT NOT NULL,
+  reason TEXT NOT NULL,
+  amount_fils INTEGER NOT NULL DEFAULT 0,
+  submitted_by_user_id INTEGER REFERENCES users(id),
+  submitted_by_name TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'PENDING' CHECK (status IN ('PENDING','APPROVED','REJECTED')),
+  owner_comment TEXT NOT NULL DEFAULT '',
+  decided_by_user_id INTEGER REFERENCES users(id),
+  decided_at TEXT,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS deal_withdrawals (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  withdrawal_ref TEXT NOT NULL UNIQUE,
+  deal_id INTEGER REFERENCES deals(id) ON DELETE SET NULL,
+  client_name TEXT NOT NULL,
+  department TEXT NOT NULL DEFAULT 'READY_SECONDARY' CHECK (department IN ('READY_SECONDARY','OFFPLAN_HANDOVER','BUYOUT_COMMERCIAL')),
+  withdrawal_stage TEXT NOT NULL DEFAULT 'FOL_ISSUED',
+  withdrawal_reason TEXT NOT NULL,
+  collected_fee_fils INTEGER NOT NULL DEFAULT 0,
+  incurred_cost_fils INTEGER NOT NULL DEFAULT 0,
+  refundable_fils INTEGER NOT NULL DEFAULT 0,
+  payment_channel TEXT NOT NULL DEFAULT 'Betterway Company Bank Account (AED/FX)',
+  status TEXT NOT NULL DEFAULT 'PENDING_OWNER' CHECK (status IN ('PENDING_MANAGER','PENDING_OWNER','APPROVED_REFUNDED','REJECTED')),
+  manager_notes TEXT NOT NULL DEFAULT '',
+  owner_notes TEXT NOT NULL DEFAULT '',
+  approved_by_owner_id INTEGER REFERENCES users(id),
+  decided_at TEXT,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS office_attendance_logs (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  employee_name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  check_in_date TEXT NOT NULL,
+  check_in_time_gst TEXT NOT NULL,
+  shift_name TEXT NOT NULL,
+  is_late INTEGER NOT NULL DEFAULT 0 CHECK (is_late IN (0,1)),
+  late_minutes INTEGER NOT NULL DEFAULT 0,
+  qr_stand_code TEXT NOT NULL DEFAULT 'BW-RECEPTION-STAND-DXB-1',
+  network_ssid TEXT NOT NULL DEFAULT 'Betterway-Office-5G',
+  device_id TEXT NOT NULL DEFAULT 'WEB-BROWSER',
+  status TEXT NOT NULL DEFAULT 'ON_TIME' CHECK (status IN ('ON_TIME','LATE','HOLIDAY_CLIENT_VISIT')),
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS late_contemptor_alerts (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  employee_name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  late_count_7d INTEGER NOT NULL,
+  window_start_date TEXT NOT NULL,
+  window_end_date TEXT NOT NULL,
+  alert_status TEXT NOT NULL DEFAULT 'OPEN' CHECK (alert_status IN ('OPEN','ACKNOWLEDGED')),
+  notified_owner_at TEXT NOT NULL DEFAULT (datetime('now')),
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS daily_work_reports (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  employee_name TEXT NOT NULL,
+  report_date TEXT NOT NULL,
+  calls_count INTEGER NOT NULL DEFAULT 0,
+  leads_qualified INTEGER NOT NULL DEFAULT 0,
+  site_visits_count INTEGER NOT NULL DEFAULT 0,
+  ipas_submitted INTEGER NOT NULL DEFAULT 0,
+  summary_notes TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'SUBMITTED' CHECK (status IN ('SUBMITTED','REVIEWED')),
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS dld_market_transactions (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  tx_ref TEXT NOT NULL UNIQUE,
+  tx_date TEXT NOT NULL,
+  area_code TEXT NOT NULL,
+  area_name TEXT NOT NULL,
+  property_type TEXT NOT NULL,
+  transaction_category TEXT NOT NULL,
+  size_sqft INTEGER NOT NULL,
+  amount_fils INTEGER NOT NULL,
+  ppsf_aed INTEGER NOT NULL,
+  lender_bank TEXT NOT NULL,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS loan_amortization_schedules (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  schedule_ref TEXT NOT NULL UNIQUE,
+  deal_id INTEGER NOT NULL REFERENCES deals(id) ON DELETE CASCADE,
+  principal_fils INTEGER NOT NULL,
+  tenure_months INTEGER NOT NULL,
+  fixed_years INTEGER NOT NULL DEFAULT 3,
+  intro_rate_bps INTEGER NOT NULL,
+  revert_eibor_bps INTEGER NOT NULL,
+  revert_margin_bps INTEGER NOT NULL,
+  floor_rate_bps INTEGER NOT NULL DEFAULT 299,
+  intro_monthly_emi_fils INTEGER NOT NULL,
+  revert_monthly_emi_fils INTEGER NOT NULL,
+  total_interest_fils INTEGER NOT NULL,
+  total_payable_fils INTEGER NOT NULL,
+  first_year_principal_fils INTEGER NOT NULL,
+  first_year_interest_fils INTEGER NOT NULL,
+  early_settlement_fee_cap_fils INTEGER NOT NULL DEFAULT 1000000,
+  schedule_json TEXT NOT NULL,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS credit_risk_profiles (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  deal_id INTEGER NOT NULL UNIQUE REFERENCES deals(id) ON DELETE CASCADE,
+  applicant_id INTEGER REFERENCES applicants(id) ON DELETE SET NULL,
+  aecb_score INTEGER NOT NULL DEFAULT 740,
+  stressed_dbr_bps INTEGER NOT NULL DEFAULT 4200,
+  ltv_bps INTEGER NOT NULL DEFAULT 7500,
+  employer_tier TEXT NOT NULL DEFAULT 'APPROVED_LISTED',
+  bounced_cheques_count INTEGER NOT NULL DEFAULT 0,
+  overdue_days INTEGER NOT NULL DEFAULT 0,
+  overdue_amount_fils INTEGER NOT NULL DEFAULT 0,
+  composite_risk_score INTEGER NOT NULL DEFAULT 82,
+  risk_grade TEXT NOT NULL DEFAULT 'AA_STANDARD' CHECK (risk_grade IN ('AAA_PRIME','AA_STANDARD','BBB_WATCH','CCC_HIGH_RISK','D_BLOCKED')),
+  dunning_level TEXT NOT NULL DEFAULT 'NONE' CHECK (dunning_level IN ('NONE','REMINDER_7D','FORMAL_DEMAND_15D','CREDIT_HOLD_30D')),
+  credit_committee_decision TEXT NOT NULL DEFAULT 'AUTO_APPROVED' CHECK (credit_committee_decision IN ('AUTO_APPROVED','REFER_COMMITTEE','DECLINED_HOLD')),
+  risk_notes TEXT NOT NULL DEFAULT '',
+  updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS real_estate_assets (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  property_code TEXT NOT NULL UNIQUE,
+  deal_id INTEGER REFERENCES deals(id) ON DELETE SET NULL,
+  household_id INTEGER REFERENCES households(id) ON DELETE SET NULL,
+  registration_type TEXT NOT NULL DEFAULT 'TITLE_DEED' CHECK (registration_type IN ('TITLE_DEED','OQOOD_PRE_TITLE')),
+  title_deed_or_oqood_no TEXT NOT NULL,
+  dld_plot_no TEXT NOT NULL,
+  makani_no TEXT NOT NULL,
+  community_name TEXT NOT NULL,
+  building_or_project_name TEXT NOT NULL,
+  unit_no TEXT NOT NULL,
+  property_type TEXT NOT NULL DEFAULT 'VILLA',
+  built_up_area_sqft INTEGER NOT NULL,
+  purchase_price_fils INTEGER NOT NULL,
+  latest_valuation_fils INTEGER NOT NULL,
+  annual_service_charge_fils INTEGER NOT NULL DEFAULT 0,
+  ejari_annual_rent_fils INTEGER NOT NULL DEFAULT 0,
+  gross_yield_bps INTEGER NOT NULL DEFAULT 0,
+  net_yield_bps INTEGER NOT NULL DEFAULT 0,
+  first_rank_mortgagee_bank TEXT NOT NULL DEFAULT 'Emirates NBD',
+  encumbrance_status TEXT NOT NULL DEFAULT 'FIRST_RANK_MORTGAGE' CHECK (encumbrance_status IN ('UNENCUMBERED','FIRST_RANK_MORTGAGE','DEVELOPER_ESCROW_LIEN','RELEASED')),
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS pdc_cheque_register (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  cheque_ref TEXT NOT NULL UNIQUE,
+  deal_id INTEGER NOT NULL REFERENCES deals(id) ON DELETE CASCADE,
+  cheque_type TEXT NOT NULL CHECK (cheque_type IN ('SECURITY_DEPOSIT_10PCT','INSTALLMENT_PDC','AGENCY_FEE_PDC','DLD_MANAGER_CHEQUE','SUBVENTION_CHEQUE')),
+  cheque_number TEXT NOT NULL,
+  drawer_name TEXT NOT NULL,
+  drawer_bank TEXT NOT NULL,
+  payee_name TEXT NOT NULL,
+  amount_fils INTEGER NOT NULL CHECK (amount_fils > 0),
+  maturity_date TEXT NOT NULL,
+  vault_status TEXT NOT NULL DEFAULT 'IN_SAFE_VAULT' CHECK (vault_status IN ('IN_SAFE_VAULT','PRESENTED_TO_BANK','CLEARED','BOUNCED_DISHONOURED','RETURNED_TO_CLIENT')),
+  bounce_reason TEXT NOT NULL DEFAULT '',
+  gl_entry_id INTEGER REFERENCES gl_journal_entries(id),
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 `;

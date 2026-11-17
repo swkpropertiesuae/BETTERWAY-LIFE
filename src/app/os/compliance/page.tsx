@@ -24,25 +24,27 @@ export default async function ComplianceAndMlroPage({
     .all() as { id: number; deal_ref: string; household_id: number; cdd_status: string; stage: string; primary_name: string }[];
 
   const activeDeal = deals.find((d) => d.id === Number(sp.dealId)) ?? deals[0];
-  const gate = checkBankSubmissionGate(db, activeDeal.id);
+  const gate = activeDeal ? checkBankSubmissionGate(db, activeDeal.id) : { allowed: false, missing: [] };
 
-  const applicants = db
-    .prepare(
-      `SELECT a.id, a.full_name_en, a.applicant_role, a.residency_type,
-              (SELECT signed_at FROM kfs_acknowledgements k WHERE k.deal_id = ? AND k.applicant_id = a.id) as kfs_signed_at,
-              (SELECT risk_band || ' (' || risk_score || ')' FROM aml_screenings s WHERE s.deal_id = ? AND s.applicant_id = a.id ORDER BY s.id DESC LIMIT 1) as aml_summary
-       FROM applicants a
-       WHERE a.household_id = ?
-       ORDER BY a.id ASC`,
-    )
-    .all(activeDeal.id, activeDeal.id, activeDeal.household_id) as {
-    id: number;
-    full_name_en: string;
-    applicant_role: string;
-    residency_type: string;
-    kfs_signed_at: string | null;
-    aml_summary: string | null;
-  }[];
+  const applicants = activeDeal
+    ? (db
+        .prepare(
+          `SELECT a.id, a.full_name_en, a.applicant_role, a.residency_type,
+                  (SELECT signed_at FROM kfs_acknowledgements k WHERE k.deal_id = ? AND k.applicant_id = a.id) as kfs_signed_at,
+                  (SELECT risk_band || ' (' || risk_score || ')' FROM aml_screenings s WHERE s.deal_id = ? AND s.applicant_id = a.id ORDER BY s.id DESC LIMIT 1) as aml_summary
+           FROM applicants a
+           WHERE a.household_id = ?
+           ORDER BY a.id ASC`,
+        )
+        .all(activeDeal.id, activeDeal.id, activeDeal.household_id) as {
+        id: number;
+        full_name_en: string;
+        applicant_role: string;
+        residency_type: string;
+        kfs_signed_at: string | null;
+        aml_summary: string | null;
+      }[])
+    : [];
 
   // Chinese-Wall check for Sealed UAE FIU goAML Vault:
   let goAmlReports: ReturnType<typeof listGoAmlReports> | null = null;
@@ -80,63 +82,81 @@ export default async function ComplianceAndMlroPage({
 
       {/* Multi-Applicant KFS & CDD Gate Matrix */}
       <div className="bw-card p-5 space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <div>
-            <h2 className="font-display font-bold text-base text-[#021125]">
-              Joint Applicant KFS & AML/CDD Clearance Matrix — {activeDeal.deal_ref}
+        {!activeDeal ? (
+          <div className="text-center py-6 space-y-2">
+            <h2 className="font-display font-bold text-base text-[var(--ink)]">
+              Joint Applicant KFS &amp; AML/CDD Clearance Matrix
             </h2>
-            <p className="text-xs text-slate-500">
-              Every obligated applicant (`PRIMARY`, `CO_BORROWER`, `GUARANTOR`) must digitally sign the CBUAE KFS and pass Source-of-Funds CDD before `IPA_SUBMITTED`.
+            <p className="text-xs text-[var(--muted)] max-w-md mx-auto">
+              No active mortgage files require KFS or AML screening yet. Convert a borrower lead in CRM (/os/crm) to open a compliance clearance file here.
             </p>
-          </div>
-          <span className={`bw-badge ${gate.allowed ? 'bg-emerald-100 text-emerald-900' : 'bg-amber-100 text-amber-900'}`}>
-            {gate.allowed ? '✓ GATE READY FOR IPA' : 'LOCKED UNTIL ALL APPLICANTS CLEARED'}
-          </span>
-        </div>
-
-        <div className="space-y-3">
-          {applicants.map((a) => (
-            <div key={a.id} className="rounded-lg border border-slate-200 p-3.5 grid lg:grid-cols-12 gap-3 items-center text-xs">
-              <div className="lg:col-span-4">
-                <div className="font-bold text-[#021125]">
-                  {a.full_name_en} <span className="bw-badge bg-slate-100 text-slate-700">{a.applicant_role}</span>
-                </div>
-                <div className="text-slate-500 mt-0.5">
-                  KFS: {a.kfs_signed_at ? <strong className="text-emerald-700">✓ Signed ({a.kfs_signed_at})</strong> : <strong className="text-rose-700">Missing</strong>}
-                  {' · '}AML: <strong>{a.aml_summary || 'Unscreened'}</strong>
-                </div>
-              </div>
-
-              <form method="POST" action="/api/v1/actions" className="lg:col-span-4 flex gap-2 items-center">
-                <input type="hidden" name="action" value="sign_kfs" />
-                <input type="hidden" name="dealId" value={activeDeal.id} />
-                <input type="hidden" name="applicantId" value={a.id} />
-                <input type="hidden" name="signedByName" value={a.full_name_en} />
-                <input type="hidden" name="returnTo" value={`/os/compliance?dealId=${activeDeal.id}`} />
-                <input
-                  name="disclosedLfiCommissionRange"
-                  defaultValue="0.45% - 1.00% paid by LFI"
-                  className="bw-input text-[11px]"
-                />
-                <button type="submit" className="bw-btn-gold shrink-0">Sign KFS</button>
-              </form>
-
-              <form method="POST" action="/api/v1/actions" className="lg:col-span-4 flex gap-2 items-center">
-                <input type="hidden" name="action" value="run_aml_screening" />
-                <input type="hidden" name="dealId" value={activeDeal.id} />
-                <input type="hidden" name="applicantId" value={a.id} />
-                <input type="hidden" name="returnTo" value={`/os/compliance?dealId=${activeDeal.id}`} />
-                <select name="sourceOfFundsType" className="bw-input text-[11px]">
-                  <option value="UAE_SALARY_SAVINGS">UAE Salary Savings</option>
-                  <option value="PROPERTY_SALE_PROCEEDS">Property Sale Proceeds</option>
-                  <option value="OVERSEAS_DIVIDENDS">Overseas Dividends</option>
-                  <option value="GIFT_FIRST_DEGREE">First-Degree Family Gift</option>
-                </select>
-                <button type="submit" className="bw-btn-navy shrink-0">Clear CDD</button>
-              </form>
+            <div className="pt-2">
+              <a href="/os/crm" className="bw-btn-gold">
+                + Open Leads &amp; 5m SLA Desk →
+              </a>
             </div>
-          ))}
-        </div>
+          </div>
+        ) : (
+          <>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <h2 className="font-display font-bold text-base text-[#021125]">
+                  Joint Applicant KFS &amp; AML/CDD Clearance Matrix — {activeDeal.deal_ref}
+                </h2>
+                <p className="text-xs text-slate-500">
+                  Every obligated applicant (`PRIMARY`, `CO_BORROWER`, `GUARANTOR`) must digitally sign the CBUAE KFS and pass Source-of-Funds CDD before `IPA_SUBMITTED`.
+                </p>
+              </div>
+              <span className={`bw-badge ${gate.allowed ? 'bg-emerald-100 text-emerald-900' : 'bg-amber-100 text-amber-900'}`}>
+                {gate.allowed ? '✓ GATE READY FOR IPA' : 'LOCKED UNTIL ALL APPLICANTS CLEARED'}
+              </span>
+            </div>
+
+            <div className="space-y-3">
+              {applicants.map((a) => (
+                <div key={a.id} className="rounded-lg border border-slate-200 p-3.5 grid lg:grid-cols-12 gap-3 items-center text-xs">
+                  <div className="lg:col-span-4">
+                    <div className="font-bold text-[#021125]">
+                      {a.full_name_en} <span className="bw-badge bg-slate-100 text-slate-700">{a.applicant_role}</span>
+                    </div>
+                    <div className="text-slate-500 mt-0.5">
+                      KFS: {a.kfs_signed_at ? <strong className="text-emerald-700">✓ Signed ({a.kfs_signed_at})</strong> : <strong className="text-rose-700">Missing</strong>}
+                      {' · '}AML: <strong>{a.aml_summary || 'Unscreened'}</strong>
+                    </div>
+                  </div>
+
+                  <form method="POST" action="/api/v1/actions" className="lg:col-span-4 flex gap-2 items-center">
+                    <input type="hidden" name="action" value="sign_kfs" />
+                    <input type="hidden" name="dealId" value={activeDeal.id} />
+                    <input type="hidden" name="applicantId" value={a.id} />
+                    <input type="hidden" name="signedByName" value={a.full_name_en} />
+                    <input type="hidden" name="returnTo" value={`/os/compliance?dealId=${activeDeal.id}`} />
+                    <input
+                      name="disclosedLfiCommissionRange"
+                      defaultValue="0.45% - 1.00% paid by LFI"
+                      className="bw-input text-[11px]"
+                    />
+                    <button type="submit" className="bw-btn-gold shrink-0">Sign KFS</button>
+                  </form>
+
+                  <form method="POST" action="/api/v1/actions" className="lg:col-span-4 flex gap-2 items-center">
+                    <input type="hidden" name="action" value="run_aml_screening" />
+                    <input type="hidden" name="dealId" value={activeDeal.id} />
+                    <input type="hidden" name="applicantId" value={a.id} />
+                    <input type="hidden" name="returnTo" value={`/os/compliance?dealId=${activeDeal.id}`} />
+                    <select name="sourceOfFundsType" className="bw-input text-[11px]">
+                      <option value="UAE_SALARY_SAVINGS">UAE Salary Savings</option>
+                      <option value="PROPERTY_SALE_PROCEEDS">Property Sale Proceeds</option>
+                      <option value="OVERSEAS_DIVIDENDS">Overseas Dividends</option>
+                      <option value="GIFT_FIRST_DEGREE">First-Degree Family Gift</option>
+                    </select>
+                    <button type="submit" className="bw-btn-navy shrink-0">Clear CDD</button>
+                  </form>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
       </div>
 
       {/* Sealed UAE FIU goAML Vault (Chinese Wall) */}

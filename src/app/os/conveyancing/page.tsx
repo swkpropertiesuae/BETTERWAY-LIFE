@@ -23,6 +23,40 @@ export default async function ConveyancingPage({
     )
     .all() as Record<string, unknown>[];
 
+  if (deals.length === 0) {
+    return (
+      <div className="space-y-5 max-w-7xl mx-auto">
+        <OsBanner notice={sp.notice} error={sp.error} />
+        <PageHeader
+          app="Sales & Conveyancing"
+          appHref="/os/conveyancing"
+          title="DLD Trustee Settlement & Manager's Cheque Desk"
+          sub="Form F (MOU) Contingency Tracker, RICS Down-Valuation Rescue, Developer NOC & 72h Cheque Splitter"
+        >
+          <a href="/os/crm" className="bw-btn-gold">
+            + Capture Lead &amp; Convert to Deal →
+          </a>
+        </PageHeader>
+        <div className="bw-card p-10 text-center space-y-3">
+          <h2 className="text-base font-bold text-[var(--ink)]">
+            No Active Conveyancing Cases Yet
+          </h2>
+          <p className="text-xs text-[var(--muted)] max-w-md mx-auto">
+            Once a borrower lead is converted into an active mortgage deal in CRM (/os/crm), its Form F (MOU) contingency dates, developer NOC status, and exact Fils-level Manager&apos;s Cheque splits appear here automatically.
+          </p>
+          <div className="pt-2 flex justify-center gap-2">
+            <a href="/os/crm" className="bw-btn-gold">
+              + Open Leads &amp; 5m SLA Desk
+            </a>
+            <a href="/os/deals" className="bw-btn-navy">
+              Open Deal Pipeline
+            </a>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const dealId = sp.dealId ? Number(sp.dealId) : Number(deals[0]?.id || 1);
   const deal = (deals.find((d) => Number(d.id) === dealId) ?? deals[0]) as Record<string, unknown>;
   const conv = (db.prepare('SELECT * FROM conveyancing_cases WHERE deal_id = ?').get(dealId) ?? {}) as Record<string, unknown>;
@@ -45,7 +79,12 @@ export default async function ConveyancingPage({
       <OsBanner notice={sp.notice} error={sp.error} />
 
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <PageHeader app="Conveyancing" appHref="/os/conveyancing" title={<>{pack.dealRef} — {String(deal.primary_name)} · DLD Trustee Settlement Desk</>} sub={tr(lang, 'Module 04 · RERA Conveyancing, Valuation Rescue & 72h Cheque Splitter', 'الوحدة 04 · نقل الملكية وعقد إف وتقسيم شيكات أمين التسجيل')}><a className="bw-btn-navy" href={`/os/deals/${deal.id}`}>Deal form →</a></PageHeader>
+        <PageHeader app="Conveyancing" appHref="/os/conveyancing" title={<>{pack.dealRef} — {String(deal.primary_name)} · DLD Trustee Settlement Desk</>} sub={tr(lang, 'Module 04 · RERA Conveyancing, Valuation Rescue & 72h Cheque Splitter', 'الوحدة 04 · نقل الملكية وعقد إف وتقسيم شيكات أمين التسجيل')}>
+          <div className="flex items-center gap-2">
+            <a className="bw-btn-gold text-xs" href={`/os/print/conveyancing/${deal.id}`}>Print DLD Cheque Pack PDF →</a>
+            <a className="bw-btn-navy text-xs" href={`/os/deals/${deal.id}`}>Deal form →</a>
+          </div>
+        </PageHeader>
 
         <div className="flex flex-wrap gap-2">
           {deals.map((d) => (
@@ -208,6 +247,88 @@ export default async function ConveyancingPage({
             </div>
           </form>
         </div>
+      </div>
+
+      {/* Bilingual Contract F Special Conditions */}
+      <div className="bw-card p-5 space-y-4 text-xs">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-3">
+          <div>
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
+              In-House Sales Progression &amp; Finance-to-Finance Coordination
+            </span>
+            <h2 className="font-display font-bold text-base text-[#021125]">
+              RICS Panel Valuation Access, Developer E-NOC Portal &amp; DLD Finance-to-Finance Blocking Ceremony
+            </h2>
+          </div>
+          <span className="bw-badge bg-slate-900 text-[#d4b475] font-num">
+            Blocking Stage: {String(conv.dld_blocking_stage || 'TITLE_BLOCKED_AT_TRUSTEE')}
+          </span>
+        </div>
+
+        <form method="POST" action="/api/v1/actions" className="grid sm:grid-cols-2 lg:grid-cols-6 gap-3 items-end">
+          <input type="hidden" name="action" value="update_sales_progression_blocking" />
+          <input type="hidden" name="dealId" value={dealId} />
+          <input type="hidden" name="returnTo" value={`/os/conveyancing?dealId=${dealId}`} />
+
+          <div>
+            <label className="block font-semibold mb-1">Appointed RICS Valuer</label>
+            <select name="valuationFirm" defaultValue={String(conv.valuation_firm || 'ValuStrat RICS Panel')} className="bw-input">
+              <option value="ValuStrat RICS Panel">ValuStrat RICS Panel</option>
+              <option value="Cavendish Maxwell">Cavendish Maxwell</option>
+              <option value="Land Sterling">Land Sterling</option>
+              <option value="Chestertons MENA">Chestertons MENA</option>
+              <option value="Asteco Valuation">Asteco Valuation</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block font-semibold mb-1">Seller / Tenant Inspection Access</label>
+            <select name="valuationAccessStatus" defaultValue={String(conv.valuation_access_status || 'ACCESS_CONFIRMED')} className="bw-input">
+              <option value="AWAITING_SELLER_ACCESS">Awaiting Seller Access</option>
+              <option value="ACCESS_CONFIRMED">Inspection Access Confirmed</option>
+              <option value="INSPECTED_REPORT_PENDING">Inspected · Report Pending</option>
+              <option value="REPORT_DELIVERED">RICS Valuation Report Delivered</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block font-semibold mb-1">Developer E-NOC Portal</label>
+            <select name="developerPortalName" defaultValue={String(conv.developer_portal_name || 'Emaar Sakani Portal')} className="bw-input">
+              <option value="Emaar Sakani Portal">Emaar Sakani Portal</option>
+              <option value="Nakheel Online NOC">Nakheel Online NOC</option>
+              <option value="Damac LOAMS">Damac LOAMS</option>
+              <option value="Sobha Connect">Sobha Connect</option>
+              <option value="Meraas / Dubai Holding">Meraas / Dubai Holding</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block font-semibold mb-1">Service Charge &amp; NOC Status</label>
+            <select name="nocStatus" defaultValue={String(conv.noc_status || 'APPLIED')} className="bw-input">
+              <option value="NOT_STARTED">NOT_STARTED</option>
+              <option value="APPLIED">APPLIED (Service Charges Cleared)</option>
+              <option value="ISSUED">ISSUED (Ready for DLD Transfer)</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block font-semibold mb-1">Finance-to-Finance DLD Blocking</label>
+            <select name="dldBlockingStage" defaultValue={String(conv.dld_blocking_stage || 'TITLE_BLOCKED_AT_TRUSTEE')} className="bw-input">
+              <option value="NOT_REQUIRED">Cash Seller (No Blocking Needed)</option>
+              <option value="AWAITING_LIABILITY_LETTER">1. Awaiting Seller 15d Liability Letter</option>
+              <option value="TITLE_BLOCKED_AT_TRUSTEE">2. Title Blocked at DLD Trustee</option>
+              <option value="SELLER_MORTGAGE_CLEARED">3. Seller Bank Cleared (Awaiting Release)</option>
+              <option value="READY_FOR_FINAL_TRANSFER">4. Original Title Released · Ready for Transfer</option>
+            </select>
+          </div>
+
+          <div>
+            <input type="hidden" name="trusteeOffice" value={String(conv.trustee_office || 'Al Manara Registration Trustee')} />
+            <button type="submit" className="bw-btn-navy w-full">
+              Update Progression Stage
+            </button>
+          </div>
+        </form>
       </div>
 
       {/* Bilingual Contract F Special Conditions */}

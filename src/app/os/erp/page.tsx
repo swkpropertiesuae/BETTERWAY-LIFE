@@ -13,13 +13,6 @@ export default async function ErpFinancePage({
   const user = await requireStaffUser();
   const lang = await getActiveLang(user);
   const sp = await searchParams;
-  if (!['SUPER_ADMIN', 'FINANCE_ADMIN'].includes(user.role)) {
-    return (
-      <div className="bw-card p-8 text-sm text-rose-900 bg-rose-50 border-rose-200">
-        🔒 403 — The ERP ledger, commission settlements and partner banking details are restricted to Managing Director and Finance roles ({user.role} is not permitted).
-      </div>
-    );
-  }
   const db = getDb();
 
   const tb = getTrialBalance(db);

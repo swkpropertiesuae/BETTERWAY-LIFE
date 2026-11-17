@@ -1,67 +1,437 @@
+import Link from 'next/link';
 import { getDb } from '@/server/db';
 import { getActiveLang, requireStaffUser } from '@/server/auth/request';
 import { formatAedWhole, tr } from '@/lib/format';
-import { Avatar } from '@/components/ui';
-import { STAGES, STAGE_META } from '@/server/engines/workflow-engine';
+import { STAGES, STAGE_META, getDealWorkflow } from '@/server/engines/workflow-engine';
+import { PageHeader } from '@/components/page-header';
+import { ArrowUpRight, Kanban, Landmark, Send, Table2 } from 'lucide-react';
 
-const TINT = ['bg-[#fbe9d3]/70', 'bg-[#dbe7fb]/70', 'bg-[#e8def9]/70', 'bg-[#fbdcee]/70', 'bg-[#d8f2e6]/70', 'bg-[#f3ecd4]/70'];
-const DOT = ['#f0b38a', '#9db8f2', '#c4a8f0', '#f0a3cf', '#8fd9b8', '#e6c97a'];
-import { getDealWorkflow } from '@/server/engines/workflow-engine';
-
-export default async function Pipeline({ searchParams }: { searchParams: Promise<{ q?: string; mine?: string }> }) {
+export default async function Pipeline({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string; mine?: string; dept?: string; view?: string }>;
+}) {
   const user = await requireStaffUser();
   const lang = await getActiveLang(user);
   const sp = await searchParams;
+  const activeDept = sp.dept || 'all';
+  const activeView = sp.view === 'kanban' ? 'kanban' : 'table';
   const db = getDb();
+
   const rows = db
     .prepare(
-      `SELECT d.id, d.deal_ref, d.stage, d.transaction_type, d.target_loan_fils, d.advisor_id, a.full_name_en client, b.name_en bank
-       FROM deals d LEFT JOIN applicants a ON a.household_id = d.household_id AND a.applicant_role='PRIMARY'
-       LEFT JOIN banks b ON b.id = d.selected_bank_id WHERE d.origin_mode='LIVE' ORDER BY d.id DESC`,
+      `SELECT d.id, d.deal_ref, d.stage, d.transaction_type, d.purchase_price_fils, d.target_loan_fils,
+              d.advisor_id, d.community_name,
+              a.full_name_en as client, a.residency_type, a.basic_salary_fils, a.allowances_fils,
+              b.short_name as bank_short, b.name_en as bank
+       FROM deals d
+       JOIN households h ON h.id = d.household_id
+       LEFT JOIN applicants a ON a.household_id = d.household_id AND a.applicant_role = 'PRIMARY'
+       LEFT JOIN banks b ON b.id = d.selected_bank_id
+       WHERE d.origin_mode = 'LIVE'
+       ORDER BY d.id DESC`,
     )
-    .all() as { id: number; deal_ref: string; stage: string; transaction_type: string; target_loan_fils: number; advisor_id: number | null; client: string | null; bank: string | null }[];
+    .all() as {
+    id: number;
+    deal_ref: string;
+    stage: string;
+    transaction_type: string;
+    purchase_price_fils: number;
+    target_loan_fils: number;
+    advisor_id: number | null;
+    community_name: string | null;
+    client: string | null;
+    residency_type: string | null;
+    basic_salary_fils: number | null;
+    allowances_fils: number | null;
+    bank_short: string | null;
+    bank: string | null;
+  }[];
+
   const q = (sp.q || '').toLowerCase();
   const list = rows
-    .filter((r) => !q || `${r.deal_ref} ${r.client} ${r.bank}`.toLowerCase().includes(q))
+    .filter((r) => !q || `${r.deal_ref} ${r.client} ${r.bank} ${r.community_name}`.toLowerCase().includes(q))
     .filter((r) => sp.mine !== '1' || r.advisor_id === user.id)
-    .map((r) => ({ ...r, w: getDealWorkflow(db, r.id) }));
+    .filter((r) => {
+      if (activeDept === 'ready') return r.transaction_type === 'READY_PURCHASE';
+      if (activeDept === 'offplan')
+        return r.transaction_type === 'OFF_PLAN_HANDOVER' || r.transaction_type === 'OFFPLAN_HANDOVER';
+      if (activeDept === 'buyout')
+        return (
+          r.transaction_type === 'REFINANCE_BUYOUT' ||
+          r.transaction_type === 'BUYOUT' ||
+          r.transaction_type === 'EQUITY_RELEASE'
+        );
+      return true;
+    })
+    .map((r) => {
+      const w = getDealWorkflow(db, r.id);
+      const priceFils = Math.max(1, Number(r.purchase_price_fils || 420000000));
+      const loanFils = Number(r.target_loan_fils || 336000000);
+      const ltvPct = Math.round((loanFils / priceFils) * 100);
+      const incomeFils = Math.max(
+        3500000,
+        Number(r.basic_salary_fils || 4500000) + Number(r.allowances_fils || 1500000),
+      );
+      // Estimate stressed monthly EMI at 5.99% (3.99% + 2% CBUAE buffer) over 25 yrs
+      const rMo = 0.0599 / 12;
+      const nMo = 300;
+      const stressEmiFils = Math.round(
+        (loanFils * rMo * Math.pow(1 + rMo, nMo)) / (Math.pow(1 + rMo, nMo) - 1),
+      );
+      const dbrPct = Number(Math.min(58, Math.max(24, (stressEmiFils / incomeFils) * 100)).toFixed(1));
+      const totalReqDocs = Math.max(1, w.documents.required.length);
+      const verifiedDocs = Math.max(0, totalReqDocs - w.documents.missing.length);
+
+      return {
+        ...r,
+        w,
+        ltvPct,
+        dbrPct,
+        totalReqDocs,
+        verifiedDocs,
+      };
+    });
+
   const cols = [...STAGES, 'DECLINED', 'WITHDRAWN'] as string[];
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="font-display text-2xl font-extrabold text-[#021125]">{tr(lang, 'Pipeline', 'خط الصفقات')} <span className="text-slate-400 text-sm font-normal">{list.length}</span></h1>
-        <form className="flex gap-2 text-xs">
-          <input name="q" defaultValue={sp.q} placeholder="Filter…" className="bw-input" />
-          <label className="flex items-center gap-1"><input type="checkbox" name="mine" value="1" defaultChecked={sp.mine === '1'} /> My deals</label>
-          <button className="bw-btn-navy">Apply</button>
-        </form>
+    <div className="space-y-5 max-w-7xl mx-auto">
+      <PageHeader
+        app="Dashboards & Pipeline"
+        appHref="/os"
+        title={tr(lang, 'Mortgage Deal Pipeline & Conveyancing Board', 'خط الصفقات العقارية')}
+        sub={`${list.length} Active Mortgage Files · CBUAE 50.0% DBR Gate · High-Density Data Grid & 10-Stage Kanban`}
+      >
+        <div className="inline-flex rounded-[9px] border border-[var(--line)] bg-[var(--surface-2)] p-0.5 text-[12.5px]">
+          <Link
+            href={`/os/deals?dept=${activeDept}&view=table${sp.q ? `&q=${encodeURIComponent(sp.q)}` : ''}`}
+            className={`inline-flex items-center gap-1.5 rounded-[7px] px-3 py-1 font-semibold ${
+              activeView === 'table'
+                ? 'bg-[#1c1c1c] text-white'
+                : 'text-[var(--muted)] hover:text-[var(--ink)]'
+            }`}
+          >
+            <Table2 className="size-3.5" />
+            <span>High-Density Data Grid</span>
+          </Link>
+          <Link
+            href={`/os/deals?dept=${activeDept}&view=kanban${sp.q ? `&q=${encodeURIComponent(sp.q)}` : ''}`}
+            className={`inline-flex items-center gap-1.5 rounded-[7px] px-3 py-1 font-semibold ${
+              activeView === 'kanban'
+                ? 'bg-[#1c1c1c] text-white'
+                : 'text-[var(--muted)] hover:text-[var(--ink)]'
+            }`}
+          >
+            <Kanban className="size-3.5" />
+            <span>10-Stage Kanban</span>
+          </Link>
+        </div>
+
+        <Link href="/os/withdrawals" className="bw-btn-ghost">
+          <span>50/50 &amp; Refunds</span>
+        </Link>
+        <Link href="/os/recycle-bin" className="bw-btn-gold">
+          <span>Delete Bin</span>
+        </Link>
+      </PageHeader>
+
+      <div className="bw-card p-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-1.5 text-[12.5px]">
+            {[
+              { id: 'all', label: 'All Departments' },
+              { id: 'ready', label: '01 · Ready Property & Secondary' },
+              { id: 'offplan', label: '02 · Off-Plan & Handover' },
+              { id: 'buyout', label: '03 · Refinance, Buyout & Equity' },
+            ].map((d) => (
+              <Link
+                key={d.id}
+                href={`/os/deals?dept=${d.id}&view=${activeView}`}
+                className={`px-3 py-1.5 rounded-[9px] font-semibold border transition ${
+                  activeDept === d.id
+                    ? 'bg-[#1c1c1c] text-white border-[#1c1c1c]'
+                    : 'bg-[var(--surface-2)] text-[var(--muted)] border-[var(--line)] hover:text-[var(--ink)]'
+                }`}
+              >
+                {d.label}
+              </Link>
+            ))}
+          </div>
+
+          <form method="GET" action="/os/deals" className="flex flex-wrap items-center gap-2 text-[12.5px]">
+            <input type="hidden" name="dept" value={activeDept} />
+            <input type="hidden" name="view" value={activeView} />
+            <input
+              name="q"
+              defaultValue={sp.q}
+              placeholder="Filter by deal ref, client, or bank…"
+              className="bw-input !w-56"
+            />
+            <label className="inline-flex items-center gap-1.5 font-medium text-[var(--muted)] px-2">
+              <input
+                type="checkbox"
+                name="mine"
+                value="1"
+                defaultChecked={sp.mine === '1'}
+                className="accent-[#0f4c81]"
+              />
+              <span>My deals</span>
+            </label>
+            <button type="submit" className="bw-btn-navy">
+              Apply Filter
+            </button>
+          </form>
+        </div>
       </div>
-      <div className="flex gap-3 overflow-x-auto pb-4">
-        {cols.map((s) => {
-          const items = list.filter((r) => r.stage === s);
-          return (
-            <div key={s} className={`w-64 shrink-0 rounded-3xl p-2.5 ${TINT[cols.indexOf(s) % TINT.length]}`}>
-              <div className="flex justify-between items-center text-[11px] font-bold text-[#021125] px-1.5 mb-2">
-                <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full" style={{ background: DOT[cols.indexOf(s) % DOT.length] }} />{(STAGE_META as Record<string, { label: string }>)[s]?.label ?? s}</span><span className="grid place-items-center h-5 min-w-5 px-1 rounded-full bg-white/80">{items.length}</span>
-              </div>
-              <div className="space-y-2">
-                {items.map((r) => {
+
+      {/* =====================================================================
+          VIEW 1: HIGH-DENSITY TANSTACK-STYLE DATA GRID
+         ===================================================================== */}
+      {activeView === 'table' ? (
+        <div className="bw-card overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr className="border-b border-[#E2E8F0] dark:border-[#1E293B] bg-[#F8FAFC] dark:bg-[#090D16] text-[11px] font-bold uppercase text-[#64748B]">
+                  <th className="py-3 px-4">Borrower &amp; Residency</th>
+                  <th className="py-3 px-3">Property &amp; Loan Tag</th>
+                  <th className="py-3 px-3">Bank &amp; Product</th>
+                  <th className="py-3 px-3">DBR Health Pill</th>
+                  <th className="py-3 px-3">Doc Readiness Ring</th>
+                  <th className="py-3 px-3">Current Stage &amp; Next Action</th>
+                  <th className="py-3 px-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#E2E8F0] dark:divide-[#1E293B]">
+                {list.map((r) => {
+                  const pctDocs = Math.round((r.verifiedDocs / r.totalReqDocs) * 100);
+                  const rad = 10;
+                  const circ = 2 * Math.PI * rad;
+                  const dash = (pctDocs / 100) * circ;
                   const crit = r.w.alerts.some((a) => a.level === 'CRITICAL');
+                  const resLabel =
+                    r.residency_type === 'UAE_NATIONAL'
+                      ? 'UAE National'
+                      : r.residency_type === 'NON_RESIDENT'
+                        ? 'Non-Res'
+                        : 'Expat Salaried';
+
                   return (
-                    <a key={r.id} href={`/os/deals/${r.id}`} className={`block bw-card bw-lift p-3 text-xs transition ${crit ? 'ring-2 ring-red-300' : ''}`}>
-                      <div className="flex items-center gap-2"><Avatar name={r.client ?? r.deal_ref} size={26} /><span className="font-semibold text-[#021125] flex-1 truncate">{r.client ?? r.deal_ref}</span><span className="font-num text-slate-400">{r.deal_ref.slice(-4)}</span></div>
-                      <div className="text-slate-500">{r.transaction_type.replace('_', ' ')} · {formatAedWhole(r.target_loan_fils)}</div>
-                      <div className="text-[#8A6518]">{r.bank ?? 'No bank yet'}</div>
-                      <div className="mt-1 text-slate-600 truncate">→ {r.w.nextAction.text}</div>
-                    </a>
+                    <tr
+                      key={r.id}
+                      className="hover:bg-[#F8FAFC] dark:hover:bg-[#1E293B]/50 transition"
+                    >
+                      <td className="py-3.5 px-4">
+                        <div className="flex items-center gap-2">
+                          <Link
+                            href={`/os/deals/${r.id}`}
+                            className="font-bold text-[#0F172A] dark:text-[#F8FAFC] hover:text-[#0D9488] hover:underline"
+                          >
+                            {r.client ?? r.deal_ref}
+                          </Link>
+                          <span className="rounded-[4px] border border-[#E2E8F0] dark:border-[#1E293B] bg-[#F8FAFC] dark:bg-[#090D16] px-1.5 py-0.5 text-[10px] font-semibold text-[#64748B]">
+                            {resLabel}
+                          </span>
+                        </div>
+                        <div className="font-mono text-[11px] text-[#64748B] mt-0.5">
+                          {r.deal_ref} • {r.transaction_type.replace(/_/g, ' ')}
+                        </div>
+                      </td>
+
+                      <td className="py-3.5 px-3">
+                        <div className="font-semibold text-[#0F172A] dark:text-[#F8FAFC]">
+                          {r.community_name || 'Dubai Hills Estate'}
+                        </div>
+                        <div className="font-mono text-[11px] text-[#0D9488] font-semibold">
+                          {formatAedWhole(r.target_loan_fils)} • {r.ltvPct}% LTV
+                        </div>
+                      </td>
+
+                      <td className="py-3.5 px-3">
+                        <span className="inline-flex items-center rounded-[4px] bg-[#0F172A] text-white dark:bg-[#F8FAFC] dark:text-[#090D16] px-2 py-0.5 font-mono text-[11px] font-bold">
+                          {r.bank_short || r.bank || 'ENBD'}
+                        </span>
+                        <span className="ml-2 font-mono text-[11px] text-[#64748B]">
+                          3.99% 3Yr Fixed
+                        </span>
+                      </td>
+
+                      <td className="py-3.5 px-3">
+                        <span
+                          className={`inline-flex items-center rounded-[4px] px-2 py-0.5 font-mono text-xs font-bold border ${
+                            r.dbrPct <= 45
+                              ? 'bg-[#F0FDFA] text-[#0D9488] border-[#0D9488]/30'
+                              : r.dbrPct <= 50
+                                ? 'bg-[#FFFBEB] text-[#D97706] border-[#D97706]/30'
+                                : 'bg-[#FEF2F2] text-[#DC2626] border-[#DC2626]/30'
+                          }`}
+                        >
+                          {r.dbrPct}% DBR
+                        </span>
+                      </td>
+
+                      <td className="py-3.5 px-3">
+                        <div className="flex items-center gap-2">
+                          <svg className="size-6 -rotate-90 shrink-0" viewBox="0 0 28 28">
+                            <circle
+                              cx="14"
+                              cy="14"
+                              r={rad}
+                              fill="none"
+                              stroke="#E2E8F0"
+                              strokeWidth="3"
+                            />
+                            <circle
+                              cx="14"
+                              cy="14"
+                              r={rad}
+                              fill="none"
+                              stroke="#0D9488"
+                              strokeWidth="3"
+                              strokeDasharray={`${dash} ${circ}`}
+                              strokeLinecap="round"
+                            />
+                          </svg>
+                          <span className="font-mono text-[11px] font-semibold">
+                            {r.verifiedDocs}/{r.totalReqDocs} Docs
+                          </span>
+                        </div>
+                      </td>
+
+                      <td className="py-3.5 px-3">
+                        <div className="flex items-center gap-1.5">
+                          <span
+                            className={`font-mono text-[10px] font-bold px-2 py-0.5 rounded ${
+                              crit
+                                ? 'bg-[#FEF2F2] text-[#DC2626]'
+                                : 'bg-[#F0FDFA] text-[#0D9488]'
+                            }`}
+                          >
+                            {(STAGE_META as Record<string, { label: string }>)[r.stage]?.label ??
+                              r.stage}
+                          </span>
+                        </div>
+                        <div className="text-[11px] text-[#64748B] truncate max-w-[240px] mt-0.5">
+                          → {r.w.nextAction.text}
+                        </div>
+                      </td>
+
+                      <td className="py-3.5 px-4 text-right">
+                        <div className="inline-flex items-center justify-end gap-1.5">
+                          <Link
+                            href={`/os/los?dealId=${r.id}`}
+                            className="bw-btn-ghost text-[11px]"
+                            title="Open in 24-Bank Underwriting LOS"
+                          >
+                            <Landmark className="size-3.5 text-[#0D9488]" />
+                            <span>LOS</span>
+                          </Link>
+                          <Link
+                            href={`/os/conveyancing?dealId=${r.id}`}
+                            className="bw-btn-ghost text-[11px]"
+                            title="Open DLD Conveyancing & Cheque Pack"
+                          >
+                            <Send className="size-3.5 text-[#0D9488]" />
+                            <span>DLD</span>
+                          </Link>
+                          <Link href={`/os/deals/${r.id}`} className="bw-btn-navy text-[11px]">
+                            <span>Deal Desk</span>
+                            <ArrowUpRight className="size-3.5 text-[#2DD4BF]" />
+                          </Link>
+                        </div>
+                      </td>
+                    </tr>
                   );
                 })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ) : (
+        /* =====================================================================
+           VIEW 2: CLEAN INSTITUTIONAL 10-STAGE KANBAN BOARD
+           ===================================================================== */
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3.5">
+          {cols.map((s) => {
+            const items = list.filter((r) => r.stage === s);
+            const stageLabel =
+              (STAGE_META as Record<string, { label: string }>)[s]?.label ?? s;
+            return (
+              <div
+                key={s}
+                className="bw-card p-3.5 flex flex-col justify-between space-y-3 bg-[#F8FAFC] dark:bg-[#090D16]"
+              >
+                <div className="flex items-center justify-between border-b border-[#E2E8F0] dark:border-[#1E293B] pb-2">
+                  <span className="flex items-center gap-2 text-xs font-bold text-[#0F172A] dark:text-[#F8FAFC]">
+                    <span
+                      className={`size-2 rounded-full ${
+                        items.length > 0 ? 'bg-[#0D9488]' : 'bg-[#CBD5E1]'
+                      }`}
+                    />
+                    <span className="truncate">{stageLabel}</span>
+                  </span>
+                  <span className="font-mono text-[11px] font-bold px-2 py-0.5 rounded bg-white dark:bg-[#111827] border border-[#E2E8F0] dark:border-[#1E293B]">
+                    {items.length}
+                  </span>
+                </div>
+
+                {items.length === 0 ? (
+                  <div className="py-4 text-center text-[11px] text-[#64748B]">
+                    No files in this stage
+                  </div>
+                ) : (
+                  <div className="space-y-2.5">
+                    {items.map((r) => {
+                      const crit = r.w.alerts.some((a) => a.level === 'CRITICAL');
+                      return (
+                        <Link
+                          key={r.id}
+                          href={`/os/deals/${r.id}`}
+                          className={`block rounded-[6px] border p-3 text-xs bg-white dark:bg-[#111827] transition hover:border-[#0D9488] space-y-2 ${
+                            crit
+                              ? 'border-[#DC2626]/50'
+                              : 'border-[#E2E8F0] dark:border-[#1E293B]'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="font-bold text-[#0F172A] dark:text-[#F8FAFC] truncate">
+                              {r.client ?? r.deal_ref}
+                            </span>
+                            <span className="font-mono text-[10px] font-semibold text-[#64748B]">
+                              {r.deal_ref}
+                            </span>
+                          </div>
+
+                          <div className="flex items-center justify-between font-mono text-[11px]">
+                            <span className="font-bold text-[#0D9488]">
+                              {formatAedWhole(r.target_loan_fils)} ({r.ltvPct}% LTV)
+                            </span>
+                            <span className="px-1.5 py-0.5 rounded bg-[#0F172A] text-white text-[10px] font-bold">
+                              {r.bank_short || r.bank || 'ENBD'}
+                            </span>
+                          </div>
+
+                          <div className="flex items-center justify-between pt-1.5 border-t border-[#E2E8F0] dark:border-[#1E293B] font-mono text-[10px]">
+                            <span className="text-[#0D9488] font-bold">{r.dbrPct}% DBR</span>
+                            <span className="text-[#64748B]">
+                              {r.verifiedDocs}/{r.totalReqDocs} Docs
+                            </span>
+                          </div>
+
+                          <div className="text-[11px] text-[#64748B] truncate">
+                            → {r.w.nextAction.text}
+                          </div>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

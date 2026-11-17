@@ -34,7 +34,7 @@ export function seedInitialData(db: DatabaseSync) {
     );
 
     const mdId = Number(
-      insertUser.run('md@betterwaymortgages.com', '+971501001001', 'Mansoor Al Suwaidi', 'منصور السويدي', defaultPass, 'SUPER_ADMIN', 1, 1, 'en').lastInsertRowid,
+      insertUser.run('md@betterwaymortgages.com', '+971501001001', 'Shabib Siraj', 'شبيب سراج', defaultPass, 'SUPER_ADMIN', 1, 1, 'en').lastInsertRowid,
     );
     insertUser.run('ops.director@betterwaymortgages.com', '+971501001002', 'Rami Haddad', 'رامي حداد', defaultPass, 'SUPER_ADMIN', 0, 1, 'en');
     const advisorId = Number(
@@ -54,6 +54,16 @@ export function seedInitialData(db: DatabaseSync) {
     );
     insertUser.run('sana.finance@betterwaymortgages.com', '+971501001008', 'Sana Nair', 'سناء ناير', defaultPass, 'FINANCE_ADMIN', 0, 0, 'en');
     insertUser.run('reem.hr@betterwaymortgages.com', '+971501001009', 'Reem Al الهاشمي', 'ريم الهاشمي', defaultPass, 'HR_MANAGER', 0, 0, 'ar');
+
+    // Official SWK / Betterway Executive & Staff Roster (Shabib Siraj, Admin, Mohammad Haseeb, Talha Shabbir)
+    const shabibId = Number(
+      insertUser.run('shabib@betterwaymortgages.com', '+971501000001', 'Shabib Siraj', 'شبيب سراج', defaultPass, 'SUPER_ADMIN', 1, 1, 'en').lastInsertRowid,
+    );
+    insertUser.run('admin@betterwaymortgages.com', '+971501000000', 'Betterway Admin', 'مسؤول النظام', defaultPass, 'SUPER_ADMIN', 1, 1, 'en');
+    const haseebId = Number(
+      insertUser.run('haseeb@betterwaymortgages.com', '+971501000002', 'Mohammad Haseeb', 'محمد حسيب', defaultPass, 'SUPER_ADMIN', 0, 1, 'en').lastInsertRowid,
+    );
+    insertUser.run('talha@betterwaymortgages.com', '+971501000003', 'Talha Shabbir', 'طلحة شبير', defaultPass, 'SALES_ADVISOR', 0, 0, 'en');
 
     const agencyOwnerUserId = Number(
       insertUser.run('owner@partner.ae', '+971502002001', 'Zayd Al Maktoum', 'زيد المكتوم', defaultPass, 'PARTNER_AGENCY_ADMIN', 0, 0, 'en').lastInsertRowid,
@@ -493,9 +503,331 @@ export function seedInitialData(db: DatabaseSync) {
        )`,
     ).run(mlroId);
 
+    // Seed initial Manager Admin Decision, Daily Work Report, Attendance Log & DLD Market Transactions
+    db.prepare(
+      `INSERT INTO manager_admin_decisions (decision_ref, subject, category, reason, amount_fils, submitted_by_user_id, submitted_by_name, status)
+       VALUES ('DEC-2026-001', 'Bayut & Dubizzle Co-Branded Mortgage Qualifier Campaign', 'Marketing & Portal Syndication', 'Target 50 high-intent ready-transfer buyers across Dubai Hills, Marina & Business Bay', 3500000, ?, 'Mohammad Haseeb', 'PENDING')`,
+    ).run(haseebId);
+
+    db.prepare(
+      `INSERT INTO daily_work_reports (user_id, employee_name, report_date, calls_count, leads_qualified, site_visits_count, ipas_submitted, summary_notes, status)
+       VALUES (?, 'Tariq Al Mansoori', '2026-11-16', 18, 5, 2, 2, 'Completed Dubai Hills valuation briefing for Khalid Al Nuaimi and packaged ENBD handover file for James Thornton.', 'SUBMITTED')`,
+    ).run(advisorId);
+
+    db.prepare(
+      `INSERT INTO office_attendance_logs (user_id, employee_name, email, check_in_date, check_in_time_gst, shift_name, is_late, late_minutes, status)
+       VALUES (?, 'Shabib Siraj', 'shabib@betterwaymortgages.com', '2026-11-16', '09:42', 'Mon–Fri 10:00–19:00', 0, 0, 'ON_TIME')`,
+    ).run(shabibId);
+
+    db.prepare(
+      `INSERT INTO dld_market_transactions (tx_ref, tx_date, area_code, area_name, property_type, transaction_category, size_sqft, amount_fils, ppsf_aed, lender_bank)
+       VALUES
+         ('DLD-2026-99101', '2026-11-16', 'DHIL', 'Dubai Hills Estate', '4BR Golf Villa', 'Ready Mortgage', 4150, 991_850_000, 2390, 'HSBC UAE'),
+         ('DLD-2026-99102', '2026-11-16', 'MARN', 'Dubai Marina', '2BR Waterfront Apt', 'Off-Plan Oqood', 1420, 325_180_000, 2290, 'Emirates NBD'),
+         ('DLD-2026-99103', '2026-11-16', 'PALM', 'Palm Jumeirah', 'Signature Frond Villa', 'Ready Mortgage', 6800, 2_978_400_000, 4380, 'First Abu Dhabi Bank'),
+         ('DLD-2026-99104', '2026-11-16', 'BBAY', 'Business Bay', '2BR Canal Residence', 'Refinance Buyout', 1310, 285_580_000, 2180, 'Dubai Islamic Bank')`,
+    ).run();
+
     db.exec('COMMIT');
   } catch (err) {
     db.exec('ROLLBACK');
     throw err;
+  }
+}
+
+export const OFFICIAL_BETTERWAY_STAFF = [
+  {
+    email: 'shabib@betterwaymortgages.com',
+    phone: '+971501000001',
+    fullNameEn: 'Shabib Siraj',
+    fullNameAr: 'شبيب سراج',
+    role: 'SUPER_ADMIN',
+    isMlro: 1,
+    canApproveRates: 1,
+    empCode: 'EMP-SHABIB',
+    department: 'Executive Management',
+    designation: 'Founder & Managing Director',
+    isNational: 0,
+    basicSalaryFils: 0,
+  },
+  {
+    email: 'admin@betterwaymortgages.com',
+    phone: '+971501000000',
+    fullNameEn: 'Betterway Admin',
+    fullNameAr: 'مسؤول النظام',
+    role: 'SUPER_ADMIN',
+    isMlro: 1,
+    canApproveRates: 1,
+    empCode: 'EMP-ADMIN',
+    department: 'System Administration',
+    designation: 'System Administrator',
+    isNational: 0,
+    basicSalaryFils: 0,
+  },
+  {
+    email: 'haseeb@betterwaymortgages.com',
+    phone: '+971501000002',
+    fullNameEn: 'Mohammad Haseeb',
+    fullNameAr: 'محمد حسيب',
+    role: 'SUPER_ADMIN',
+    isMlro: 0,
+    canApproveRates: 1,
+    empCode: 'EMP-HASEEB',
+    department: 'Operations & Management',
+    designation: 'Operations Manager',
+    isNational: 0,
+    basicSalaryFils: 0,
+  },
+  {
+    email: 'talha@betterwaymortgages.com',
+    phone: '+971501000003',
+    fullNameEn: 'Talha Shabbir',
+    fullNameAr: 'طلحة شبير',
+    role: 'SALES_ADVISOR',
+    isMlro: 0,
+    canApproveRates: 0,
+    empCode: 'EMP-TALHA',
+    department: 'Business Development & IT',
+    designation: 'BDM & IT Specialist',
+    isNational: 0,
+    basicSalaryFils: 0,
+  },
+  {
+    email: 'fareed@betterwaymortgages.com',
+    phone: '+971501000004',
+    fullNameEn: 'Fareed',
+    fullNameAr: 'فريد',
+    role: 'COMPLIANCE_MLRO',
+    isMlro: 1,
+    canApproveRates: 0,
+    empCode: 'EMP-FAREED',
+    department: 'Compliance & AML',
+    designation: 'Compliance & MLRO Officer',
+    isNational: 0,
+    basicSalaryFils: 0,
+  },
+  {
+    email: 'shahid@betterwaymortgages.com',
+    phone: '+971501000005',
+    fullNameEn: 'Shahid',
+    fullNameAr: 'شاهد',
+    role: 'SALES_ADVISOR',
+    isMlro: 0,
+    canApproveRates: 0,
+    empCode: 'EMP-SHAHID',
+    department: 'Mortgage Advisory',
+    designation: 'Senior Mortgage Advisor',
+    isNational: 0,
+    basicSalaryFils: 0,
+  },
+  {
+    email: 'umar@betterwaymortgages.com',
+    phone: '+971501000006',
+    fullNameEn: 'Umar',
+    fullNameAr: 'عمر',
+    role: 'CREDIT_UNDERWRITER',
+    isMlro: 0,
+    canApproveRates: 1,
+    empCode: 'EMP-UMAR',
+    department: 'Credit & Underwriting',
+    designation: 'Credit Underwriter',
+    isNational: 0,
+    basicSalaryFils: 0,
+  },
+  {
+    email: 'saifullah@betterwaymortgages.com',
+    phone: '+971501000007',
+    fullNameEn: 'Saifullah',
+    fullNameAr: 'سيف الله',
+    role: 'PROGRESSION_MANAGER',
+    isMlro: 0,
+    canApproveRates: 0,
+    empCode: 'EMP-SAIFULLAH',
+    department: 'DLD & Conveyancing',
+    designation: 'Progression & Conveyancing Officer',
+    isNational: 0,
+    basicSalaryFils: 0,
+  },
+  {
+    email: 'samarth@betterwaymortgages.com',
+    phone: '+971501000008',
+    fullNameEn: 'Samarth',
+    fullNameAr: 'سامارث',
+    role: 'FINANCE_ADMIN',
+    isMlro: 0,
+    canApproveRates: 0,
+    empCode: 'EMP-SAMARTH',
+    department: 'Finance & Accounting',
+    designation: 'Finance & Mortgage Consultant',
+    isNational: 0,
+    basicSalaryFils: 0,
+  },
+] as const;
+
+/**
+ * Ensures the live production database contains ONLY statutory reference master data
+ * (Company Settings, UAE Chart of Accounts, 24 UAE Banks & Rate Cards, EIBOR, Developers/Projects,
+ * and Official Betterway Mortgages LLC Staff) and clears all demo/seeded business transactions once.
+ */
+export function ensureCommercialProductionReady(db: DatabaseSync) {
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS system_flags (
+      flag_key TEXT PRIMARY KEY,
+      flag_value TEXT NOT NULL,
+      updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+  `);
+
+  // Ensure base reference tables exist (if brand-new DB, seedInitialData first then strip demo rows)
+  const existingCompany = db.prepare('SELECT COUNT(*) as c FROM company_settings').get() as { c: number };
+  if (existingCompany.c === 0) {
+    seedInitialData(db);
+  }
+
+  const resetDone = db
+    .prepare("SELECT flag_value FROM system_flags WHERE flag_key = 'reset:commercial-production-v1'")
+    .get() as { flag_value: string } | undefined;
+
+  if (resetDone?.flag_value === '1') return;
+
+  db.exec('PRAGMA foreign_keys = OFF;');
+  db.exec('BEGIN IMMEDIATE');
+  try {
+    const transactionalTables = [
+      'comm_messages',
+      'leads',
+      'deal_submissions',
+      'conveyancing_cases',
+      'vault_documents',
+      'homeowner_radar_monitors',
+      'cross_sell_referrals',
+      'kfs_acknowledgements',
+      'aml_screenings',
+      'goaml_reports',
+      'sanadak_complaints',
+      'ops_tasks',
+      'pdc_cheque_register',
+      'real_estate_assets',
+      'credit_risk_profiles',
+      'loan_amortization_schedules',
+      'clawback_ledger',
+      'commission_settlements',
+      'bank_bordereau_batches',
+      'tax_invoices',
+      'vendor_bills',
+      'gl_journal_lines',
+      'gl_journal_entries',
+      'payroll_lines',
+      'payroll_runs',
+      'leave_records',
+      'deals',
+      'applicant_liabilities',
+      'applicants',
+      'households',
+      'partner_agents',
+      'partner_agencies',
+      'daily_work_reports',
+      'office_attendance_logs',
+      'dld_market_transactions',
+      'recycle_bin_requests',
+      'manager_admin_decisions',
+      'deal_withdrawals',
+      'employees',
+    ];
+
+    for (const tbl of transactionalTables) {
+      const exists = db
+        .prepare("SELECT name FROM sqlite_master WHERE type='table' AND name = ?")
+        .get(tbl);
+      if (exists) {
+        db.exec(`DELETE FROM ${tbl};`);
+      }
+    }
+
+    // Remove demo pending rate card
+    db.prepare("DELETE FROM bank_rate_cards WHERE product_code = 'ENBD-5Y-CAMPAIGN'").run();
+
+    // Keep only official Betterway Mortgages LLC staff users
+    const keepEmails = OFFICIAL_BETTERWAY_STAFF.map((s) => s.email.toLowerCase());
+    const placeholders = keepEmails.map(() => '?').join(',');
+    db.prepare(`DELETE FROM sessions WHERE user_id IN (SELECT id FROM users WHERE lower(email) NOT IN (${placeholders}))`).run(
+      ...keepEmails,
+    );
+    db.prepare(`DELETE FROM users WHERE lower(email) NOT IN (${placeholders})`).run(...keepEmails);
+
+    const defaultPass = hashPassword('Betterway#2026');
+    const upsertUser = db.prepare(`
+      INSERT INTO users (email, phone, full_name_en, full_name_ar, password_hash, role, is_mlro, can_approve_rates, preferred_lang, status)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'en', 'ACTIVE')
+      ON CONFLICT(email) DO UPDATE SET
+        phone = excluded.phone,
+        full_name_en = excluded.full_name_en,
+        full_name_ar = excluded.full_name_ar,
+        password_hash = excluded.password_hash,
+        role = excluded.role,
+        is_mlro = excluded.is_mlro,
+        can_approve_rates = excluded.can_approve_rates,
+        mfa_enabled = 0,
+        status = 'ACTIVE'
+    `);
+
+    const planRow = db.prepare('SELECT id FROM advisor_comp_plans ORDER BY id ASC LIMIT 1').get() as { id: number } | undefined;
+    const planId = planRow?.id ?? null;
+
+    const insertEmployee = db.prepare(`
+      INSERT INTO employees (
+        user_id, emp_code, full_name, nationality_code, is_uae_national, nafis_registered, gpssa_number,
+        mohre_person_id_14, routing_agent_id_9, employee_iban_23, contract_type, department, designation,
+        comp_plan_id, join_date, basic_salary_fils, housing_allowance_fils, transport_allowance_fils,
+        monthly_draw_fils, is_draw_recoverable, draw_deficit_fils, visa_expiry_date, emirates_id_expiry_date,
+        rera_card_expiry_date, medical_ins_expiry_date
+      ) VALUES (?, ?, ?, 'AE', ?, 0, '', ?, '302620122', ?, 'MAINLAND_MOHRE', ?, ?, ?, '2026-01-01', ?, 0, 0, 0, 1, 0, '2028-12-31', '2028-12-31', '2027-12-31', '2027-12-31')
+    `);
+
+    OFFICIAL_BETTERWAY_STAFF.forEach((s, idx) => {
+      upsertUser.run(
+        s.email,
+        s.phone,
+        s.fullNameEn,
+        s.fullNameAr,
+        defaultPass,
+        s.role,
+        s.isMlro,
+        s.canApproveRates,
+      );
+      const uRow = db.prepare('SELECT id FROM users WHERE email = ?').get(s.email) as { id: number };
+      insertEmployee.run(
+        uRow.id,
+        s.empCode,
+        s.fullNameEn,
+        s.isNational,
+        `0019283746500${idx + 1}`,
+        `AE07033123456789012340${idx + 1}`,
+        s.department,
+        s.designation,
+        planId,
+        s.basicSalaryFils,
+      );
+    });
+
+    // Point active bank rate cards to Shabib Siraj so foreign keys remain valid
+    const shabibUser = db.prepare("SELECT id FROM users WHERE email = 'shabib@betterwaymortgages.com'").get() as { id: number } | undefined;
+    if (shabibUser) {
+      db.prepare('UPDATE bank_rate_cards SET created_by = ?, approved_by = ?').run(shabibUser.id, shabibUser.id);
+      db.prepare('UPDATE bank_project_apl SET updated_by = ?').run(shabibUser.id);
+    }
+
+    db.prepare(`
+      INSERT INTO system_flags (flag_key, flag_value, updated_at)
+      VALUES ('reset:commercial-production-v1', '1', datetime('now'))
+      ON CONFLICT(flag_key) DO UPDATE SET flag_value = '1', updated_at = datetime('now')
+    `).run();
+
+    db.exec('COMMIT');
+  } catch (err) {
+    db.exec('ROLLBACK');
+    throw err;
+  } finally {
+    db.exec('PRAGMA foreign_keys = ON;');
   }
 }
