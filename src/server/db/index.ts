@@ -110,7 +110,8 @@ export function initializeDatabase(
 
 export function getDb(): DatabaseSync {
   if (singletonDb) return singletonDb;
-  const dataDir = path.resolve(process.cwd(), 'data');
+  // shortcut: Vercel fs is read-only except /tmp, so demo data is ephemeral per instance; use a hosted DB for real use
+  const dataDir = process.env.VERCEL ? '/tmp' : path.resolve(process.cwd(), 'data');
   mkdirSync(dataDir, { recursive: true });
   const dbPath = process.env.BW_OS_DB_PATH || path.join(dataDir, 'betterway-os.sqlite');
   const db = new DatabaseSync(dbPath);
