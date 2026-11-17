@@ -5,9 +5,9 @@ export function Brand() {
         <svg viewBox="0 0 36 36" width="22" height="22" fill="none" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <linearGradient id="bwGoldIcon" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#F6E2A4" />
-              <stop offset="45%" stopColor="#DFBA5B" />
-              <stop offset="100%" stopColor="#B88E30" />
+              <stop offset="0%" stopColor="#ecd9a6" />
+              <stop offset="45%" stopColor="#c9a257" />
+              <stop offset="100%" stopColor="#a8822f" />
             </linearGradient>
           </defs>
           <path

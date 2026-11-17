@@ -144,21 +144,21 @@ export default function ToolkitPage() {
       <div className="bw-card p-5 flex flex-wrap items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1 rounded-[4px] bg-[#0F172A] text-white dark:bg-[#F8FAFC] dark:text-[#090D16] px-2 py-0.5 font-mono text-[10px] font-bold uppercase">
+            <span className="inline-flex items-center gap-1 rounded-[4px] bg-[#2a1418] text-white dark:bg-[#faf6f0] dark:text-[#231115] px-2 py-0.5 font-mono text-[10px] font-bold uppercase">
               Eligibility &amp; Rate Engine
             </span>
-            <span className="font-mono text-xs text-[#0D9488] font-semibold">
+            <span className="font-mono text-xs text-[#7a1f2b] font-semibold">
               CBUAE 50.0% DBR Ceiling • 7x Annual LTI Cap • 4% DLD Cost-to-Close
             </span>
           </div>
-          <h1 className="text-xl sm:text-2xl font-bold text-[#0F172A] dark:text-[#F8FAFC] mt-1">
+          <h1 className="text-xl sm:text-2xl font-bold text-[#2a1418] dark:text-[#faf6f0] mt-1">
             Live CBUAE Eligibility &amp; Multi-Bank Comparison Split-Screen
           </h1>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
           <Link href="/os/print/aip/1" className="bw-btn-ghost">
-            <Shield className="size-3.5 text-[#0D9488]" />
+            <Shield className="size-3.5 text-[#7a1f2b]" />
             <span>60-Day Buyer AIP Certificate</span>
           </Link>
           <Link
@@ -177,35 +177,35 @@ export default function ToolkitPage() {
         <div className="col-span-12 lg:col-span-5 bw-card p-5 space-y-4">
           {/* 3 Instant Live Gauges at the Top */}
           <div className="grid grid-cols-3 gap-2.5">
-            <div className="rounded-[6px] border border-[#E2E8F0] dark:border-[#1E293B] bg-[#F8FAFC] dark:bg-[#090D16] p-3">
-              <span className="text-[10px] font-bold uppercase text-[#64748B]">
+            <div className="rounded-[6px] border border-[#e7dccd] dark:border-[#3a2326] bg-[#faf6f0] dark:bg-[#231115] p-3">
+              <span className="text-[10px] font-bold uppercase text-[#766661]">
                 Max Loan Eligible
               </span>
-              <p className="font-mono text-base font-bold text-[#0D9488] mt-0.5">
+              <p className="font-mono text-base font-bold text-[#7a1f2b] mt-0.5">
                 AED {(maxLoanEligible / 1000000).toFixed(2)}M
               </p>
             </div>
-            <div className="rounded-[6px] border border-[#E2E8F0] dark:border-[#1E293B] bg-[#F8FAFC] dark:bg-[#090D16] p-3">
-              <span className="text-[10px] font-bold uppercase text-[#64748B]">
+            <div className="rounded-[6px] border border-[#e7dccd] dark:border-[#3a2326] bg-[#faf6f0] dark:bg-[#231115] p-3">
+              <span className="text-[10px] font-bold uppercase text-[#766661]">
                 Calculated DBR %
               </span>
               <p
                 className={`font-mono text-base font-bold mt-0.5 ${
                   dbrPct <= 45
-                    ? 'text-[#0D9488]'
+                    ? 'text-[#7a1f2b]'
                     : dbrPct <= 50
-                      ? 'text-[#D97706]'
-                      : 'text-[#DC2626]'
+                      ? 'text-[#a8741a]'
+                      : 'text-[#c8321f]'
                 }`}
               >
-                {dbrPct}% <span className="text-[10px] font-normal text-[#64748B]">/ 50%</span>
+                {dbrPct}% <span className="text-[10px] font-normal text-[#766661]">/ 50%</span>
               </p>
             </div>
-            <div className="rounded-[6px] border border-[#E2E8F0] dark:border-[#1E293B] bg-[#F8FAFC] dark:bg-[#090D16] p-3">
-              <span className="text-[10px] font-bold uppercase text-[#64748B]">
+            <div className="rounded-[6px] border border-[#e7dccd] dark:border-[#3a2326] bg-[#faf6f0] dark:bg-[#231115] p-3">
+              <span className="text-[10px] font-bold uppercase text-[#766661]">
                 Total Upfront Cash
               </span>
-              <p className="font-mono text-base font-bold text-[#0F172A] dark:text-[#F8FAFC] mt-0.5">
+              <p className="font-mono text-base font-bold text-[#2a1418] dark:text-[#faf6f0] mt-0.5">
                 AED {Math.round(totalUpfrontCash / 1000).toLocaleString('en-US')}k
               </p>
             </div>
@@ -214,25 +214,25 @@ export default function ToolkitPage() {
           {/* Hard Visual Marker at 50.0% CBUAE Ceiling */}
           <div className="space-y-1">
             <div className="flex justify-between font-mono text-[11px]">
-              <span className="text-[#64748B]">
+              <span className="text-[#766661]">
                 Contract EMI: AED {emiContract.toLocaleString('en-US')} • Stress EMI (+2%): AED{' '}
                 {emiStress.toLocaleString('en-US')}
               </span>
-              <span className="font-bold text-[#DC2626]">50.0% CBUAE Ceiling</span>
+              <span className="font-bold text-[#c8321f]">50.0% CBUAE Ceiling</span>
             </div>
-            <div className="relative h-3 w-full rounded bg-[#F1F5F9] dark:bg-[#1E293B] overflow-hidden">
+            <div className="relative h-3 w-full rounded bg-[#f1ebe1] dark:bg-[#3a2326] overflow-hidden">
               <div
                 className={`h-full transition-all ${
                   dbrPct <= 45
-                    ? 'bg-[#0D9488]'
+                    ? 'bg-[#7a1f2b]'
                     : dbrPct <= 50
-                      ? 'bg-[#D97706]'
-                      : 'bg-[#DC2626]'
+                      ? 'bg-[#a8741a]'
+                      : 'bg-[#c8321f]'
                 }`}
                 style={{ width: `${Math.min(100, (dbrPct / 65) * 100)}%` }}
               />
               <div
-                className="absolute top-0 bottom-0 w-0.5 bg-[#DC2626]"
+                className="absolute top-0 bottom-0 w-0.5 bg-[#c8321f]"
                 style={{ left: `${(50 / 65) * 100}%` }}
               />
             </div>
@@ -254,7 +254,7 @@ export default function ToolkitPage() {
                 step={100000}
                 value={priceAed}
                 onChange={(e) => setPriceAed(Number(e.target.value))}
-                className="w-full accent-[#0F172A] mb-1.5"
+                className="w-full accent-[#2a1418] mb-1.5"
               />
               <input
                 type="number"
@@ -266,7 +266,7 @@ export default function ToolkitPage() {
 
             <div className="grid grid-cols-3 gap-2.5">
               <label className="block">
-                <span className="font-semibold text-[#64748B]">Down Payment %</span>
+                <span className="font-semibold text-[#766661]">Down Payment %</span>
                 <input
                   type="number"
                   value={downPaymentPct}
@@ -275,7 +275,7 @@ export default function ToolkitPage() {
                 />
               </label>
               <label className="block">
-                <span className="font-semibold text-[#64748B]">Base Rate (%)</span>
+                <span className="font-semibold text-[#766661]">Base Rate (%)</span>
                 <input
                   type="number"
                   step="0.05"
@@ -285,7 +285,7 @@ export default function ToolkitPage() {
                 />
               </label>
               <label className="block">
-                <span className="font-semibold text-[#64748B]">Tenure (Yrs)</span>
+                <span className="font-semibold text-[#766661]">Tenure (Yrs)</span>
                 <input
                   type="number"
                   max={25}
@@ -298,7 +298,7 @@ export default function ToolkitPage() {
 
             <div className="grid grid-cols-3 gap-2.5">
               <label className="block">
-                <span className="font-semibold text-[#64748B]">Monthly Salary</span>
+                <span className="font-semibold text-[#766661]">Monthly Salary</span>
                 <input
                   type="number"
                   value={monthlyIncomeAed}
@@ -307,7 +307,7 @@ export default function ToolkitPage() {
                 />
               </label>
               <label className="block">
-                <span className="font-semibold text-[#64748B]">Card Limits</span>
+                <span className="font-semibold text-[#766661]">Card Limits</span>
                 <input
                   type="number"
                   value={cardLimitsAed}
@@ -316,7 +316,7 @@ export default function ToolkitPage() {
                 />
               </label>
               <label className="block">
-                <span className="font-semibold text-[#64748B]">Existing EMIs</span>
+                <span className="font-semibold text-[#766661]">Existing EMIs</span>
                 <input
                   type="number"
                   value={existingDebtAed}
@@ -326,9 +326,9 @@ export default function ToolkitPage() {
               </label>
             </div>
 
-            <div className="grid grid-cols-2 gap-2.5 pt-2 border-t border-[#E2E8F0] dark:border-[#1E293B]">
+            <div className="grid grid-cols-2 gap-2.5 pt-2 border-t border-[#e7dccd] dark:border-[#3a2326]">
               <label className="block">
-                <span className="font-semibold text-[#64748B]">Gross Bank Subvention (AED)</span>
+                <span className="font-semibold text-[#766661]">Gross Bank Subvention (AED)</span>
                 <input
                   type="number"
                   value={grossSubventionAed}
@@ -337,7 +337,7 @@ export default function ToolkitPage() {
                 />
               </label>
               <label className="block">
-                <span className="font-semibold text-[#64748B]">B2B Partner Share (AED)</span>
+                <span className="font-semibold text-[#766661]">B2B Partner Share (AED)</span>
                 <input
                   type="number"
                   value={partnerShareAed}
@@ -352,20 +352,20 @@ export default function ToolkitPage() {
         {/* Right Panel (7 cols): Ranked UAE Bank Matrix Cards + DLD Upfront Cash & 50/50 Split */}
         <div className="col-span-12 lg:col-span-7 space-y-4">
           <div className="bw-card p-5 space-y-3">
-            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#E2E8F0] dark:border-[#1E293B] pb-3">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#e7dccd] dark:border-[#3a2326] pb-3">
               <div>
-                <h2 className="text-sm font-bold text-[#0F172A] dark:text-[#F8FAFC]">
+                <h2 className="text-sm font-bold text-[#2a1418] dark:text-[#faf6f0]">
                   Ranked UAE Bank Matrix Cards (Select Top 3 for Client Proposal)
                 </h2>
-                <p className="text-[11px] text-[#64748B]">
+                <p className="text-[11px] text-[#766661]">
                   Facility Amount: <strong className="font-mono">AED {loanAmount.toLocaleString('en-US')}</strong> ({100 - downPaymentPct}% LTV)
                 </p>
               </div>
               <span
                 className={`font-mono text-xs font-bold px-2 py-0.5 rounded ${
                   goldenVisaEligible
-                    ? 'bg-[#F0FDFA] text-[#0D9488]'
-                    : 'bg-[#FFFBEB] text-[#D97706]'
+                    ? 'bg-[#f8ecec] text-[#7a1f2b]'
+                    : 'bg-[#f9f3e3] text-[#a8741a]'
                 }`}
               >
                 {goldenVisaEligible ? '✓ 10-Yr Golden Visa Eligible (AED 2M+)' : 'Below AED 2M Golden Visa'}
@@ -387,8 +387,8 @@ export default function ToolkitPage() {
                     onClick={() => toggleBank(bank.code)}
                     className={`rounded-[6px] border p-3.5 text-xs space-y-2 transition cursor-pointer ${
                       isSel
-                        ? 'border-[#0D9488] bg-[#F0FDFA]/50 dark:bg-[#0D9488]/10'
-                        : 'border-[#E2E8F0] dark:border-[#1E293B]'
+                        ? 'border-[#7a1f2b] bg-[#f8ecec]/50 dark:bg-[#7a1f2b]/10'
+                        : 'border-[#e7dccd] dark:border-[#3a2326]'
                     }`}
                   >
                     <div className="flex items-center justify-between">
@@ -397,20 +397,20 @@ export default function ToolkitPage() {
                           type="checkbox"
                           checked={isSel}
                           onChange={() => {}}
-                          className="accent-[#0D9488]"
+                          className="accent-[#7a1f2b]"
                         />
-                        <span className="font-mono font-bold px-1.5 py-0.5 rounded bg-[#0F172A] text-white text-[10px]">
+                        <span className="font-mono font-bold px-1.5 py-0.5 rounded bg-[#2a1418] text-white text-[10px]">
                           {bank.code}
                         </span>
-                        <span className="font-bold text-[#0F172A] dark:text-[#F8FAFC]">
+                        <span className="font-bold text-[#2a1418] dark:text-[#faf6f0]">
                           {bank.name}
                         </span>
                       </div>
                       <span
                         className={`font-mono text-[10px] font-bold px-1.5 py-0.5 rounded ${
                           bankDbr <= 50
-                            ? 'bg-[#F0FDFA] text-[#0D9488]'
-                            : 'bg-[#FEF2F2] text-[#DC2626]'
+                            ? 'bg-[#f8ecec] text-[#7a1f2b]'
+                            : 'bg-[#fbebe7] text-[#c8321f]'
                         }`}
                       >
                         {bankDbr}% DBR
@@ -419,23 +419,23 @@ export default function ToolkitPage() {
 
                     <div className="grid grid-cols-3 gap-2 font-mono pt-1">
                       <div>
-                        <span className="text-[10px] text-[#64748B] block">Fixed Rate</span>
+                        <span className="text-[10px] text-[#766661] block">Fixed Rate</span>
                         <strong className="text-sm">{bank.fixedRatePct.toFixed(2)}%</strong>
-                        <span className="text-[10px] text-[#64748B] block">{bank.fixedTerm}</span>
+                        <span className="text-[10px] text-[#766661] block">{bank.fixedTerm}</span>
                       </div>
                       <div>
-                        <span className="text-[10px] text-[#64748B] block">Monthly EMI</span>
-                        <strong className="text-sm text-[#0D9488]">
+                        <span className="text-[10px] text-[#766661] block">Monthly EMI</span>
+                        <strong className="text-sm text-[#7a1f2b]">
                           AED {emi.toLocaleString('en-US')}
                         </strong>
-                        <span className="text-[10px] text-[#64748B] block">
+                        <span className="text-[10px] text-[#766661] block">
                           Card @ {bank.cardStressRate * 100}%
                         </span>
                       </div>
                       <div>
-                        <span className="text-[10px] text-[#64748B] block">Revert &amp; Fee</span>
+                        <span className="text-[10px] text-[#766661] block">Revert &amp; Fee</span>
                         <strong className="text-[11px]">{bank.reversionLabel}</strong>
-                        <span className="text-[10px] text-[#64748B] block">
+                        <span className="text-[10px] text-[#766661] block">
                           {bank.earlySettlement}
                         </span>
                       </div>
@@ -449,7 +449,7 @@ export default function ToolkitPage() {
           {/* DLD Cost-to-Close + 50/50 Split Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="bw-card p-4 space-y-2 text-xs">
-              <div className="font-bold text-[#0F172A] dark:text-[#F8FAFC] border-b border-[#E2E8F0] dark:border-[#1E293B] pb-2">
+              <div className="font-bold text-[#2a1418] dark:text-[#faf6f0] border-b border-[#e7dccd] dark:border-[#3a2326] pb-2">
                 DLD &amp; Upfront Cash Breakdown
               </div>
               {[
@@ -461,13 +461,13 @@ export default function ToolkitPage() {
                 ['RERA Agency Fee (2% + 5% VAT)', agencyFeeIncVat],
               ].map(([lbl, val]) => (
                 <div key={String(lbl)} className="flex justify-between">
-                  <span className="text-[#64748B]">{lbl}</span>
+                  <span className="text-[#766661]">{lbl}</span>
                   <span className="font-mono font-bold">
                     AED {Number(val).toLocaleString('en-US')}
                   </span>
                 </div>
               ))}
-              <div className="flex justify-between pt-2 border-t border-[#E2E8F0] dark:border-[#1E293B] font-mono font-bold text-[#0D9488]">
+              <div className="flex justify-between pt-2 border-t border-[#e7dccd] dark:border-[#3a2326] font-mono font-bold text-[#7a1f2b]">
                 <span>Total Upfront Cash Required</span>
                 <span>AED {totalUpfrontCash.toLocaleString('en-US')}</span>
               </div>
@@ -475,23 +475,23 @@ export default function ToolkitPage() {
 
             <div className="bw-card p-4 flex flex-col justify-between space-y-3 text-xs">
               <div>
-                <div className="font-bold text-[#0F172A] dark:text-[#F8FAFC] border-b border-[#E2E8F0] dark:border-[#1E293B] pb-2">
+                <div className="font-bold text-[#2a1418] dark:text-[#faf6f0] border-b border-[#e7dccd] dark:border-[#3a2326] pb-2">
                   Betterway 50/50 Commission Waterfall
                 </div>
                 <div className="grid grid-cols-2 gap-3 mt-3 font-mono">
-                  <div className="rounded-[6px] border border-[#0D9488]/30 bg-[#F0FDFA] p-3">
-                    <span className="text-[10px] font-bold uppercase text-[#0D9488] block">
+                  <div className="rounded-[6px] border border-[#7a1f2b]/30 bg-[#f8ecec] p-3">
+                    <span className="text-[10px] font-bold uppercase text-[#7a1f2b] block">
                       Betterway 50%
                     </span>
-                    <strong className="text-base text-[#0F172A]">
+                    <strong className="text-base text-[#2a1418]">
                       AED {betterwayShare50.toLocaleString('en-US')}
                     </strong>
                   </div>
-                  <div className="rounded-[6px] border border-[#E2E8F0] dark:border-[#1E293B] bg-[#F8FAFC] dark:bg-[#090D16] p-3">
-                    <span className="text-[10px] font-bold uppercase text-[#64748B] block">
+                  <div className="rounded-[6px] border border-[#e7dccd] dark:border-[#3a2326] bg-[#faf6f0] dark:bg-[#231115] p-3">
+                    <span className="text-[10px] font-bold uppercase text-[#766661] block">
                       Advisor 50% Split
                     </span>
-                    <strong className="text-base text-[#0F172A] dark:text-[#F8FAFC]">
+                    <strong className="text-base text-[#2a1418] dark:text-[#faf6f0]">
                       AED {advisorShare50.toLocaleString('en-US')}
                     </strong>
                   </div>
@@ -502,7 +502,7 @@ export default function ToolkitPage() {
                 href={`/os/print/proposal/1?banks=${selectedBanks.join(',')}`}
                 className="bw-btn-navy justify-center w-full"
               >
-                <Printer className="size-3.5 text-[#2DD4BF]" />
+                <Printer className="size-3.5 text-[#c9a257]" />
                 <span>Open Printable 3-Bank Client Proposal</span>
               </Link>
             </div>

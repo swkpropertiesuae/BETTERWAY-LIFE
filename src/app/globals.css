@@ -13,97 +13,154 @@
   --font-serif: "Instrument Serif", Georgia, "Times New Roman", serif;
   --font-mono: "JetBrains Mono Variable", ui-monospace, SFMono-Regular, Menlo, monospace;
 
-  --color-navy-950: #05162c;
-  --color-navy-900: #0b1f3a;
-  --color-navy-800: #0f294a;
-  --color-gold-500: #0f4c81;
-  --color-gold-600: #0b3b66;
-  --color-gold-400: #1d639e;
-  --color-teal-600: #0d8a52;
-  --color-teal-400: #10b981;
-  --color-amber-600: #b48327;
-  --color-crimson-600: #c81e1e;
+  /* Betterway palette: oxblood, brass, bone. Tailwind's default cool ramps are remapped so every utility class follows the brand. */
+  --color-navy-950: #1f0d10;
+  --color-navy-900: #2a1418;
+  --color-navy-800: #3b161d;
+  --color-gold-500: #7a1f2b;
+  --color-gold-600: #651822;
+  --color-gold-400: #96303d;
+  --color-teal-600: #4d6b3a;
+  --color-teal-400: #6a8a42;
+  --color-amber-600: #9a6f1f;
+  --color-crimson-600: #bc3a26;
+
+  /* neutrals: warm stone instead of cool slate */
+  --color-slate-50: #faf6f0; --color-slate-100: #f3ece1; --color-slate-200: #e7dccd; --color-slate-300: #d3c4ae; --color-slate-400: #a89a90;
+  --color-slate-500: #76665f; --color-slate-600: #66564f; --color-slate-700: #4d3a3c; --color-slate-800: #3a2326; --color-slate-900: #2a1418; --color-slate-950: #1f0d10;
+  --color-gray-50: #faf6f0; --color-gray-100: #f3ece1; --color-gray-200: #e7dccd; --color-gray-300: #d3c4ae; --color-gray-400: #a89a90;
+  --color-gray-500: #76665f; --color-gray-600: #66564f; --color-gray-700: #4d3a3c; --color-gray-800: #3a2326; --color-gray-900: #2a1418; --color-gray-950: #1f0d10;
+  --color-zinc-50: #faf6f0; --color-zinc-100: #f3ece1; --color-zinc-200: #e7dccd; --color-zinc-300: #d3c4ae; --color-zinc-400: #a89a90;
+  --color-zinc-500: #76665f; --color-zinc-600: #66564f; --color-zinc-700: #4d3a3c; --color-zinc-800: #3a2326; --color-zinc-900: #2a1418; --color-zinc-950: #1f0d10;
+  --color-neutral-50: #faf6f0; --color-neutral-100: #f3ece1; --color-neutral-200: #e7dccd; --color-neutral-300: #d3c4ae; --color-neutral-400: #a89a90;
+  --color-neutral-500: #76665f; --color-neutral-600: #66564f; --color-neutral-700: #4d3a3c; --color-neutral-800: #3a2326; --color-neutral-900: #2a1418; --color-neutral-950: #1f0d10;
+  --color-stone-50: #faf6f0; --color-stone-100: #f3ece1; --color-stone-200: #e7dccd; --color-stone-300: #d3c4ae; --color-stone-400: #a89a90;
+  --color-stone-500: #76665f; --color-stone-600: #66564f; --color-stone-700: #4d3a3c; --color-stone-800: #3a2326; --color-stone-900: #2a1418; --color-stone-950: #1f0d10;
+
+  /* success: moss */
+  --color-emerald-50: #f1f5ea; --color-emerald-100: #e2ebd3; --color-emerald-200: #c6d6a9; --color-emerald-300: #a5bd7c; --color-emerald-400: #86a459;
+  --color-emerald-500: #6a8a42; --color-emerald-600: #587536; --color-emerald-700: #475f2d; --color-emerald-800: #3a4c26; --color-emerald-900: #2f3e21; --color-emerald-950: #1a2512;
+  --color-green-50: #f1f5ea; --color-green-100: #e2ebd3; --color-green-200: #c6d6a9; --color-green-300: #a5bd7c; --color-green-400: #86a459;
+  --color-green-500: #6a8a42; --color-green-600: #587536; --color-green-700: #475f2d; --color-green-800: #3a4c26; --color-green-900: #2f3e21; --color-green-950: #1a2512;
+  --color-lime-50: #f1f5ea; --color-lime-100: #e2ebd3; --color-lime-200: #c6d6a9; --color-lime-300: #a5bd7c; --color-lime-400: #86a459;
+  --color-lime-500: #6a8a42; --color-lime-600: #587536; --color-lime-700: #475f2d; --color-lime-800: #3a4c26; --color-lime-900: #2f3e21; --color-lime-950: #1a2512;
+
+  /* danger: brick (kept clearly distinct from oxblood brand) */
+  --color-red-50: #fdf0ec; --color-red-100: #fadbd3; --color-red-200: #f4b9aa; --color-red-300: #ec9180; --color-red-400: #df6a55;
+  --color-red-500: #d04a34; --color-red-600: #bc3a26; --color-red-700: #9c2f1f; --color-red-800: #7d281c; --color-red-900: #66241b; --color-red-950: #38100b;
+  --color-rose-50: #fdf0ec; --color-rose-100: #fadbd3; --color-rose-200: #f4b9aa; --color-rose-300: #ec9180; --color-rose-400: #df6a55;
+  --color-rose-500: #d04a34; --color-rose-600: #bc3a26; --color-rose-700: #9c2f1f; --color-rose-800: #7d281c; --color-rose-900: #66241b; --color-rose-950: #38100b;
+
+  /* warning: brass ochre */
+  --color-amber-50: #fbf5e6; --color-amber-100: #f5e8c6; --color-amber-200: #ecd490; --color-amber-300: #e0bb5f; --color-amber-400: #d1a23f;
+  --color-amber-500: #b88a2c; --color-amber-600: #9a6f1f; --color-amber-700: #7d581b; --color-amber-800: #64461a; --color-amber-900: #523a19; --color-amber-950: #2d1f0a;
+  --color-yellow-50: #fbf5e6; --color-yellow-100: #f5e8c6; --color-yellow-200: #ecd490; --color-yellow-300: #e0bb5f; --color-yellow-400: #d1a23f;
+  --color-yellow-500: #b88a2c; --color-yellow-600: #9a6f1f; --color-yellow-700: #7d581b; --color-yellow-800: #64461a; --color-yellow-900: #523a19; --color-yellow-950: #2d1f0a;
+  --color-orange-50: #fbf0ea; --color-orange-100: #f5dccf; --color-orange-200: #ebbaa1; --color-orange-300: #de9370; --color-orange-400: #cf7048;
+  --color-orange-500: #b8582f; --color-orange-600: #9c4626; --color-orange-700: #7e3a22; --color-orange-800: #66321f; --color-orange-900: #542c1d; --color-orange-950: #2d150d;
+
+  /* brand accent: oxblood (replaces teal) */
+  --color-teal-50: #f8eded; --color-teal-100: #f0dadc; --color-teal-200: #e2b8bd; --color-teal-300: #cf8d96; --color-teal-400: #b4545f;
+  --color-teal-500: #96303d; --color-teal-700: #651822; --color-teal-800: #5a1620; --color-teal-900: #3b0f16; --color-teal-950: #2a0a10;
+  --color-cyan-50: #f8eded; --color-cyan-100: #f0dadc; --color-cyan-200: #e2b8bd; --color-cyan-300: #cf8d96; --color-cyan-400: #b4545f;
+  --color-cyan-500: #96303d; --color-cyan-600: #7a1f2b; --color-cyan-700: #651822; --color-cyan-800: #5a1620; --color-cyan-900: #3b0f16; --color-cyan-950: #2a0a10;
+
+  /* info: ink slate-blue (replaces sky/blue/indigo) */
+  --color-sky-50: #eef2f5; --color-sky-100: #dbe4ea; --color-sky-200: #bccad5; --color-sky-300: #93a9ba; --color-sky-400: #6a859b;
+  --color-sky-500: #4d6a82; --color-sky-600: #3b566d; --color-sky-700: #314758; --color-sky-800: #2b3c4a; --color-sky-900: #26333e; --color-sky-950: #151d24;
+  --color-blue-50: #eef2f5; --color-blue-100: #dbe4ea; --color-blue-200: #bccad5; --color-blue-300: #93a9ba; --color-blue-400: #6a859b;
+  --color-blue-500: #4d6a82; --color-blue-600: #3b566d; --color-blue-700: #314758; --color-blue-800: #2b3c4a; --color-blue-900: #26333e; --color-blue-950: #151d24;
+  --color-indigo-50: #eef2f5; --color-indigo-100: #dbe4ea; --color-indigo-200: #bccad5; --color-indigo-300: #93a9ba; --color-indigo-400: #6a859b;
+  --color-indigo-500: #4d6a82; --color-indigo-600: #3b566d; --color-indigo-700: #314758; --color-indigo-800: #2b3c4a; --color-indigo-900: #26333e; --color-indigo-950: #151d24;
+
+  /* plum (replaces violet/purple/fuchsia/pink) */
+  --color-violet-50: #f6eef2; --color-violet-100: #ecdce5; --color-violet-200: #dbbdcd; --color-violet-300: #c496ae; --color-violet-400: #a76a89;
+  --color-violet-500: #8a4c6b; --color-violet-600: #723d57; --color-violet-700: #5e3347; --color-violet-800: #4e2c3c; --color-violet-900: #42273a; --color-violet-950: #26141f;
+  --color-purple-50: #f6eef2; --color-purple-100: #ecdce5; --color-purple-200: #dbbdcd; --color-purple-300: #c496ae; --color-purple-400: #a76a89;
+  --color-purple-500: #8a4c6b; --color-purple-600: #723d57; --color-purple-700: #5e3347; --color-purple-800: #4e2c3c; --color-purple-900: #42273a; --color-purple-950: #26141f;
+  --color-fuchsia-500: #8a4c6b; --color-fuchsia-600: #723d57; --color-pink-500: #8a4c6b; --color-pink-600: #723d57;
 }
 
 :root {
-  /* Sovereign Corporate Banking Navy + Royal Institutional Sapphire + Alabaster Chrome */
-  --obs: #05162c;
-  --obs-2: #0b1f3a;
+  /* Oxblood + brass + bone. Calm operating workspace: bone canvas, white floating surfaces, oxblood actions, brass accents. */
+  --obs: #2a1418;
+  --obs-2: #3b161d;
   --obs-line: rgba(255, 255, 255, 0.10);
-  --obs-text: #f1f5f9;
-  --obs-mute: #94a3b8;
+  --obs-text: #f6efe6;
+  --obs-mute: #c2aea5;
 
-  --bg: #eef1f5;
-  --bg-2: #e4e9f0;
-  --sidebar: #f8fafc;
+  --bg: #f6f1ea;
+  --bg-2: #ece4d8;
+  --sidebar: #2a1418;
   --surface: #ffffff;
   --card: #ffffff;
-  --surface-2: #f8fafc;
-  --hover: #f1f5f9;
-  --soft: #e8edf3;
+  --surface-2: #faf6f0;
+  --hover: #f3ece1;
+  --soft: #efe7da;
 
-  --text: #0b1f3a;
-  --ink: #0b1f3a;
-  --text-2: #334155;
-  --body: #334155;
-  --text-3: #64748b;
-  --muted: #64748b;
-  --text-4: #94a3b8;
+  --text: #2a1418;
+  --ink: #2a1418;
+  --text-2: #4d3a3c;
+  --body: #4d3a3c;
+  --text-3: #76665f;
+  --muted: #76665f;
+  --text-4: #a89a90;
 
-  --border: #d5dde7;
-  --line: #d5dde7;
-  --border-2: #b8c4d4;
-  --line-strong: #b8c4d4;
+  --border: #e7dccd;
+  --line: #e7dccd;
+  --border-2: #d3c4ae;
+  --line-strong: #d3c4ae;
 
-  --ember: #0f4c81;
-  --ember-dark: #0b3b66;
-  --blaze: #c81e1e;
-  --champ: #0f4c81;
-  --champ-deep: #0b1f3a;
-  --champ-soft: #eaf2f9;
-  --oasis: #0d8a52;
-  --dune: #c81e1e;
-  --navy: #0b1f3a;
+  --ember: #7a1f2b;
+  --ember-dark: #5a1620;
+  --blaze: #bc3a26;
+  --champ: #b08a3e;
+  --champ-deep: #7d5f1f;
+  --champ-soft: #f3e9cf;
+  --oasis: #587536;
+  --dune: #bc3a26;
+  --navy: #2a1418;
+  --fold: #5a1620;
 
-  --primary: #0b1f3a;
+  --primary: #7a1f2b;
   --primary-fg: #ffffff;
-  --accent: #0f4c81;
+  --accent: #7a1f2b;
   --accent-fg: #ffffff;
 
-  --success: #0d8a52;
-  --warning: #9a6b16;
-  --danger: #c81e1e;
-  --info: #0f4c81;
+  --success: #587536;
+  --warning: #9a6f1f;
+  --danger: #bc3a26;
+  --info: #3b566d;
 
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
-  --shadow-xs: 0 1px 2px rgba(11, 31, 58, 0.04);
-  --shadow-sm: 0 1px 2px rgba(11, 31, 58, 0.04), 0 4px 16px -6px rgba(11, 31, 58, 0.07);
-  --shadow-md: 0 8px 24px -6px rgba(11, 31, 58, 0.12), 0 2px 6px rgba(11, 31, 58, 0.05);
-  --shadow-lg: 0 24px 60px -18px rgba(11, 31, 58, 0.24);
+  --shadow-xs: 0 1px 2px rgba(42, 20, 24, 0.04);
+  --shadow-sm: 0 1px 2px rgba(42, 20, 24, 0.04), 0 4px 16px -6px rgba(90, 22, 32, 0.08);
+  --shadow-md: 0 8px 24px -6px rgba(90, 22, 32, 0.14), 0 2px 6px rgba(42, 20, 24, 0.05);
+  --shadow-lg: 0 24px 60px -18px rgba(90, 22, 32, 0.28);
 }
 
 :root[data-theme="dark"],
 .dark {
-  --bg: #050b14;
-  --bg-2: #081221;
-  --sidebar: #07101e;
-  --surface: #0b1628;
-  --card: #0b1628;
-  --surface-2: #0f1e34;
-  --hover: #152742;
-  --soft: #13233b;
-  --text: #f1f5f9;
-  --ink: #f1f5f9;
-  --text-2: #94a3b8;
-  --body: #94a3b8;
-  --text-3: #64748b;
-  --muted: #64748b;
-  --text-4: #475569;
-  --border: #1e3250;
-  --line: #1e3250;
-  --border-2: #2c466e;
-  --line-strong: #2c466e;
-  --champ-soft: rgba(56, 189, 248, 0.14);
+  --bg: #140a0c;
+  --bg-2: #1b0e11;
+  --sidebar: #180c0f;
+  --surface: #1f1013;
+  --card: #1f1013;
+  --surface-2: #251317;
+  --hover: #2f1a1f;
+  --soft: #2c181c;
+  --text: #f6efe6;
+  --ink: #f6efe6;
+  --text-2: #c2aea5;
+  --body: #c2aea5;
+  --text-3: #a08c84;
+  --muted: #a08c84;
+  --text-4: #7a6760;
+  --border: #3a2227;
+  --line: #3a2227;
+  --border-2: #4d3238;
+  --line-strong: #4d3238;
+  --champ-soft: rgba(201, 162, 87, 0.16);
 }
 
 @layer base {
@@ -121,7 +178,7 @@
   }
 
   ::selection {
-    background: rgba(15, 76, 129, 0.24);
+    background: rgba(122, 31, 43, 0.24);
   }
 
   h1,
@@ -198,7 +255,7 @@
   }
 
   .swk-shimmer-text {
-    background: linear-gradient(90deg, #f6e2a4 0%, #ffffff 45%, #dfba5b 75%, #b88e30 100%);
+    background: linear-gradient(90deg, #ecd9a6 0%, #ffffff 45%, #c9a257 75%, #a8822f 100%);
     background-size: 200% 100%;
     -webkit-background-clip: text;
     background-clip: text;
@@ -208,228 +265,19 @@
   .swk-glass {
     border-radius: 14px;
     border: 1px solid rgba(255, 255, 255, 0.14);
-    background: rgba(11, 22, 40, 0.62);
+    background: rgba(31, 13, 16, 0.62);
     backdrop-filter: blur(18px) saturate(1.3);
     -webkit-backdrop-filter: blur(18px) saturate(1.3);
   }
 
   /* =====================================================================
-     ALL APPS LAUNCHER (.swk-launch, .swk-launch-hero, .swk-app-tile)
-     ===================================================================== */
-  .swk-launch {
-    max-width: 960px;
-    margin: 0 auto;
-    padding-bottom: 36px;
-  }
-
-  .swk-launch-hero {
-    position: relative;
-    overflow: hidden;
-    text-align: center;
-    border-radius: 20px;
-    padding: clamp(24px, 3vw, 36px) clamp(16px, 3vw, 36px);
-    margin-bottom: 24px;
-    background:
-      radial-gradient(700px 300px at 85% -20%, rgba(15, 76, 129, 0.35), transparent 60%),
-      radial-gradient(500px 260px at 10% 120%, rgba(215, 176, 78, 0.15), transparent 60%),
-      linear-gradient(160deg, #0b1f3a, #051224);
-    box-shadow: 0 24px 48px -24px rgba(5, 18, 36, 0.55);
-    border: 1px solid var(--obs-line);
-  }
-
-  .swk-launch-hero .swk-launch-logo {
-    display: block;
-    height: 68px;
-    width: auto;
-    margin: 0 auto 10px;
-    filter: drop-shadow(0 0 24px rgba(215, 176, 78, 0.25));
-  }
-
-  .swk-launch-hero .swk-eyebrow,
-  .swk-launch-date {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: #d7b04e;
-    margin-bottom: 6px;
-  }
-
-  .swk-launch-hero h1 {
-    margin: 0;
-    color: #ffffff;
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: clamp(24px, 3vw, 32px);
-    letter-spacing: -0.02em;
-    line-height: 1.15;
-  }
-
-  .swk-launch-search {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    width: min(500px, 100%);
-    height: 42px;
-    margin: 16px auto 0;
-    padding: 0 12px 0 14px;
-    border-radius: 10px;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid var(--obs-line);
-    transition: border-color 0.16s, box-shadow 0.16s;
-  }
-
-  .swk-launch-search:focus-within {
-    border-color: #38bdf8;
-    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.22);
-  }
-
-  .swk-launch-search svg {
-    color: var(--obs-mute);
-    flex: none;
-  }
-
-  .swk-launch-search input {
-    flex: 1;
-    min-width: 0;
-    height: 100%;
-    border: 0;
-    outline: none;
-    background: transparent;
-    color: #ffffff;
-    font-size: 13.5px;
-  }
-
-  .swk-launch-search input::placeholder {
-    color: var(--obs-mute);
-  }
-
-  .swk-launch-recent {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin: 0 0 20px;
-  }
-
-  .swk-launch-recent .lbl {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-
-  .swk-launch-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    height: 30px;
-    padding: 0 12px;
-    border-radius: 99px;
-    background: #ffffff;
-    border: 1px solid var(--line);
-    font-size: 12.5px;
-    font-weight: 600;
-    color: var(--ink);
-    text-decoration: none;
-    transition: border-color 0.15s, background 0.15s;
-  }
-
-  .swk-launch-chip svg {
-    color: var(--ember);
-  }
-
-  .swk-launch-chip:hover {
-    border-color: var(--ember);
-    background: var(--champ-soft);
-  }
-
-  .swk-launch-grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 14px;
-    max-width: 780px;
-    margin: 6px auto 0;
-  }
-
-  @media (max-width: 640px) {
-    .swk-launch-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
-    }
-  }
-
-  .swk-app-tile {
-    --t1: #0f294a;
-    --t2: #05162c;
-    --tc: #d7b04e;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 8px;
-    padding: 18px 12px 15px;
-    border-radius: 14px;
-    background: #ffffff;
-    border: 1px solid var(--line);
-    text-align: center;
-    text-decoration: none;
-    transition: transform 0.18s var(--ease), border-color 0.18s, box-shadow 0.18s;
-    min-width: 0;
-  }
-
-  .swk-app-tile:hover {
-    border-color: var(--ember);
-    transform: translateY(-2px);
-    box-shadow: 0 12px 28px -14px rgba(11, 31, 58, 0.28);
-  }
-
-  .swk-app-icon {
-    width: 54px;
-    height: 54px;
-    border-radius: 13px;
-    display: grid;
-    place-items: center;
-    color: var(--tc);
-    background: linear-gradient(145deg, var(--t1), var(--t2));
-    border: 1px solid rgba(215, 176, 78, 0.32);
-    box-shadow: 0 10px 20px -10px rgba(11, 31, 58, 0.45);
-    transition: transform 0.2s var(--ease);
-  }
-
-  .swk-app-tile:hover .swk-app-icon {
-    transform: scale(1.05);
-  }
-
-  .swk-app-name {
-    font-weight: 700;
-    font-size: 13.5px;
-    line-height: 1.2;
-    color: var(--ink);
-  }
-
-  .swk-app-sub {
-    font-size: 11.5px;
-    font-weight: 500;
-    color: var(--muted);
-    margin-top: -4px;
-  }
-
-  /* =====================================================================
-     SPLIT SIGN-IN (.swk-login2) — Sovereign Midnight Navy & Alabaster
+     SPLIT SIGN-IN (.swk-login2) — Oxblood panel & bone form
      ===================================================================== */
   .swk-login2 {
     min-height: 100svh;
     display: grid;
     grid-template-columns: 1fr;
-    background: #f8fafc;
+    background: #faf6f0;
     color: var(--ink);
   }
 
@@ -447,9 +295,9 @@
     justify-content: space-between;
     padding: 48px;
     background:
-      radial-gradient(600px 360px at 100% 0%, rgba(15, 76, 129, 0.35), transparent 60%),
-      radial-gradient(500px 320px at 0% 100%, rgba(215, 176, 78, 0.14), transparent 60%),
-      linear-gradient(165deg, #061c38 0%, #021125 65%, #010a17 100%);
+      radial-gradient(600px 360px at 100% 0%, rgba(201, 162, 87, 0.16), transparent 60%),
+      radial-gradient(500px 320px at 0% 100%, rgba(143, 42, 55, 0.5), transparent 60%),
+      linear-gradient(165deg, #5a1620 0%, #2f1015 65%, #1f0d10 100%);
     border-right: 1px solid rgba(255, 255, 255, 0.08);
   }
 
@@ -462,7 +310,7 @@
   .swk-login2-fade {
     position: absolute;
     inset: 0;
-    background: linear-gradient(to bottom, transparent 55%, rgba(1, 10, 23, 0.55));
+    background: linear-gradient(to bottom, transparent 55%, rgba(14, 6, 7, 0.55));
   }
 
   .swk-login2-logo {
@@ -470,7 +318,7 @@
     z-index: 1;
     width: 190px;
     height: auto;
-    filter: drop-shadow(0 0 28px rgba(215, 176, 78, 0.25));
+    filter: drop-shadow(0 0 28px rgba(201, 162, 87, 0.25));
   }
 
   .swk-login2-quote {
@@ -488,7 +336,7 @@
 
   .swk-login2-quote em {
     font-style: normal;
-    color: #d7b04e;
+    color: #c9a257;
   }
 
   .swk-login2-quote figcaption {
@@ -496,7 +344,7 @@
     font: 600 11px var(--font-mono);
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: #94a3b8;
+    color: #a89a90;
   }
 
   .swk-login2-main {
@@ -518,8 +366,8 @@
     border-radius: 999px;
     background: radial-gradient(
       60% 60% at 55% 35%,
-      rgba(15, 76, 129, 0.08),
-      rgba(215, 176, 78, 0.04) 55%,
+      rgba(122, 31, 43, 0.08),
+      rgba(201, 162, 87, 0.04) 55%,
       transparent 80%
     );
     pointer-events: none;
@@ -537,13 +385,13 @@
     margin: 0;
     font: 700 clamp(28px, 3vw, 36px) / 1.12 var(--font-display);
     letter-spacing: -0.025em;
-    color: #0b1f3a;
+    color: #2a1418;
   }
 
   .swk-login2-sub {
     margin: 8px 0 22px;
     font-size: 13.5px;
-    color: #475569;
+    color: #66564f;
   }
 
   .swk-login2-field {
@@ -552,16 +400,16 @@
     gap: 10px;
     height: 42px;
     padding: 0 12px;
-    border: 1px solid #cbd5e1;
+    border: 1px solid #d3c4ae;
     border-radius: 10px;
     background: #ffffff;
-    color: #64748b;
+    color: #766661;
     transition: border-color 0.15s, box-shadow 0.15s;
   }
 
   .swk-login2-field:focus-within {
-    border-color: #0f4c81;
-    box-shadow: 0 0 0 3px rgba(15, 76, 129, 0.18);
+    border-color: #7a1f2b;
+    box-shadow: 0 0 0 3px rgba(122, 31, 43, 0.18);
   }
 
   .swk-login2-field input {
@@ -570,7 +418,7 @@
     border: 0;
     outline: 0;
     background: transparent;
-    color: #0b1f3a;
+    color: #2a1418;
     font-size: 13.5px;
     height: 100%;
   }
@@ -583,20 +431,20 @@
     justify-content: center;
     gap: 8px;
     border: 0;
-    border-radius: 10px;
-    background: #0b1f3a;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #8f2a37 0%, #651822 100%);
     color: #ffffff;
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 650;
     cursor: pointer;
-    transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
-    box-shadow: 0 8px 20px -10px rgba(11, 31, 58, 0.55);
+    transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
+    box-shadow: 0 10px 22px -12px rgba(90, 22, 32, 0.8);
   }
 
   .swk-login2-btn:hover:not(:disabled) {
-    background: #0f4c81;
+    filter: brightness(1.1);
     transform: translateY(-1px);
-    box-shadow: 0 12px 24px -12px rgba(15, 76, 129, 0.65);
+    box-shadow: 0 12px 24px -12px rgba(122, 31, 43, 0.65);
   }
 
   /* =====================================================================
@@ -612,7 +460,7 @@
 
   .dark .bw-card,
   .dark .swk-card {
-    background: #0b1628;
+    background: #2a1418;
     border-color: var(--line);
   }
 
@@ -724,7 +572,7 @@
 
   .bw-input:focus {
     border-color: var(--ember);
-    box-shadow: 0 0 0 3px rgba(15, 76, 129, 0.16);
+    box-shadow: 0 0 0 3px rgba(122, 31, 43, 0.16);
   }
 
   .bw-badge {

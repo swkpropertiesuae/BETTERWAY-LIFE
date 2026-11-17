@@ -116,8 +116,8 @@ export default async function WithdrawalsPage({
             </p>
           </div>
 
-          <div className="p-4 rounded-[6px] bg-[#0F172A] text-white border border-[#1E293B] space-y-2 text-xs">
-            <div className="text-[10px] font-bold uppercase tracking-widest text-[#2DD4BF]">
+          <div className="p-4 rounded-[6px] bg-[#2a1418] text-white border border-[#3a2326] space-y-2 text-xs">
+            <div className="text-[10px] font-bold uppercase tracking-widest text-[#c9a257]">
               Live Split Illustration (AED 45,000 Gross Subvention · 20% B2B Partner)
             </div>
             <div className="grid grid-cols-2 gap-2 pt-1">
@@ -139,7 +139,7 @@ export default async function WithdrawalsPage({
                   {formatAedWhole(sampleSplit.company50ShareFils)}
                 </div>
               </div>
-              <div className="p-2.5 rounded-lg bg-[#c9a96e]/20 border border-slate-300">
+              <div className="p-2.5 rounded-lg bg-[#c9a257]/20 border border-slate-300">
                 <div className="text-slate-300 text-[10px]">Advisor 50% Payout</div>
                 <div className="font-num font-bold text-sm text-slate-300">
                   {formatAedWhole(sampleSplit.advisor50ShareFils)}

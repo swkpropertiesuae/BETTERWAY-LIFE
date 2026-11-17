@@ -5,12 +5,17 @@ import {
   CalendarCheck,
   CalendarDays,
   CircleAlert,
+  Calculator,
   Download,
   Handshake,
+  Home,
   Info,
+  Landmark,
   Target,
   Timer,
+  Repeat,
   Trophy,
+  UserPlus,
   UserRound,
   Zap,
   CheckCircle2,
@@ -276,24 +281,35 @@ export function Dashboard() {
 
   return (
     <div className="page">
-      <PageHeader
-        eyebrow={`[ ${org.name} · ${new Date().toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long' })} ]`}
-        title={<>{greeting}, <span className="serif">{me.name.split(' ')[0]}</span></>}
-        sub={
-          org.outboundPaused
-            ? 'Outbound communication is paused. Agents are drafting only — nothing is being sent.'
-            : `${todayLeads} lead${todayLeads === 1 ? '' : 's'} arrived today. ${upcoming.filter((a) => sameDay(a.start, now)).length} visits still ahead of you.`
-        }
-        actions={
-          <>
-            <Segmented mono value={range} onChange={setRangeSaved} options={[{ value: '7d', label: '7D' }, { value: '30d', label: '30D' }, { value: '90d', label: '90D' }, { value: '12m', label: '12M' }]} />
-            <label className="row desktop-only" style={{ gap: 8, fontSize: 13, color: 'var(--text-2)', cursor: 'pointer' }}>
-              <Switch on={compare} onChange={setCompare} label="Compare to previous period" /> Compare
-            </label>
-            <Button icon={<Download size={15} />} onClick={exportSummary}>Export</Button>
-          </>
-        }
-      />
+      <div className="swk-dash-top">
+        <div className="lead">
+          <div className="eyebrow">{`[ ${org.name} · ${new Date().toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long' })} ]`}</div>
+          <h1 className="page-title">{greeting}, <span className="serif">{me.name.split(' ')[0]}</span></h1>
+          <p className="page-sub">
+            {org.outboundPaused
+              ? 'Outbound communication is paused. Agents are drafting only — nothing is being sent.'
+              : `${todayLeads} lead${todayLeads === 1 ? '' : 's'} arrived today. ${upcoming.filter((a) => sameDay(a.start, now)).length} meetings still ahead of you.`}
+          </p>
+          <div className="swk-dash-actions">
+            <Button variant="primary" icon={<UserPlus size={15} />} onClick={() => navigate('leads', { new: '1' })}>New lead</Button>
+            <Button icon={<Landmark size={15} />} onClick={() => { window.location.href = '/os/los'; }}>Run 24-bank match</Button>
+            <Button icon={<Calculator size={15} />} onClick={() => { window.location.href = '/os/toolkit'; }}>DBR toolkit</Button>
+          </div>
+        </div>
+        <div className="swk-dash-stats">
+          <div className="swk-dash-stat"><small>Pipeline</small><b>{money(v.pipeline)}</b></div>
+          <div className="swk-dash-stat"><small>Won value</small><b>{money(v.wonValue)}</b></div>
+          <div className="swk-dash-stat"><small>Within SLA</small><b>{pct(v.withinSla, 0)}</b></div>
+        </div>
+      </div>
+
+      <div className="row" style={{ justifyContent: 'flex-end', gap: 10, flexWrap: 'wrap', marginBottom: 14 }}>
+        <Segmented mono value={range} onChange={setRangeSaved} options={[{ value: '7d', label: '7D' }, { value: '30d', label: '30D' }, { value: '90d', label: '90D' }, { value: '12m', label: '12M' }]} />
+        <label className="row desktop-only" style={{ gap: 8, fontSize: 13, color: 'var(--text-2)', cursor: 'pointer' }}>
+          <Switch on={compare} onChange={setCompare} label="Compare to previous period" /> Compare
+        </label>
+        <Button icon={<Download size={15} />} onClick={exportSummary}>Export</Button>
+      </div>
 
       <div className="grid g-kpi-6">
         {kpis.map((k) => (
@@ -453,6 +469,21 @@ export function Dashboard() {
           <Button size="sm" onClick={() => navigate('logs', { status: 'failed' })}>Review</Button>
         </div>
       )}
+      <div className="swk-dept-grid" aria-label="Mortgage departments">
+        {[
+          { tag: 'Dept · Purchase', title: '1. Residential Purchase Mortgages', body: 'Fact-find → AECB & DBR check → 24-bank match → IPA → valuation → Form F & developer NOC → DLD transfer → bank commission.', href: '/os/deals', icon: <Landmark size={18} /> },
+          { tag: 'Dept · Refinance', title: '2. Refinance, Buyout & Equity Release', body: 'Existing loan statement → liability reconciliation → buyout break-even → new-bank offer → settlement letter → re-registration → payout.', href: '/os/toolkit', icon: <Repeat size={18} /> },
+          { tag: 'Dept · Off-Plan', title: '3. Off-Plan Finance & Handover', body: 'Developer payment plan → bank APL tower check → SPA & Oqood → escrow tranches → snagging & handover → disbursement → 50/50 split.', href: '/os/handover', icon: <Home size={18} /> },
+        ].map((d) => (
+          <a key={d.title} href={d.href} className="swk-dept">
+            <div className="swk-dept-top"><span className="swk-dept-tag">{d.tag}</span>{d.icon}</div>
+            <h3>{d.title}</h3>
+            <p>{d.body}</p>
+            <div className="swk-dept-open">Open department pipeline <ArrowUpRight size={15} /></div>
+          </a>
+        ))}
+      </div>
+
       <p className="faint mt-16" style={{ fontSize: 11.5 }}>
         Figures update as records change; provider data (calls, delivery) can lag by a few minutes. Times in {org.timezone}. A call or message counts as delivered only when the provider confirms it, not when the request is sent.
       </p>

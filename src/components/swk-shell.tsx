@@ -9,8 +9,8 @@ import '@/estate-os/styles/components.css';
 import '@/estate-os/styles/motion.css';
 import '@/estate-os/styles/assistant.css';
 import '@/estate-os/styles/integrations.css';
-import { Brand } from '@/estate-os/layout/Brand';
-import { NAV, NAV_FLAT } from '@/estate-os/layout/nav';
+import { DubaiClock, OsFrame, QuickAdd } from '@/components/os-chrome';
+import { OS_ITEMS } from '@/lib/os-apps';
 import {
   Activity,
   ArrowLeftRight,
@@ -208,8 +208,6 @@ export function OsLayoutFrame({
   const pathname = usePathname() || '/os';
   const router = useRouter();
 
-  const [collapsed, setCollapsed] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
   const [outboundPaused, setOutboundPaused] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [cmdOpen, setCmdOpen] = useState(false);
@@ -248,7 +246,6 @@ export function OsLayoutFrame({
   };
 
   useEffect(() => {
-    setMobileOpen(false);
     setUserMenuOpen(false);
     setNotifOpen(false);
   }, [pathname]);
@@ -274,16 +271,7 @@ export function OsLayoutFrame({
     return () => window.removeEventListener('keydown', onKey);
   }, []);
 
-  const activeNav = useMemo(() => {
-    const clean = pathname.split('?')[0];
-    const match = NAV_FLAT.find(
-      (n) => n.href && (n.href === clean || (clean.startsWith('/os/print/') && n.href.startsWith('/os/print/'))),
-    );
-    if (match) return { section: match.section, label: match.label, key: match.key };
-    return { section: 'Overview', label: 'Dashboard', key: 'dashboard' };
-  }, [pathname]);
-
-  // On /os root, EstateOsHost renders its own Shell (Sidebar + Topbar + Assistant)
+  // On /os root, EstateOsHost renders its own frame (same chrome, workspace pages, Assistant).
   if (pathname === '/os') {
     return <>{children}</>;
   }
@@ -295,11 +283,12 @@ export function OsLayoutFrame({
     .map((s) => s[0]!.toUpperCase())
     .join('');
 
-  const filteredCmd = NAV_FLAT.filter(
+  const filteredCmd = OS_ITEMS.filter(
     (n) =>
       !cmdQuery.trim() ||
       n.label.toLowerCase().includes(cmdQuery.toLowerCase()) ||
-      n.section.toLowerCase().includes(cmdQuery.toLowerCase()),
+      n.desc.toLowerCase().includes(cmdQuery.toLowerCase()) ||
+      n.app.label.toLowerCase().includes(cmdQuery.toLowerCase()),
   );
 
   const handleAiSend = (text?: string) => {
@@ -315,215 +304,143 @@ export function OsLayoutFrame({
     if (!text) setAiInput('');
   };
 
-  return (
-    <div
-      dir={lang === 'ar' ? 'rtl' : 'ltr'}
-      className="app"
-      data-collapsed={collapsed}
-      data-mobile-open={mobileOpen}
-    >
-      <div className="sb-scrim" onClick={() => setMobileOpen(false)} />
-
-      {/* Unified EstateOS Sidebar */}
-      <nav className="sidebar no-print" aria-label="Primary">
-        <div className="sb-brand">
-          <Link href="/os" className="row" style={{ gap: 10, minWidth: 0, textDecoration: 'none' }}>
-            <Brand />
-          </Link>
-          <button
-            type="button"
-            className="btn btn-ghost btn-sm btn-icon sb-collapse desktop-only"
-            onClick={() => setCollapsed(!collapsed)}
-            aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-            title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          >
-            {collapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
-          </button>
-        </div>
-
-        <div className="sb-scroll">
-          {NAV.map((section) => (
-            <div className="sb-section" key={section.section}>
-              <div className="sb-label">{section.section}</div>
-              {section.items.map((item) => {
-                const Icon = item.icon;
-                const targetHref = item.href ?? `/os#/${item.key}`;
-                const isActive = activeNav.key === item.key;
-                return (
-                  <Link
-                    key={item.key}
-                    href={targetHref}
-                    className={`sb-item ${isActive ? 'active' : ''}`}
-                    aria-current={isActive ? 'page' : undefined}
-                    title={collapsed ? item.label : undefined}
-                  >
-                    <Icon size={16} strokeWidth={1.8} />
-                    <span>{item.label}</span>
-                  </Link>
-                );
-              })}
+  const header = (
+    <>
+      <DubaiClock />
+      <span className="swk-chip brass swk-hide-lg" title="CBUAE 3M EIBOR benchmark, UAE dirham workspace">
+        3M EIBOR {eibor3mPct}% · AED
+      </span>
+      {outboundPaused && <span className="swk-chip warn swk-hide-md">Outbound paused</span>}
+      <button type="button" className="swk-search-pill" onClick={() => setCmdOpen(true)} aria-label="Search (Ctrl K)">
+        <Search size={15} />
+        <span>Search leads, banks, deals…</span>
+        <kbd>Ctrl K</kbd>
+      </button>
+      <button
+        type="button"
+        className="swk-tbtn"
+        onClick={toggleTheme}
+        aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+        title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
+      >
+        {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
+      </button>
+      <div className="swk-rel">
+        <button
+          type="button"
+          className="swk-tbtn"
+          onClick={() => {
+            setNotifOpen((o) => !o);
+            setUserMenuOpen(false);
+          }}
+          aria-label={`Notifications, ${openTasksCount} open tasks`}
+        >
+          <Bell size={17} />
+          {openTasksCount > 0 && <span className="count">{openTasksCount}</span>}
+        </button>
+        {notifOpen && (
+          <div className="swk-menu" role="dialog" aria-label="Notifications" style={{ width: 340 }}>
+            <div className="head">
+              <b>Notifications</b>
             </div>
-          ))}
-        </div>
-
-        <div className="sb-footer">
-          {!collapsed ? (
-            <div className={`sb-kill ${outboundPaused ? 'on' : ''}`}>
-              <OctagonPause size={16} />
-              <div className="grow sb-footer-text">
-                <div style={{ fontWeight: 600 }}>{outboundPaused ? 'Outbound paused' : 'Outbound live'}</div>
-                <div style={{ fontSize: 11.5, opacity: 0.75 }}>Global kill switch</div>
-              </div>
-              <button
-                type="button"
-                role="switch"
-                aria-checked={outboundPaused}
-                className={`switch danger ${outboundPaused ? 'on' : ''}`}
-                onClick={() => setOutboundPaused((v) => !v)}
-                aria-label="Pause all outbound"
-              />
+            <div className="sep" />
+            <div className="head" style={{ textAlign: 'center', padding: '22px 10px' }}>
+              {openTasksCount > 0 ? `${openTasksCount} open tasks need follow-up.` : "You're all caught up."}
             </div>
-          ) : (
-            <div className="row" style={{ justifyContent: 'center' }} title={outboundPaused ? 'Outbound paused' : 'Outbound live'}>
-              <span className={`status-dot ${!outboundPaused ? 'live' : ''}`} />
-            </div>
-          )}
-        </div>
-      </nav>
-
-      {/* Main Content Area */}
-      <div className="main">
-        <header className="topbar scrolled no-print">
-          <button
-            type="button"
-            className="btn btn-ghost btn-sm btn-icon mobile-only"
-            onClick={() => setMobileOpen(true)}
-            aria-label="Open navigation"
-          >
-            <MenuIcon size={18} />
-          </button>
-
-          <div className="crumbs">
-            <Link href="/os" className="desktop-only" style={{ color: 'var(--text-3)' }}>
-              Betterway Mortgages
-            </Link>
-            <span className="desktop-only">/</span>
-            <span className="desktop-only">{activeNav.section}</span>
-            <span className="desktop-only">/</span>
-            <b className="truncate">{activeNav.label}</b>
-          </div>
-
-          <div className="ml-auto row" style={{ gap: 6 }}>
-            <span className="demo-pill desktop-only" title="CBUAE 3M EIBOR Benchmark & UAE Dirham Workspace">
-              3M EIBOR {eibor3mPct}% · AED
-            </span>
-
-            <button
-              type="button"
-              className="search-trigger"
-              onClick={() => setCmdOpen(true)}
-              aria-label="Search (Ctrl K)"
-            >
-              <Search size={15} />
-              <span className="label">Search leads, properties…</span>
-              <span className="kbd">Ctrl K</span>
-            </button>
-
-            <button
-              type="button"
-              className="btn btn-ghost btn-icon"
-              onClick={toggleTheme}
-              aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-              title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
-            >
-              {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
-            </button>
-
-            <div className="menu-anchor">
-              <span className="icon-btn-badge">
-                <button
-                  type="button"
-                  className="btn btn-ghost btn-icon"
-                  onClick={() => {
-                    setNotifOpen((o) => !o);
-                    setUserMenuOpen(false);
-                  }}
-                  aria-label="Notifications"
-                >
-                  <Bell size={17} />
-                </button>
-                {openTasksCount > 0 && <span className="badge-count">{openTasksCount}</span>}
-              </span>
-              {notifOpen && (
-                <div className="panel" role="dialog" aria-label="Notifications">
-                  <div className="row" style={{ padding: '14px 16px 10px' }}>
-                    <b style={{ fontSize: 14 }}>Notifications</b>
-                  </div>
-                  <div style={{ overflowY: 'auto', borderTop: '1px solid var(--border-soft)' }}>
-                    <div className="empty">
-                      <div className="empty-title">You&apos;re all caught up</div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <div className="menu-anchor">
-              <button
-                type="button"
-                className="row"
-                style={{ gap: 8, padding: '3px 4px', borderRadius: 999 }}
-                onClick={() => {
-                  setUserMenuOpen((o) => !o);
-                  setNotifOpen(false);
-                }}
-                aria-label="Account menu"
-              >
-                <span
-                  className="avatar"
-                  style={{
-                    background: 'linear-gradient(135deg, #1d639e, #0b1f3a)',
-                    color: '#ffffff',
-                  }}
-                >
-                  {initials}
+            {openTasksCount > 0 && (
+              <a href="/os/activities">
+                <span className="ic">
+                  <CheckSquare size={16} />
                 </span>
-              </button>
-              {userMenuOpen && (
-                <div className="menu" style={{ width: 250, right: 0 }}>
-                  <div className="menu-label">
-                    {user.full_name_en} · {user.role}
-                  </div>
-                  <Link href="/os" className="menu-item" onClick={() => setUserMenuOpen(false)}>
-                    <LayoutDashboard size={14} />
-                    <span>Dashboard</span>
-                  </Link>
-                  <button
-                    type="button"
-                    className="menu-item"
-                    onClick={() => {
-                      toggleTheme();
-                      setUserMenuOpen(false);
-                    }}
-                  >
-                    {theme === 'dark' ? <Sun size={14} /> : <Moon size={14} />}
-                    <span>{theme === 'dark' ? 'Light mode' : 'Dark mode'}</span>
-                  </button>
-                  <div className="menu-sep" />
-                  <a href="/api/v1/auth/logout" className="menu-item danger">
-                    <LogOut size={14} />
-                    <span>Sign out</span>
-                  </a>
-                </div>
-              )}
-            </div>
+                <span>
+                  <b>Open tasks</b>
+                  <small>Review callbacks, viewings and DLD steps</small>
+                </span>
+              </a>
+            )}
           </div>
-        </header>
-
-        <main className="content" id="main">
-          <div className="page">{children}</div>
-        </main>
+        )}
       </div>
+      <QuickAdd />
+      <div className="swk-rel">
+        <button
+          type="button"
+          className="swk-avatar"
+          onClick={() => {
+            setUserMenuOpen((o) => !o);
+            setNotifOpen(false);
+          }}
+          aria-label="Account menu"
+          aria-expanded={userMenuOpen}
+        >
+          {initials}
+        </button>
+        {userMenuOpen && (
+          <div className="swk-menu" style={{ minWidth: 250 }}>
+            <div className="head">
+              <b>{user.full_name_en}</b>
+              <div>
+                {user.email} · {user.role}
+              </div>
+            </div>
+            <div className="sep" />
+            <Link href="/os/home" onClick={() => setUserMenuOpen(false)}>
+              <span className="ic">
+                <LayoutGrid size={16} />
+              </span>
+              All apps
+            </Link>
+            <Link href="/os" onClick={() => setUserMenuOpen(false)}>
+              <span className="ic">
+                <LayoutDashboard size={16} />
+              </span>
+              Dashboard
+            </Link>
+            <button
+              type="button"
+              className="item"
+              onClick={() => {
+                toggleTheme();
+                setUserMenuOpen(false);
+              }}
+            >
+              <span className="ic">{theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}</span>
+              {theme === 'dark' ? 'Light mode' : 'Dark mode'}
+            </button>
+            <div className="sep" />
+            <a href="/api/v1/auth/logout">
+              <span className="ic">
+                <LogOut size={16} />
+              </span>
+              Sign out
+            </a>
+          </div>
+        )}
+      </div>
+    </>
+  );
+
+  const sidebarFooter = (
+    <div className={`swk-kill ${outboundPaused ? 'on' : ''}`}>
+      <OctagonPause size={16} />
+      <div className="grow">
+        <div style={{ fontWeight: 600 }}>{outboundPaused ? 'Outbound paused' : 'Outbound live'}</div>
+        <small>Global kill switch</small>
+      </div>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={outboundPaused}
+        className={`switch danger ${outboundPaused ? 'on' : ''}`}
+        onClick={() => setOutboundPaused((v) => !v)}
+        aria-label="Pause all outbound"
+      />
+    </div>
+  );
+
+  return (
+    <OsFrame pathname={pathname} header={header} sidebarFooter={sidebarFooter} dir={lang === 'ar' ? 'rtl' : 'ltr'}>
+      <div className="page">{children}</div>
 
       {/* Floating AI Assistant Launcher */}
       <button
@@ -546,12 +463,7 @@ export function OsLayoutFrame({
               <div className="ai-title">Betterway AI Assistant</div>
               <div className="ai-sub">CBUAE 50% DBR · 24 UAE Banks · DLD &amp; VAT</div>
             </div>
-            <button
-              type="button"
-              className="btn btn-ghost btn-sm btn-icon"
-              onClick={() => setAiOpen(false)}
-              aria-label="Close assistant"
-            >
+            <button type="button" className="btn btn-ghost btn-sm btn-icon" onClick={() => setAiOpen(false)} aria-label="Close assistant">
               <X size={16} />
             </button>
           </div>
@@ -564,11 +476,7 @@ export function OsLayoutFrame({
               </div>
             ))}
             <div className="ai-chips">
-              {[
-                'CBUAE 50% DBR stress rule',
-                'Top 3Yr fixed bank rates',
-                '50/50 commission & FTA VAT',
-              ].map((chip) => (
+              {['CBUAE 50% DBR stress rule', 'Top 3Yr fixed bank rates', '50/50 commission & FTA VAT'].map((chip) => (
                 <button key={chip} type="button" className="ai-chip" onClick={() => handleAiSend(chip)}>
                   {chip}
                 </button>
@@ -586,14 +494,7 @@ export function OsLayoutFrame({
               value={aiInput}
               onChange={(e) => setAiInput(e.target.value)}
               placeholder="Ask about leads, DBR, banks, or DLD…"
-              style={{
-                flex: 1,
-                border: 0,
-                outline: 'none',
-                background: 'transparent',
-                fontSize: 13.5,
-                height: 34,
-              }}
+              style={{ flex: 1, border: 0, outline: 'none', background: 'transparent', fontSize: 13.5, height: 34 }}
             />
             <button type="submit" className="ai-send" disabled={!aiInput.trim()} aria-label="Send">
               <ArrowUp size={16} />
@@ -609,42 +510,33 @@ export function OsLayoutFrame({
           <div className="cmdk" role="dialog" aria-label="Command palette">
             <div className="cmdk-input">
               <Search size={17} className="faint" />
-              <input
-                autoFocus
-                value={cmdQuery}
-                onChange={(e) => setCmdQuery(e.target.value)}
-                placeholder="Search or jump to…"
-                aria-label="Search"
-              />
+              <input autoFocus value={cmdQuery} onChange={(e) => setCmdQuery(e.target.value)} placeholder="Search or jump to…" aria-label="Search" />
               <span className="kbd">Esc</span>
             </div>
             <div className="cmdk-list">
               {filteredCmd.map((item) => {
                 const Icon = item.icon;
-                const targetHref = item.href ?? `/os#/${item.key}`;
                 return (
                   <button
-                    key={item.key}
+                    key={item.href}
                     type="button"
                     className="cmdk-item"
                     onClick={() => {
                       setCmdOpen(false);
-                      router.push(targetHref);
+                      if (item.href.startsWith('/os#')) window.location.href = item.href;
+                      else router.push(item.href);
                     }}
                   >
                     <span className="faint">
                       <Icon size={15} />
                     </span>
                     <span className="truncate">{item.label}</span>
-                    <span className="hint">{item.section}</span>
+                    <span className="hint">{item.app.label}</span>
                   </button>
                 );
               })}
             </div>
-            <div
-              className="row faint"
-              style={{ padding: '9px 14px', borderTop: '1px solid var(--border-soft)', fontSize: 12, gap: 14 }}
-            >
+            <div className="row faint" style={{ padding: '9px 14px', borderTop: '1px solid var(--border-soft)', fontSize: 12, gap: 14 }}>
               <span className="row" style={{ gap: 5 }}>
                 <CornerDownLeft size={12} /> open
               </span>
@@ -655,6 +547,6 @@ export function OsLayoutFrame({
           </div>
         </>
       )}
-    </div>
+    </OsFrame>
   );
 }

@@ -127,7 +127,7 @@ export default async function InternalTeamWorkloadPage({
           <div className="text-[11px] font-semibold uppercase tracking-wider text-[var(--text-3)]">
             Commission Split Policy
           </div>
-          <div className="text-2xl font-bold font-num text-[#0f4c81] mt-1">50% / 50%</div>
+          <div className="text-2xl font-bold font-num text-[#7a1f2b] mt-1">50% / 50%</div>
           <div className="text-xs text-[var(--text-3)] mt-1">Net Pool After Partner Referral Share</div>
         </div>
       </div>
@@ -156,7 +156,7 @@ export default async function InternalTeamWorkloadPage({
               <div>
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-[#1c1c1c] text-white font-bold text-xs flex items-center justify-center shrink-0">
+                    <div className="w-10 h-10 rounded-full bg-[#2a1418] text-white font-bold text-xs flex items-center justify-center shrink-0">
                       {initials}
                     </div>
                     <div>
@@ -191,7 +191,7 @@ export default async function InternalTeamWorkloadPage({
                   <div className="h-1.5 rounded-full bg-[var(--bg-2)] overflow-hidden">
                     <div
                       className={`h-full rounded-full ${
-                        capacityPct > 80 ? 'bg-amber-500' : 'bg-[#0f4c81]'
+                        capacityPct > 80 ? 'bg-amber-500' : 'bg-[#7a1f2b]'
                       }`}
                       style={{ width: `${capacityPct}%` }}
                     />

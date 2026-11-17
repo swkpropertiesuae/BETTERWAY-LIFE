@@ -119,7 +119,7 @@ export default async function CompanyOperationsPage({
     <div className="space-y-6">
       <OsBanner notice={sp.notice} error={sp.error} />
 
-      {/* Midnight & Champagne Header Banner */}
+      {/* Oxblood & Brass Header Banner */}
       <div className="rounded-2xl bg-white text-gray-900 p-6 border border-gray-200 shadow-xs flex flex-wrap items-center justify-between gap-4">
         <div>
           <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-700">

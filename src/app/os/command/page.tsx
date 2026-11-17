@@ -414,7 +414,7 @@ export default async function CommandBoardPage({
                 className="flex items-center justify-between p-3 rounded-md border border-slate-200 bg-slate-50/50"
               >
                 <div className="flex items-center space-x-2.5 min-w-0">
-                  <div className="size-8 rounded-md bg-slate-900 text-[#d4b475] font-semibold text-xs flex items-center justify-center shrink-0">
+                  <div className="size-8 rounded-md bg-slate-900 text-[#d0b074] font-semibold text-xs flex items-center justify-center shrink-0">
                     {initials}
                   </div>
                   <div className="min-w-0">

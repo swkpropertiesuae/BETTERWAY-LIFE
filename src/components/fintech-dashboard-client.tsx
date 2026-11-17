@@ -231,7 +231,7 @@ const VAULT_CHECKLIST_ITEMS = [
   {
     id: 'doc-4',
     category: 'Property (Form F / Title Deed)',
-    title: 'DLD Form F (MOU) & Dubai Hills Title Deed #104928',
+    title: 'DLD Form F (MOU) & Dubai Hills Title Deed #2f4a22',
     status: 'PENDING_PAGE' as const,
     ocrFields: [
       { key: 'Community & Plot', val: 'Dubai Hills Estate • Golf Place Villa 42' },
@@ -402,7 +402,7 @@ export function FintechDashboardClient({
          ===================================================================== */}
       <section
         className="relative overflow-hidden rounded-[26px] text-white"
-        style={{ background: 'linear-gradient(120deg, #111 0%, #1c1c1c 60%, #3a1d10 125%)' }}
+        style={{ background: 'linear-gradient(120deg, #111 0%, #2a1418 60%, #3a1d10 125%)' }}
       >
         <div
           className="absolute inset-0 opacity-[.28] bg-cover bg-center mix-blend-luminosity"
@@ -420,7 +420,7 @@ export function FintechDashboardClient({
         />
         <div
           className="absolute -top-24 right-[12%] w-[420px] h-[420px] rounded-full pointer-events-none"
-          style={{ background: 'radial-gradient(circle, rgba(255,91,31,.30), transparent 65%)' }}
+          style={{ background: 'radial-gradient(circle, rgba(184,85,58,.30), transparent 65%)' }}
         />
         <img
           src="/brand/skyline-front.svg"
@@ -431,13 +431,13 @@ export function FintechDashboardClient({
 
         <div className="relative grid gap-5 lg:grid-cols-[1.45fr_1fr] items-center p-5 sm:p-6">
           <div>
-            <div className="font-mono text-[11px] font-bold tracking-[.14em] uppercase text-[#ff8a3d]">
+            <div className="font-mono text-[11px] font-bold tracking-[.14em] uppercase text-[#c8744f]">
               {dubaiDateFormatted}
             </div>
             <h1 className="m-0 mt-1.5 font-display font-bold text-white text-[22px] sm:text-[26px] leading-[1.15]">
               Good morning, <span className="swk-shimmer-text">Shabib</span>
             </h1>
-            <p className="mt-1.5 mb-0 text-[13px] text-[#c7d2e4] max-w-[640px] leading-relaxed">
+            <p className="mt-1.5 mb-0 text-[13px] text-[#d3c4ae] max-w-[640px] leading-relaxed">
               {metrics.dealsCount} live database mortgage files · {metrics.leadsCount} active enquiries · 3M EIBOR{' '}
               {metrics.eibor3mPct}% · Double-Entry Trial Balance {metrics.isBalanced !== false ? '✓ Balanced' : 'Check'}.
             </p>
@@ -461,7 +461,7 @@ export function FintechDashboardClient({
               </Link>
               <Link
                 href="/os/home"
-                className="inline-flex items-center gap-1.5 h-[36px] px-3.5 rounded-[9px] text-[13px] font-semibold text-[#ffe4d6] bg-white/10 border border-[#ff5b1f]/40 hover:bg-[#ff5b1f]/25 transition"
+                className="inline-flex items-center gap-1.5 h-[36px] px-3.5 rounded-[9px] text-[13px] font-semibold text-[#f4dfd3] bg-white/10 border border-[#b8553a]/40 hover:bg-[#b8553a]/25 transition"
               >
                 <span>All Apps Launcher</span>
                 <ArrowUpRight className="size-3.5" />
@@ -488,7 +488,7 @@ export function FintechDashboardClient({
               },
             ].map((s) => (
               <div key={s.l} className="swk-glass px-3.5 py-3">
-                <div className="font-mono text-[10.5px] font-semibold uppercase tracking-[.12em] text-[#ffd9c4]">
+                <div className="font-mono text-[10.5px] font-semibold uppercase tracking-[.12em] text-[#efd0c0]">
                   {s.l}
                 </div>
                 <div className="font-display font-num text-[17px] sm:text-[19px] font-bold text-white mt-1 whitespace-nowrap">
@@ -510,21 +510,21 @@ export function FintechDashboardClient({
             title: '1. Secondary Ready Purchases & Refinance',
             sub: 'Buyer / Partner A2A Intake → CBUAE 50% DBR & KFS Gate → 24-Bank IPA → Form F (MOU) & RICS Valuation → DLD Manager Cheques → 50/50 Split',
             to: '/os/deals?dept=ready',
-            accent: '#c9420f',
+            accent: '#9a4a2c',
           },
           {
             code: 'OFFPLAN',
             title: '2. Off-Plan Handover & Developer Oqood',
             sub: 'Developer Handover Notice → 50% Construction LTV / Completion Finance → Snagging & BCC → Developer NOC → Escrow Tranche Release',
             to: '/os/handover',
-            accent: '#148a4b',
+            accent: '#4d6b3a',
           },
           {
             code: 'COMMERCIAL & HNW',
             title: '3. Commercial, Equity Release & Non-Resident',
             sub: 'Corporate Trade Licence & 2Yr Audit → DSCR & Rental NOI Stress → Non-Resident 60% LTV Matrix → Cross-Sell Takaful, DIFC Wills & Golden Visa',
             to: '/os/los',
-            accent: '#1c1c1c',
+            accent: '#2a1418',
           },
         ].map((dept) => (
           <Link
@@ -543,7 +543,7 @@ export function FintechDashboardClient({
               <div className="font-display font-bold text-[15px] text-[var(--ink)] mt-2">{dept.title}</div>
               <p className="text-[12.5px] text-[var(--muted)] mt-1 leading-relaxed">{dept.sub}</p>
             </div>
-            <div className="mt-3 pt-2.5 border-t border-[var(--line)] flex items-center justify-between text-[12.5px] font-bold text-[#148a4b]">
+            <div className="mt-3 pt-2.5 border-t border-[var(--line)] flex items-center justify-between text-[12.5px] font-bold text-[#4d6b3a]">
               <span>Open Department Pipeline</span>
               <span>→</span>
             </div>
@@ -583,11 +583,11 @@ export function FintechDashboardClient({
             <Link
               key={st.step}
               href={st.to}
-              className="p-3 rounded-xl border border-[var(--line)] bg-[var(--surface-2)] hover:bg-[#fff0e8] hover:border-[#c9420f] transition flex flex-col justify-between group"
+              className="p-3 rounded-xl border border-[var(--line)] bg-[var(--surface-2)] hover:bg-[#f8ebe4] hover:border-[#9a4a2c] transition flex flex-col justify-between group"
             >
               <div>
                 <div className="flex items-center justify-between">
-                  <span className="font-mono text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-[#1c1c1c] text-[#ffe4d6]">
+                  <span className="font-mono text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-[#2a1418] text-[#f4dfd3]">
                     {st.step}
                   </span>
                   <ArrowUpRight className="size-3.5 text-[var(--muted)] group-hover:text-[var(--ink)]" />
@@ -607,7 +607,7 @@ export function FintechDashboardClient({
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div className="space-y-0.5">
             <div className="text-[13px] font-bold text-[var(--ink)] flex items-center gap-1.5">
-              <ShieldCheck className="size-4 text-[#148a4b]" />
+              <ShieldCheck className="size-4 text-[#4d6b3a]" />
               Betterway Leadership Governance, Office Hours (Mon–Fri 10am–7pm · Sat 10am–4pm · 10:05 AM Grace) &amp; Briefings
             </div>
             <div className="text-[12.5px] text-[var(--muted)]">
@@ -653,17 +653,17 @@ export function FintechDashboardClient({
                 onClick={() => openDealDrawer(mergedDeals[0]!)}
                 className="bw-btn-ghost"
               >
-                <PanelRightOpen className="size-3.5 text-[#ff5b1f]" />
+                <PanelRightOpen className="size-3.5 text-[#b8553a]" />
                 <span>Inspect Deal Drawer</span>
               </button>
             ) : (
               <Link href="/os/deals" className="bw-btn-ghost">
-                <PanelRightOpen className="size-3.5 text-[#ff5b1f]" />
+                <PanelRightOpen className="size-3.5 text-[#b8553a]" />
                 <span>Open Deal Pipeline</span>
               </Link>
             )}
             <Link href="/os/print/proposal/1" className="bw-btn-navy">
-              <Printer className="size-3.5 text-[#ff8a3d]" />
+              <Printer className="size-3.5 text-[#c8744f]" />
               <span>Print 3-Bank Proposal</span>
             </Link>
           </div>
@@ -689,11 +689,11 @@ export function FintechDashboardClient({
                   onClick={() => setActiveTab(t.id as CommandSectionTab)}
                   className={`inline-flex items-center gap-1.5 rounded-[9px] px-3 py-1.5 text-[12.5px] font-semibold whitespace-nowrap transition cursor-pointer ${
                     isAct
-                      ? 'bg-[#1c1c1c] text-white'
+                      ? 'bg-[#2a1418] text-white'
                       : 'text-[var(--muted)] hover:bg-[var(--hover)] hover:text-[var(--ink)]'
                   }`}
                 >
-                  <Icon className={`size-3.5 ${isAct ? 'text-[#ff8a3d]' : 'text-[var(--muted)]'}`} />
+                  <Icon className={`size-3.5 ${isAct ? 'text-[#c8744f]' : 'text-[var(--muted)]'}`} />
                   <span>{t.label}</span>
                 </button>
               );
@@ -705,7 +705,7 @@ export function FintechDashboardClient({
             onClick={() => setActiveTab(activeTab === 'all' ? 'overview' : 'all')}
             className={`px-3 py-1.5 rounded-[9px] font-mono text-[11px] font-semibold whitespace-nowrap border cursor-pointer ${
               activeTab === 'all'
-                ? 'bg-[#ff5b1f] text-white border-[#ff5b1f]'
+                ? 'bg-[#b8553a] text-white border-[#b8553a]'
                 : 'border-[var(--line)] text-[var(--muted)] hover:text-[var(--ink)]'
             }`}
           >
@@ -730,8 +730,8 @@ export function FintechDashboardClient({
                     : 'AED 0',
                 sub: `${metrics.dealsCount} live mortgage files in SQLite`,
                 badge: 'Live DB',
-                badgeStyle: 'bg-[#F0FDFA] text-[#148a4b] border-[#148a4b]/30',
-                sparkColor: '#148a4b',
+                badgeStyle: 'bg-[#f8ecec] text-[#4d6b3a] border-[#4d6b3a]/30',
+                sparkColor: '#4d6b3a',
                 sparkPoints: '0,24 20,20 40,22 60,14 80,16 100,6',
                 onClick: () => setActiveTab('pipeline'),
               },
@@ -740,8 +740,8 @@ export function FintechDashboardClient({
                 value: `${metrics.leadsCount} Leads`,
                 sub: '5-Minute GST Response SLA Enforced',
                 badge: '5m SLA',
-                badgeStyle: 'bg-[#fff0e8] text-[#c9420f] border-[#ff5b1f]/30',
-                sparkColor: '#ff5b1f',
+                badgeStyle: 'bg-[#f8ebe4] text-[#9a4a2c] border-[#b8553a]/30',
+                sparkColor: '#b8553a',
                 sparkPoints: '0,26 20,22 40,18 60,15 80,10 100,5',
                 onClick: () => setActiveTab('cbuae'),
               },
@@ -750,8 +750,8 @@ export function FintechDashboardClient({
                 value: `AED ${Math.round(metrics.bankCashFils / 100).toLocaleString('en-US')}`,
                 sub: `Subvention Rec: AED ${Math.round(metrics.subventionReceivableFils / 100).toLocaleString('en-US')}`,
                 badge: metrics.isBalanced !== false ? '✓ Balanced' : 'Check',
-                badgeStyle: 'bg-[#F0FDFA] text-[#148a4b] border-[#148a4b]/30',
-                sparkColor: '#1c1c1c',
+                badgeStyle: 'bg-[#f8ecec] text-[#4d6b3a] border-[#4d6b3a]/30',
+                sparkColor: '#2a1418',
                 sparkPoints: '0,22 20,18 40,20 60,12 80,9 100,4',
                 onClick: () => setActiveTab('closing'),
               },
@@ -760,8 +760,8 @@ export function FintechDashboardClient({
                 value: `AED ${Math.round(metrics.netProfitFils / 100).toLocaleString('en-US')}`,
                 sub: `PDC Vault (${metrics.pdcVaultCount}): AED ${Math.round(metrics.pdcVaultFils / 100).toLocaleString('en-US')}`,
                 badge: 'FTA VAT & CT',
-                badgeStyle: 'bg-[#FFFBEB] text-[#D97706] border-[#D97706]/30',
-                sparkColor: '#D97706',
+                badgeStyle: 'bg-[#f9f3e3] text-[#a8741a] border-[#a8741a]/30',
+                sparkColor: '#a8741a',
                 sparkPoints: '0,25 20,19 40,15 60,17 80,8 100,6',
                 onClick: () => setActiveTab('ledger'),
               },
@@ -773,7 +773,7 @@ export function FintechDashboardClient({
                 className="bw-card bw-lift p-4 text-left flex flex-col justify-between gap-3 cursor-pointer"
               >
                 <div className="flex items-start justify-between gap-2 w-full">
-                  <span className="text-xs font-semibold text-[#64748B]">{kpi.label}</span>
+                  <span className="text-xs font-semibold text-[#766661]">{kpi.label}</span>
                   <span
                     className={`font-mono text-[10px] font-bold px-1.5 py-0.5 rounded border ${kpi.badgeStyle}`}
                   >
@@ -783,10 +783,10 @@ export function FintechDashboardClient({
 
                 <div className="flex items-end justify-between gap-2 w-full">
                   <div>
-                    <div className="font-mono text-2xl font-bold tracking-tight text-[#0F172A] dark:text-[#F8FAFC]">
+                    <div className="font-mono text-2xl font-bold tracking-tight text-[#2a1418] dark:text-[#faf6f0]">
                       {kpi.value}
                     </div>
-                    <div className="font-mono text-[11px] text-[#64748B] mt-0.5">{kpi.sub}</div>
+                    <div className="font-mono text-[11px] text-[#766661] mt-0.5">{kpi.sub}</div>
                   </div>
 
                   <svg viewBox="0 0 100 30" className="w-20 h-7 shrink-0 overflow-visible">
@@ -806,16 +806,16 @@ export function FintechDashboardClient({
           <div className="grid grid-cols-12 gap-4">
             {/* Left 65% (8 cols): Pipeline Funnel & Bottleneck Bar */}
             <div className="col-span-12 lg:col-span-8 bw-card p-5 space-y-4">
-              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#E2E8F0] dark:border-[#1E293B] pb-3">
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#e7dccd] dark:border-[#3a2326] pb-3">
                 <div>
-                  <h2 className="text-sm font-bold text-[#0F172A] dark:text-[#F8FAFC]">
+                  <h2 className="text-sm font-bold text-[#2a1418] dark:text-[#faf6f0]">
                     Pipeline Funnel &amp; Stage Bottleneck Bar
                   </h2>
-                  <p className="text-[11px] text-[#64748B]">
+                  <p className="text-[11px] text-[#766661]">
                     Conversion drop-off and average turnaround days across UAE mortgage origination stages
                   </p>
                 </div>
-                <span className="font-mono text-xs font-semibold text-[#0D9488]">
+                <span className="font-mono text-xs font-semibold text-[#7a1f2b]">
                   Avg End-to-End Cycle: 21.8 Days
                 </span>
               </div>
@@ -823,30 +823,30 @@ export function FintechDashboardClient({
               <div className="space-y-2.5">
                 {PIPELINE_FUNNEL_STAGES.map((s) => (
                   <div key={s.stage} className="grid grid-cols-12 items-center gap-3 text-xs">
-                    <div className="col-span-5 sm:col-span-4 font-semibold text-[#0F172A] dark:text-[#F8FAFC] truncate">
+                    <div className="col-span-5 sm:col-span-4 font-semibold text-[#2a1418] dark:text-[#faf6f0] truncate">
                       {s.stage}
                     </div>
                     <div className="col-span-4 sm:col-span-5">
-                      <div className="h-2.5 w-full rounded-[3px] bg-[#F1F5F9] dark:bg-[#1E293B] overflow-hidden">
+                      <div className="h-2.5 w-full rounded-[3px] bg-[#f1ebe1] dark:bg-[#3a2326] overflow-hidden">
                         <div
                           className={`h-full rounded-[3px] ${
                             s.status === 'warning'
-                              ? 'bg-[#D97706]'
-                              : 'bg-[#0F172A] dark:bg-[#2DD4BF]'
+                              ? 'bg-[#a8741a]'
+                              : 'bg-[#2a1418] dark:bg-[#c9a257]'
                           }`}
                           style={{ width: `${s.pct}%` }}
                         />
                       </div>
                     </div>
                     <div className="col-span-3 flex items-center justify-end gap-2 font-mono text-[11px]">
-                      <span className="font-bold text-[#0F172A] dark:text-[#F8FAFC]">
+                      <span className="font-bold text-[#2a1418] dark:text-[#faf6f0]">
                         {s.files} ({s.volumeM})
                       </span>
                       <span
                         className={`px-1.5 py-0.5 rounded font-semibold ${
                           s.status === 'warning'
-                            ? 'bg-[#FFFBEB] text-[#D97706]'
-                            : 'bg-[#F0FDFA] text-[#0D9488]'
+                            ? 'bg-[#f9f3e3] text-[#a8741a]'
+                            : 'bg-[#f8ecec] text-[#7a1f2b]'
                         }`}
                       >
                         {s.avgDays}d
@@ -857,48 +857,48 @@ export function FintechDashboardClient({
               </div>
 
               {/* Live Corporate Treasury & Accounting Health Strip inside Overview */}
-              <div className="pt-3 border-t border-[#E2E8F0] dark:border-[#1E293B] grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+              <div className="pt-3 border-t border-[#e7dccd] dark:border-[#3a2326] grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
                 <Link
                   href="/os/accounts-expenses"
-                  className="rounded-[6px] border border-[#E2E8F0] dark:border-[#1E293B] bg-[#F8FAFC] dark:bg-[#090D16] p-2.5 hover:border-[#0D9488]"
+                  className="rounded-[6px] border border-[#e7dccd] dark:border-[#3a2326] bg-[#faf6f0] dark:bg-[#231115] p-2.5 hover:border-[#7a1f2b]"
                 >
-                  <span className="text-[10px] font-bold uppercase text-[#64748B] block">
+                  <span className="text-[10px] font-bold uppercase text-[#766661] block">
                     Treasury Cash (GL 1100)
                   </span>
-                  <strong className="font-mono text-sm text-[#0F172A] dark:text-[#F8FAFC]">
+                  <strong className="font-mono text-sm text-[#2a1418] dark:text-[#faf6f0]">
                     AED {Math.round(metrics.bankCashFils / 100).toLocaleString('en-US')}
                   </strong>
                 </Link>
                 <Link
                   href="/os/erp"
-                  className="rounded-[6px] border border-[#E2E8F0] dark:border-[#1E293B] bg-[#F8FAFC] dark:bg-[#090D16] p-2.5 hover:border-[#0D9488]"
+                  className="rounded-[6px] border border-[#e7dccd] dark:border-[#3a2326] bg-[#faf6f0] dark:bg-[#231115] p-2.5 hover:border-[#7a1f2b]"
                 >
-                  <span className="text-[10px] font-bold uppercase text-[#64748B] block">
+                  <span className="text-[10px] font-bold uppercase text-[#766661] block">
                     Subvention Rec. (GL 1200)
                   </span>
-                  <strong className="font-mono text-sm text-[#0D9488]">
+                  <strong className="font-mono text-sm text-[#7a1f2b]">
                     AED {Math.round(metrics.subventionReceivableFils / 100).toLocaleString('en-US')}
                   </strong>
                 </Link>
                 <Link
                   href="/os/loan-risk-pdc"
-                  className="rounded-[6px] border border-[#E2E8F0] dark:border-[#1E293B] bg-[#F8FAFC] dark:bg-[#090D16] p-2.5 hover:border-[#0D9488]"
+                  className="rounded-[6px] border border-[#e7dccd] dark:border-[#3a2326] bg-[#faf6f0] dark:bg-[#231115] p-2.5 hover:border-[#7a1f2b]"
                 >
-                  <span className="text-[10px] font-bold uppercase text-[#64748B] block">
+                  <span className="text-[10px] font-bold uppercase text-[#766661] block">
                     PDC Safe Vault ({metrics.pdcVaultCount})
                   </span>
-                  <strong className="font-mono text-sm text-[#0F172A] dark:text-[#F8FAFC]">
+                  <strong className="font-mono text-sm text-[#2a1418] dark:text-[#faf6f0]">
                     AED {Math.round(metrics.pdcVaultFils / 100).toLocaleString('en-US')}
                   </strong>
                 </Link>
                 <Link
                   href="/os/accounts-expenses"
-                  className="rounded-[6px] border border-[#E2E8F0] dark:border-[#1E293B] bg-[#F8FAFC] dark:bg-[#090D16] p-2.5 hover:border-[#0D9488]"
+                  className="rounded-[6px] border border-[#e7dccd] dark:border-[#3a2326] bg-[#faf6f0] dark:bg-[#231115] p-2.5 hover:border-[#7a1f2b]"
                 >
-                  <span className="text-[10px] font-bold uppercase text-[#64748B] block">
+                  <span className="text-[10px] font-bold uppercase text-[#766661] block">
                     Net Profit After Tax
                   </span>
-                  <strong className="font-mono text-sm text-[#0D9488]">
+                  <strong className="font-mono text-sm text-[#7a1f2b]">
                     AED {Math.round(metrics.netProfitFils / 100).toLocaleString('en-US')}
                   </strong>
                 </Link>
@@ -916,7 +916,7 @@ export function FintechDashboardClient({
                     Live database mortgage files &amp; drawer inspection
                   </p>
                 </div>
-                <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded bg-[#fff0e8] text-[#c9420f] border border-[#ff5b1f]/30">
+                <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded bg-[#f8ebe4] text-[#9a4a2c] border border-[#b8553a]/30">
                   {mergedDeals.length} Live
                 </span>
               </div>
@@ -958,14 +958,14 @@ export function FintechDashboardClient({
                           <button
                             type="button"
                             onClick={() => openDealDrawer(deal)}
-                            className="text-[11px] font-semibold text-[#148a4b] hover:underline cursor-pointer"
+                            className="text-[11px] font-semibold text-[#4d6b3a] hover:underline cursor-pointer"
                           >
                             Open Deal Drawer →
                           </button>
                           <button
                             type="button"
                             onClick={() => setNudgedIds((prev) => ({ ...prev, [deal.id]: true }))}
-                            className="px-2.5 py-1 rounded-md bg-[#1c1c1c] text-white font-semibold text-[11px] cursor-pointer"
+                            className="px-2.5 py-1 rounded-md bg-[#2a1418] text-white font-semibold text-[11px] cursor-pointer"
                           >
                             {isNudged ? '✓ Nudge Dispatched' : 'Nudge Client'}
                           </button>
@@ -985,28 +985,28 @@ export function FintechDashboardClient({
          ===================================================================== */}
       {showSection('pipeline') && (
         <section className="bw-card p-5 space-y-4">
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#E2E8F0] dark:border-[#1E293B] pb-3">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#e7dccd] dark:border-[#3a2326] pb-3">
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-base font-bold text-[#0F172A] dark:text-[#F8FAFC]">
+                <h2 className="text-base font-bold text-[#2a1418] dark:text-[#faf6f0]">
                   Mortgage Pipeline (Click Any Client to Open Slide-Over Deal Drawer)
                 </h2>
                 <span className="bw-badge font-mono">{mergedDeals.length} Active Files</span>
               </div>
-              <p className="text-xs text-[#64748B]">
+              <p className="text-xs text-[#766661]">
                 Information-dense borrower rows with Residency Pill, LTV tag, DBR Health Pill (50% Cap), and Document Readiness Ring
               </p>
             </div>
 
             <div className="flex items-center gap-2">
-              <div className="inline-flex rounded-[6px] border border-[#E2E8F0] dark:border-[#1E293B] bg-[#F8FAFC] dark:bg-[#090D16] p-0.5 text-xs">
+              <div className="inline-flex rounded-[6px] border border-[#e7dccd] dark:border-[#3a2326] bg-[#faf6f0] dark:bg-[#231115] p-0.5 text-xs">
                 <button
                   type="button"
                   onClick={() => setPipelineView('table')}
                   className={`inline-flex items-center gap-1.5 rounded-[4px] px-3 py-1 font-semibold cursor-pointer ${
                     pipelineView === 'table'
-                      ? 'bg-[#0F172A] text-white dark:bg-[#F8FAFC] dark:text-[#090D16]'
-                      : 'text-[#64748B]'
+                      ? 'bg-[#2a1418] text-white dark:bg-[#faf6f0] dark:text-[#231115]'
+                      : 'text-[#766661]'
                   }`}
                 >
                   <Table2 className="size-3.5" />
@@ -1017,8 +1017,8 @@ export function FintechDashboardClient({
                   onClick={() => setPipelineView('kanban')}
                   className={`inline-flex items-center gap-1.5 rounded-[4px] px-3 py-1 font-semibold cursor-pointer ${
                     pipelineView === 'kanban'
-                      ? 'bg-[#0F172A] text-white dark:bg-[#F8FAFC] dark:text-[#090D16]'
-                      : 'text-[#64748B]'
+                      ? 'bg-[#2a1418] text-white dark:bg-[#faf6f0] dark:text-[#231115]'
+                      : 'text-[#766661]'
                   }`}
                 >
                   <Kanban className="size-3.5" />
@@ -1036,7 +1036,7 @@ export function FintechDashboardClient({
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
-                  <tr className="border-b border-[#E2E8F0] dark:border-[#1E293B] text-[11px] font-bold uppercase text-[#64748B]">
+                  <tr className="border-b border-[#e7dccd] dark:border-[#3a2326] text-[11px] font-bold uppercase text-[#766661]">
                     <th className="py-2.5 pr-3">Borrower &amp; Residency</th>
                     <th className="py-2.5 px-3">Property &amp; Loan Tag</th>
                     <th className="py-2.5 px-3">Bank &amp; Rate</th>
@@ -1045,7 +1045,7 @@ export function FintechDashboardClient({
                     <th className="py-2.5 pl-3 text-right">Stage &amp; Drawer</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#E2E8F0] dark:divide-[#1E293B]">
+                <tbody className="divide-y divide-[#e7dccd] dark:divide-[#3a2326]">
                   {mergedDeals.map((deal) => {
                     const pctDocs = Math.round((deal.docsVerified / deal.docsTotal) * 100);
                     const r = 10;
@@ -1055,36 +1055,36 @@ export function FintechDashboardClient({
                       <tr
                         key={`${deal.id}-${deal.dealRef}`}
                         onClick={() => openDealDrawer(deal)}
-                        className="hover:bg-[#F8FAFC] dark:hover:bg-[#1E293B]/60 transition cursor-pointer"
+                        className="hover:bg-[#faf6f0] dark:hover:bg-[#3a2326]/60 transition cursor-pointer"
                       >
                         <td className="py-3 pr-3">
                           <div className="flex items-center gap-2">
-                            <span className="font-bold text-[#0F172A] dark:text-[#F8FAFC]">
+                            <span className="font-bold text-[#2a1418] dark:text-[#faf6f0]">
                               {deal.borrowerName}
                             </span>
-                            <span className="rounded-[4px] border border-[#E2E8F0] dark:border-[#1E293B] bg-[#F8FAFC] dark:bg-[#090D16] px-1.5 py-0.5 text-[10px] font-semibold text-[#64748B]">
+                            <span className="rounded-[4px] border border-[#e7dccd] dark:border-[#3a2326] bg-[#faf6f0] dark:bg-[#231115] px-1.5 py-0.5 text-[10px] font-semibold text-[#766661]">
                               {deal.residency}
                             </span>
                           </div>
-                          <div className="font-mono text-[11px] text-[#64748B]">
+                          <div className="font-mono text-[11px] text-[#766661]">
                             {deal.dealRef} • EID {deal.eidNumber}
                           </div>
                         </td>
 
                         <td className="py-3 px-3">
-                          <div className="font-semibold text-[#0F172A] dark:text-[#F8FAFC]">
+                          <div className="font-semibold text-[#2a1418] dark:text-[#faf6f0]">
                             {deal.propertyTitle}
                           </div>
-                          <div className="font-mono text-[11px] text-[#0D9488] font-semibold">
+                          <div className="font-mono text-[11px] text-[#7a1f2b] font-semibold">
                             AED {(deal.loanAmountAed / 1000000).toFixed(2)}M • {deal.ltvPct}% LTV
                           </div>
                         </td>
 
                         <td className="py-3 px-3">
-                          <span className="inline-flex items-center gap-1.5 rounded-[4px] bg-[#0F172A] text-white dark:bg-[#F8FAFC] dark:text-[#090D16] px-2 py-0.5 font-mono text-[11px] font-bold">
+                          <span className="inline-flex items-center gap-1.5 rounded-[4px] bg-[#2a1418] text-white dark:bg-[#faf6f0] dark:text-[#231115] px-2 py-0.5 font-mono text-[11px] font-bold">
                             {deal.selectedBank}
                           </span>
-                          <span className="ml-2 font-mono text-xs font-semibold text-[#0F172A] dark:text-[#F8FAFC]">
+                          <span className="ml-2 font-mono text-xs font-semibold text-[#2a1418] dark:text-[#faf6f0]">
                             {deal.rateLabel}
                           </span>
                         </td>
@@ -1093,10 +1093,10 @@ export function FintechDashboardClient({
                           <span
                             className={`inline-flex items-center rounded-[4px] px-2 py-0.5 font-mono text-xs font-bold border ${
                               deal.dbrPct <= 45
-                                ? 'bg-[#F0FDFA] text-[#0D9488] border-[#0D9488]/30'
+                                ? 'bg-[#f8ecec] text-[#7a1f2b] border-[#7a1f2b]/30'
                                 : deal.dbrPct <= 50
-                                  ? 'bg-[#FFFBEB] text-[#D97706] border-[#D97706]/30'
-                                  : 'bg-[#FEF2F2] text-[#DC2626] border-[#DC2626]/30'
+                                  ? 'bg-[#f9f3e3] text-[#a8741a] border-[#a8741a]/30'
+                                  : 'bg-[#fbebe7] text-[#c8321f] border-[#c8321f]/30'
                             }`}
                           >
                             {deal.dbrPct.toFixed(1)}% DBR
@@ -1112,7 +1112,7 @@ export function FintechDashboardClient({
                                 cy="14"
                                 r={r}
                                 fill="none"
-                                stroke="#E2E8F0"
+                                stroke="#e7dccd"
                                 strokeWidth="3"
                               />
                               <circle
@@ -1120,7 +1120,7 @@ export function FintechDashboardClient({
                                 cy="14"
                                 r={r}
                                 fill="none"
-                                stroke="#0D9488"
+                                stroke="#7a1f2b"
                                 strokeWidth="3"
                                 strokeDasharray={`${dash} ${circ}`}
                                 strokeLinecap="round"
@@ -1129,7 +1129,7 @@ export function FintechDashboardClient({
                             <span className="font-mono text-[11px] font-semibold">
                               {deal.docsVerified}/{deal.docsTotal} Docs
                             </span>
-                            <span className="rounded bg-[#F1F5F9] dark:bg-[#1E293B] px-1.5 py-0.5 font-mono text-[10px] text-[#64748B]">
+                            <span className="rounded bg-[#f1ebe1] dark:bg-[#3a2326] px-1.5 py-0.5 font-mono text-[10px] text-[#766661]">
                               {deal.daysInStage}d in stage
                             </span>
                           </div>
@@ -1145,7 +1145,7 @@ export function FintechDashboardClient({
                             className="bw-btn-ghost text-[11px]"
                           >
                             <span>{deal.stage}</span>
-                            <PanelRightOpen className="size-3.5 text-[#0D9488]" />
+                            <PanelRightOpen className="size-3.5 text-[#7a1f2b]" />
                           </button>
                         </td>
                       </tr>
@@ -1160,43 +1160,43 @@ export function FintechDashboardClient({
                 <div
                   key={`${deal.id}-${deal.dealRef}`}
                   onClick={() => openDealDrawer(deal)}
-                  className="rounded-[6px] border border-[#E2E8F0] dark:border-[#1E293B] bg-[#F8FAFC] dark:bg-[#090D16] p-3.5 space-y-2.5 hover:border-[#0D9488] transition cursor-pointer"
+                  className="rounded-[6px] border border-[#e7dccd] dark:border-[#3a2326] bg-[#faf6f0] dark:bg-[#231115] p-3.5 space-y-2.5 hover:border-[#7a1f2b] transition cursor-pointer"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded bg-[#0F172A] text-white">
+                    <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded bg-[#2a1418] text-white">
                       {deal.stage}
                     </span>
-                    <span className="font-mono text-[10px] text-[#64748B]">
+                    <span className="font-mono text-[10px] text-[#766661]">
                       {deal.daysInStage}d in stage
                     </span>
                   </div>
                   <div>
-                    <p className="font-bold text-sm text-[#0F172A] dark:text-[#F8FAFC]">
+                    <p className="font-bold text-sm text-[#2a1418] dark:text-[#faf6f0]">
                       {deal.borrowerName}
                     </p>
-                    <p className="text-[11px] text-[#64748B] truncate">{deal.propertyTitle}</p>
+                    <p className="text-[11px] text-[#766661] truncate">{deal.propertyTitle}</p>
                   </div>
                   <div className="flex items-center justify-between font-mono text-xs">
-                    <span className="font-bold text-[#0D9488]">
+                    <span className="font-bold text-[#7a1f2b]">
                       AED {(deal.loanAmountAed / 1000000).toFixed(2)}M ({deal.ltvPct}% LTV)
                     </span>
                     <span className="font-semibold">
                       {deal.selectedBank} • {deal.rateLabel}
                     </span>
                   </div>
-                  <div className="flex items-center justify-between pt-2 border-t border-[#E2E8F0] dark:border-[#1E293B] text-[11px] font-mono">
+                  <div className="flex items-center justify-between pt-2 border-t border-[#e7dccd] dark:border-[#3a2326] text-[11px] font-mono">
                     <span
                       className={`px-1.5 py-0.5 rounded font-bold ${
                         deal.dbrPct <= 45
-                          ? 'bg-[#F0FDFA] text-[#0D9488]'
+                          ? 'bg-[#f8ecec] text-[#7a1f2b]'
                           : deal.dbrPct <= 50
-                            ? 'bg-[#FFFBEB] text-[#D97706]'
-                            : 'bg-[#FEF2F2] text-[#DC2626]'
+                            ? 'bg-[#f9f3e3] text-[#a8741a]'
+                            : 'bg-[#fbebe7] text-[#c8321f]'
                       }`}
                     >
                       {deal.dbrPct.toFixed(1)}% DBR
                     </span>
-                    <span className="text-[#64748B]">
+                    <span className="text-[#766661]">
                       {deal.docsVerified}/{deal.docsTotal} Docs Verified
                     </span>
                   </div>
@@ -1214,49 +1214,49 @@ export function FintechDashboardClient({
         <section className="grid grid-cols-12 gap-4">
           {/* Left Panel (5 cols): Interactive Input Controls & Live CBUAE Gauges */}
           <div className="col-span-12 lg:col-span-5 bw-card p-5 space-y-4">
-            <div className="border-b border-[#E2E8F0] dark:border-[#1E293B] pb-3">
-              <span className="font-mono text-[10px] font-bold uppercase text-[#0D9488]">
+            <div className="border-b border-[#e7dccd] dark:border-[#3a2326] pb-3">
+              <span className="font-mono text-[10px] font-bold uppercase text-[#7a1f2b]">
                 Live CBUAE Underwriting Engine
               </span>
-              <h2 className="text-base font-bold text-[#0F172A] dark:text-[#F8FAFC]">
+              <h2 className="text-base font-bold text-[#2a1418] dark:text-[#faf6f0]">
                 Eligibility &amp; 50.0% DBR Stress Calculator
               </h2>
             </div>
 
             {/* 3 Instant Live Gauges at the Top */}
             <div className="grid grid-cols-3 gap-2.5">
-              <div className="rounded-[6px] border border-[#E2E8F0] dark:border-[#1E293B] bg-[#F8FAFC] dark:bg-[#090D16] p-3">
-                <span className="text-[10px] font-bold uppercase text-[#64748B]">
+              <div className="rounded-[6px] border border-[#e7dccd] dark:border-[#3a2326] bg-[#faf6f0] dark:bg-[#231115] p-3">
+                <span className="text-[10px] font-bold uppercase text-[#766661]">
                   Max Loan Eligible
                 </span>
-                <p className="font-mono text-sm sm:text-base font-bold text-[#0D9488] mt-0.5">
+                <p className="font-mono text-sm sm:text-base font-bold text-[#7a1f2b] mt-0.5">
                   AED {(maxLoanEligibleAed / 1000000).toFixed(2)}M
                 </p>
               </div>
 
-              <div className="rounded-[6px] border border-[#E2E8F0] dark:border-[#1E293B] bg-[#F8FAFC] dark:bg-[#090D16] p-3">
-                <span className="text-[10px] font-bold uppercase text-[#64748B]">
+              <div className="rounded-[6px] border border-[#e7dccd] dark:border-[#3a2326] bg-[#faf6f0] dark:bg-[#231115] p-3">
+                <span className="text-[10px] font-bold uppercase text-[#766661]">
                   Calculated DBR %
                 </span>
                 <p
                   className={`font-mono text-sm sm:text-base font-bold mt-0.5 ${
                     calculatedDbrPct <= 45
-                      ? 'text-[#0D9488]'
+                      ? 'text-[#7a1f2b]'
                       : calculatedDbrPct <= 50
-                        ? 'text-[#D97706]'
-                        : 'text-[#DC2626]'
+                        ? 'text-[#a8741a]'
+                        : 'text-[#c8321f]'
                   }`}
                 >
                   {calculatedDbrPct}%{' '}
-                  <span className="text-[10px] font-normal text-[#64748B]">/ 50%</span>
+                  <span className="text-[10px] font-normal text-[#766661]">/ 50%</span>
                 </p>
               </div>
 
-              <div className="rounded-[6px] border border-[#E2E8F0] dark:border-[#1E293B] bg-[#F8FAFC] dark:bg-[#090D16] p-3">
-                <span className="text-[10px] font-bold uppercase text-[#64748B]">
+              <div className="rounded-[6px] border border-[#e7dccd] dark:border-[#3a2326] bg-[#faf6f0] dark:bg-[#231115] p-3">
+                <span className="text-[10px] font-bold uppercase text-[#766661]">
                   Upfront Cash Req.
                 </span>
-                <p className="font-mono text-sm sm:text-base font-bold text-[#0F172A] dark:text-[#F8FAFC] mt-0.5">
+                <p className="font-mono text-sm sm:text-base font-bold text-[#2a1418] dark:text-[#faf6f0] mt-0.5">
                   AED {Math.round(totalUpfrontCashAed / 1000).toLocaleString('en-US')}k
                 </p>
               </div>
@@ -1265,22 +1265,22 @@ export function FintechDashboardClient({
             {/* Hard Visual Marker at 50.0% CBUAE Ceiling */}
             <div className="space-y-1">
               <div className="flex justify-between text-[11px] font-mono">
-                <span className="text-[#64748B]">Stressed DBR Gauge (+2.0% CBUAE Buffer)</span>
-                <span className="font-bold text-[#DC2626]">50.0% CBUAE Hard Ceiling</span>
+                <span className="text-[#766661]">Stressed DBR Gauge (+2.0% CBUAE Buffer)</span>
+                <span className="font-bold text-[#c8321f]">50.0% CBUAE Hard Ceiling</span>
               </div>
-              <div className="relative h-3 w-full rounded bg-[#F1F5F9] dark:bg-[#1E293B] overflow-hidden">
+              <div className="relative h-3 w-full rounded bg-[#f1ebe1] dark:bg-[#3a2326] overflow-hidden">
                 <div
                   className={`h-full transition-all ${
                     calculatedDbrPct <= 45
-                      ? 'bg-[#0D9488]'
+                      ? 'bg-[#7a1f2b]'
                       : calculatedDbrPct <= 50
-                        ? 'bg-[#D97706]'
-                        : 'bg-[#DC2626]'
+                        ? 'bg-[#a8741a]'
+                        : 'bg-[#c8321f]'
                   }`}
                   style={{ width: `${Math.min(100, (calculatedDbrPct / 65) * 100)}%` }}
                 />
                 <div
-                  className="absolute top-0 bottom-0 w-0.5 bg-[#DC2626]"
+                  className="absolute top-0 bottom-0 w-0.5 bg-[#c8321f]"
                   style={{ left: `${(50 / 65) * 100}%` }}
                 />
               </div>
@@ -1302,13 +1302,13 @@ export function FintechDashboardClient({
                   step={100000}
                   value={propValueAed}
                   onChange={(e) => setPropValueAed(Number(e.target.value))}
-                  className="w-full accent-[#0F172A]"
+                  className="w-full accent-[#2a1418]"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <label className="block">
-                  <span className="font-semibold text-[#64748B]">Down Payment (%)</span>
+                  <span className="font-semibold text-[#766661]">Down Payment (%)</span>
                   <input
                     type="number"
                     min={15}
@@ -1319,7 +1319,7 @@ export function FintechDashboardClient({
                   />
                 </label>
                 <label className="block">
-                  <span className="font-semibold text-[#64748B]">Tenure (Years, Max 25)</span>
+                  <span className="font-semibold text-[#766661]">Tenure (Years, Max 25)</span>
                   <input
                     type="number"
                     min={5}
@@ -1333,7 +1333,7 @@ export function FintechDashboardClient({
 
               <div className="grid grid-cols-3 gap-2.5">
                 <label className="block">
-                  <span className="font-semibold text-[#64748B]">Monthly Salary</span>
+                  <span className="font-semibold text-[#766661]">Monthly Salary</span>
                   <input
                     type="number"
                     value={monthlySalaryAed}
@@ -1342,7 +1342,7 @@ export function FintechDashboardClient({
                   />
                 </label>
                 <label className="block">
-                  <span className="font-semibold text-[#64748B]">Card Limits</span>
+                  <span className="font-semibold text-[#766661]">Card Limits</span>
                   <input
                     type="number"
                     value={cardLimitsAed}
@@ -1351,7 +1351,7 @@ export function FintechDashboardClient({
                   />
                 </label>
                 <label className="block">
-                  <span className="font-semibold text-[#64748B]">Existing EMIs</span>
+                  <span className="font-semibold text-[#766661]">Existing EMIs</span>
                   <input
                     type="number"
                     value={existingEmiAed}
@@ -1365,12 +1365,12 @@ export function FintechDashboardClient({
 
           {/* Right Panel (7 cols): Ranked UAE Bank Matrix Cards */}
           <div className="col-span-12 lg:col-span-7 bw-card p-5 flex flex-col justify-between space-y-4">
-            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#E2E8F0] dark:border-[#1E293B] pb-3">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#e7dccd] dark:border-[#3a2326] pb-3">
               <div>
-                <span className="font-mono text-[10px] font-bold uppercase text-[#0D9488]">
+                <span className="font-mono text-[10px] font-bold uppercase text-[#7a1f2b]">
                   Multi-Bank Comparison Matrix ({selectedBanks.length}/3 Selected)
                 </span>
-                <h2 className="text-base font-bold text-[#0F172A] dark:text-[#F8FAFC]">
+                <h2 className="text-base font-bold text-[#2a1418] dark:text-[#faf6f0]">
                   Ranked UAE Bank Offers for AED {loanAmountAed.toLocaleString('en-US')} Loan
                 </h2>
               </div>
@@ -1409,8 +1409,8 @@ export function FintechDashboardClient({
                     onClick={() => toggleBankSelection(bank.code)}
                     className={`rounded-[6px] border p-3.5 text-xs space-y-2 transition cursor-pointer ${
                       isSelected
-                        ? 'border-[#0D9488] bg-[#F0FDFA]/50 dark:bg-[#0D9488]/10'
-                        : 'border-[#E2E8F0] dark:border-[#1E293B] bg-white dark:bg-[#111827]'
+                        ? 'border-[#7a1f2b] bg-[#f8ecec]/50 dark:bg-[#7a1f2b]/10'
+                        : 'border-[#e7dccd] dark:border-[#3a2326] bg-white dark:bg-[#2a1418]'
                     }`}
                   >
                     <div className="flex items-center justify-between">
@@ -1419,20 +1419,20 @@ export function FintechDashboardClient({
                           type="checkbox"
                           checked={isSelected}
                           onChange={() => {}}
-                          className="accent-[#0D9488]"
+                          className="accent-[#7a1f2b]"
                         />
-                        <span className="font-mono font-bold px-1.5 py-0.5 rounded bg-[#0F172A] text-white text-[10px]">
+                        <span className="font-mono font-bold px-1.5 py-0.5 rounded bg-[#2a1418] text-white text-[10px]">
                           {bank.code}
                         </span>
-                        <span className="font-bold text-[#0F172A] dark:text-[#F8FAFC]">
+                        <span className="font-bold text-[#2a1418] dark:text-[#faf6f0]">
                           {bank.name}
                         </span>
                       </div>
                       <span
                         className={`font-mono text-[10px] font-bold px-1.5 py-0.5 rounded ${
                           isEligible
-                            ? 'bg-[#F0FDFA] text-[#0D9488]'
-                            : 'bg-[#FEF2F2] text-[#DC2626]'
+                            ? 'bg-[#f8ecec] text-[#7a1f2b]'
+                            : 'bg-[#fbebe7] text-[#c8321f]'
                         }`}
                       >
                         {bankDbr}% DBR
@@ -1441,27 +1441,27 @@ export function FintechDashboardClient({
 
                     <div className="grid grid-cols-3 gap-2 pt-1 font-mono">
                       <div>
-                        <span className="text-[10px] text-[#64748B] block">Fixed Rate</span>
-                        <strong className="text-sm text-[#0F172A] dark:text-[#F8FAFC]">
+                        <span className="text-[10px] text-[#766661] block">Fixed Rate</span>
+                        <strong className="text-sm text-[#2a1418] dark:text-[#faf6f0]">
                           {bank.fixedRatePct.toFixed(2)}%
                         </strong>
-                        <span className="block text-[10px] text-[#64748B]">{bank.fixedTerm}</span>
+                        <span className="block text-[10px] text-[#766661]">{bank.fixedTerm}</span>
                       </div>
                       <div>
-                        <span className="text-[10px] text-[#64748B] block">Monthly EMI</span>
-                        <strong className="text-sm text-[#0D9488]">
+                        <span className="text-[10px] text-[#766661] block">Monthly EMI</span>
+                        <strong className="text-sm text-[#7a1f2b]">
                           AED {emi.toLocaleString('en-US')}
                         </strong>
-                        <span className="block text-[10px] text-[#64748B]">
+                        <span className="block text-[10px] text-[#766661]">
                           Card @ {bank.cardStressRate * 100}%
                         </span>
                       </div>
                       <div>
-                        <span className="text-[10px] text-[#64748B] block">Reversion</span>
-                        <strong className="text-[11px] text-[#0F172A] dark:text-[#F8FAFC]">
+                        <span className="text-[10px] text-[#766661] block">Reversion</span>
+                        <strong className="text-[11px] text-[#2a1418] dark:text-[#faf6f0]">
                           {bank.reversionLabel}
                         </strong>
-                        <span className="block text-[10px] text-[#64748B]">
+                        <span className="block text-[10px] text-[#766661]">
                           Early: {bank.earlySettlementRule}
                         </span>
                       </div>
@@ -1479,17 +1479,17 @@ export function FintechDashboardClient({
          ===================================================================== */}
       {showSection('vault') && (
         <section className="bw-card p-5 space-y-4">
-          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#E2E8F0] dark:border-[#1E293B] pb-3">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#e7dccd] dark:border-[#3a2326] pb-3">
             <div>
-              <span className="font-mono text-[10px] font-bold uppercase text-[#0D9488]">
+              <span className="font-mono text-[10px] font-bold uppercase text-[#7a1f2b]">
                 AES-256-GCM Encrypted Vault &amp; Local Stirling-PDF Worker
               </span>
-              <h2 className="text-base font-bold text-[#0F172A] dark:text-[#F8FAFC]">
+              <h2 className="text-base font-bold text-[#2a1418] dark:text-[#faf6f0]">
                 Intelligent Document Vault &amp; In-App OCR Split-Viewer
               </h2>
             </div>
             {vaultBanner && (
-              <span className="font-mono text-xs font-semibold px-3 py-1 rounded bg-[#F0FDFA] text-[#0D9488] border border-[#0D9488]/30">
+              <span className="font-mono text-xs font-semibold px-3 py-1 rounded bg-[#f8ecec] text-[#7a1f2b] border border-[#7a1f2b]/30">
                 {vaultBanner}
               </span>
             )}
@@ -1508,27 +1508,27 @@ export function FintechDashboardClient({
                     onClick={() => setActiveDocId(item.id)}
                     className={`w-full text-left rounded-[6px] border p-3 text-xs transition cursor-pointer ${
                       isAct
-                        ? 'border-[#0F172A] dark:border-[#2DD4BF] bg-[#F8FAFC] dark:bg-[#090D16]'
-                        : 'border-[#E2E8F0] dark:border-[#1E293B]'
+                        ? 'border-[#2a1418] dark:border-[#c9a257] bg-[#faf6f0] dark:bg-[#231115]'
+                        : 'border-[#e7dccd] dark:border-[#3a2326]'
                     }`}
                   >
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-bold uppercase text-[#64748B]">
+                      <span className="text-[10px] font-bold uppercase text-[#766661]">
                         {item.category}
                       </span>
                       <span
                         className={`font-mono text-[10px] font-bold px-1.5 py-0.5 rounded ${
                           st === 'VERIFIED'
-                            ? 'bg-[#F0FDFA] text-[#0D9488]'
+                            ? 'bg-[#f8ecec] text-[#7a1f2b]'
                             : st === 'REJECTED_WA'
-                              ? 'bg-[#FEF2F2] text-[#DC2626]'
-                              : 'bg-[#FFFBEB] text-[#D97706]'
+                              ? 'bg-[#fbebe7] text-[#c8321f]'
+                              : 'bg-[#f9f3e3] text-[#a8741a]'
                         }`}
                       >
                         {st}
                       </span>
                     </div>
-                    <p className="font-semibold text-[#0F172A] dark:text-[#F8FAFC] mt-1">
+                    <p className="font-semibold text-[#2a1418] dark:text-[#faf6f0] mt-1">
                       {item.title}
                     </p>
                   </button>
@@ -1537,17 +1537,17 @@ export function FintechDashboardClient({
             </div>
 
             {/* Center Column (5 cols): In-App PDF & OCR Inspector */}
-            <div className="col-span-12 lg:col-span-5 rounded-[6px] border border-[#E2E8F0] dark:border-[#1E293B] bg-[#F8FAFC] dark:bg-[#090D16] p-4 space-y-3">
-              <div className="flex items-center justify-between border-b border-[#E2E8F0] dark:border-[#1E293B] pb-2.5">
+            <div className="col-span-12 lg:col-span-5 rounded-[6px] border border-[#e7dccd] dark:border-[#3a2326] bg-[#faf6f0] dark:bg-[#231115] p-4 space-y-3">
+              <div className="flex items-center justify-between border-b border-[#e7dccd] dark:border-[#3a2326] pb-2.5">
                 <div>
-                  <span className="font-mono text-[10px] font-bold text-[#0D9488] uppercase">
+                  <span className="font-mono text-[10px] font-bold text-[#7a1f2b] uppercase">
                     In-App OCR Key-Value Overlay
                   </span>
-                  <h3 className="text-xs font-bold text-[#0F172A] dark:text-[#F8FAFC]">
+                  <h3 className="text-xs font-bold text-[#2a1418] dark:text-[#faf6f0]">
                     {activeDoc.title}
                   </h3>
                 </div>
-                <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-white dark:bg-[#111827] border border-[#E2E8F0] dark:border-[#1E293B]">
+                <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-white dark:bg-[#2a1418] border border-[#e7dccd] dark:border-[#3a2326]">
                   Confidence: 99.4%
                 </span>
               </div>
@@ -1556,10 +1556,10 @@ export function FintechDashboardClient({
                 {activeDoc.ocrFields.map((f) => (
                   <div
                     key={f.key}
-                    className="flex items-center justify-between rounded-[4px] bg-white dark:bg-[#111827] border border-[#E2E8F0] dark:border-[#1E293B] px-3 py-2 text-xs"
+                    className="flex items-center justify-between rounded-[4px] bg-white dark:bg-[#2a1418] border border-[#e7dccd] dark:border-[#3a2326] px-3 py-2 text-xs"
                   >
-                    <span className="text-[#64748B]">{f.key}</span>
-                    <span className="font-mono font-bold text-[#0F172A] dark:text-[#F8FAFC]">
+                    <span className="text-[#766661]">{f.key}</span>
+                    <span className="font-mono font-bold text-[#2a1418] dark:text-[#faf6f0]">
                       {f.val}
                     </span>
                   </div>
@@ -1568,9 +1568,9 @@ export function FintechDashboardClient({
             </div>
 
             {/* Right Column (3 cols): Compliance & Action Bar */}
-            <div className="col-span-12 lg:col-span-3 flex flex-col justify-between rounded-[6px] border border-[#E2E8F0] dark:border-[#1E293B] p-4 space-y-3">
+            <div className="col-span-12 lg:col-span-3 flex flex-col justify-between rounded-[6px] border border-[#e7dccd] dark:border-[#3a2326] p-4 space-y-3">
               <div className="space-y-2">
-                <span className="text-[10px] font-bold uppercase text-[#64748B]">
+                <span className="text-[10px] font-bold uppercase text-[#766661]">
                   Compliance &amp; Bank Portal Actions
                 </span>
                 <button
@@ -1593,7 +1593,7 @@ export function FintechDashboardClient({
                       'WhatsApp Template sent: "Page 3 of ENBD statement missing — please re-upload."',
                     );
                   }}
-                  className="w-full bw-btn-ghost justify-center border-[#DC2626]/40 text-[#DC2626]"
+                  className="w-full bw-btn-ghost justify-center border-[#c8321f]/40 text-[#c8321f]"
                 >
                   <XCircle className="size-3.5" />
                   <span>Reject via WhatsApp Reason</span>
@@ -1615,7 +1615,7 @@ export function FintechDashboardClient({
 
               <Link
                 href="/os/compliance"
-                className="text-center text-xs font-semibold text-[#0D9488] hover:underline"
+                className="text-center text-xs font-semibold text-[#7a1f2b] hover:underline"
               >
                 Open Full KFS &amp; goAML Vault →
               </Link>
@@ -1629,12 +1629,12 @@ export function FintechDashboardClient({
          ===================================================================== */}
       {showSection('closing') && (
         <section className="bw-card p-5 space-y-4">
-          <div className="flex items-center justify-between border-b border-[#E2E8F0] dark:border-[#1E293B] pb-3">
+          <div className="flex items-center justify-between border-b border-[#e7dccd] dark:border-[#3a2326] pb-3">
             <div>
-              <span className="font-mono text-[10px] font-bold uppercase text-[#0D9488]">
+              <span className="font-mono text-[10px] font-bold uppercase text-[#7a1f2b]">
                 Al Manara DLD Registration Trustee
               </span>
-              <h2 className="text-base font-bold text-[#0F172A] dark:text-[#F8FAFC]">
+              <h2 className="text-base font-bold text-[#2a1418] dark:text-[#faf6f0]">
                 DLD Transfer &amp; Manager&apos;s Cheque Day-of-Closing Sheet
               </h2>
             </div>
@@ -1643,7 +1643,7 @@ export function FintechDashboardClient({
                 <span>Conveyancing Desk</span>
               </Link>
               <Link href="/os/print/conveyancing/1" className="bw-btn-navy">
-                <Printer className="size-3.5 text-[#2DD4BF]" />
+                <Printer className="size-3.5 text-[#c9a257]" />
                 <span>Print Closing Sheet</span>
               </Link>
             </div>
@@ -1656,16 +1656,16 @@ export function FintechDashboardClient({
                 key={st.label}
                 className={`rounded-[6px] border p-2.5 text-[11px] ${
                   st.done
-                    ? 'border-[#0D9488]/40 bg-[#F0FDFA] text-[#0D9488]'
+                    ? 'border-[#7a1f2b]/40 bg-[#f8ecec] text-[#7a1f2b]'
                     : st.active
-                      ? 'border-[#D97706] bg-[#FFFBEB] text-[#D97706]'
-                      : 'border-[#E2E8F0] text-[#64748B]'
+                      ? 'border-[#a8741a] bg-[#f9f3e3] text-[#a8741a]'
+                      : 'border-[#e7dccd] text-[#766661]'
                 }`}
               >
                 <div className="font-mono text-[10px] font-bold">
                   0{idx + 1} • {st.date}
                 </div>
-                <div className="font-semibold text-[#0F172A] dark:text-[#F8FAFC] mt-0.5 leading-tight">
+                <div className="font-semibold text-[#2a1418] dark:text-[#faf6f0] mt-0.5 leading-tight">
                   {st.label}
                 </div>
               </div>
@@ -1676,14 +1676,14 @@ export function FintechDashboardClient({
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-[#E2E8F0] dark:border-[#1E293B] text-[10px] font-bold uppercase text-[#64748B]">
+                <tr className="border-b border-[#e7dccd] dark:border-[#3a2326] text-[10px] font-bold uppercase text-[#766661]">
                   <th className="py-2.5">Payee / Instrument</th>
                   <th className="py-2.5">Funding Source</th>
                   <th className="py-2.5">Verification Status</th>
                   <th className="py-2.5 text-right">Amount (AED)</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#E2E8F0] dark:divide-[#1E293B] font-mono">
+              <tbody className="divide-y divide-[#e7dccd] dark:divide-[#3a2326] font-mono">
                 {[
                   ['1. Seller Liability Settlement Cheque (ADCB)', 'ENBD Disbursal', 'Verified against Liability Letter', '1,950,000.00'],
                   ['2. Seller Net Equity Manager Cheque', 'ENBD + Buyer', 'Matched to Form F Price', '2,250,000.00'],
@@ -1692,12 +1692,12 @@ export function FintechDashboardClient({
                   ['5. RERA Brokerage Commission (2% + 5% VAT)', 'Buyer Manager Chq', 'Held in Safe Vault Custody', '88,200.00'],
                 ].map(([payee, src, ver, amt]) => (
                   <tr key={payee}>
-                    <td className="py-2.5 font-sans font-semibold text-[#0F172A] dark:text-[#F8FAFC]">
+                    <td className="py-2.5 font-sans font-semibold text-[#2a1418] dark:text-[#faf6f0]">
                       {payee}
                     </td>
-                    <td className="py-2.5 text-[#64748B] text-[11px]">{src}</td>
-                    <td className="py-2.5 font-sans text-[11px] text-[#0D9488] font-medium">{ver}</td>
-                    <td className="py-2.5 text-right font-bold text-[#0F172A] dark:text-[#F8FAFC]">
+                    <td className="py-2.5 text-[#766661] text-[11px]">{src}</td>
+                    <td className="py-2.5 font-sans text-[11px] text-[#7a1f2b] font-medium">{ver}</td>
+                    <td className="py-2.5 text-right font-bold text-[#2a1418] dark:text-[#faf6f0]">
                       AED {amt}
                     </td>
                   </tr>
@@ -1713,12 +1713,12 @@ export function FintechDashboardClient({
          ===================================================================== */}
       {showSection('ledger') && (
         <section className="bw-card p-5 space-y-4">
-          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#E2E8F0] dark:border-[#1E293B] pb-3">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#e7dccd] dark:border-[#3a2326] pb-3">
             <div>
-              <span className="font-mono text-[10px] font-bold uppercase text-[#0D9488]">
+              <span className="font-mono text-[10px] font-bold uppercase text-[#7a1f2b]">
                 Pay-When-Paid Waterfall &amp; 5% FTA VAT 201
               </span>
-              <h2 className="text-base font-bold text-[#0F172A] dark:text-[#F8FAFC]">
+              <h2 className="text-base font-bold text-[#2a1418] dark:text-[#faf6f0]">
                 Commission, Clawback &amp; UAE VAT Ledger
               </h2>
             </div>
@@ -1728,7 +1728,7 @@ export function FintechDashboardClient({
               </Link>
               <Link href="/os/erp" className="bw-btn-navy">
                 <span>Open Full GL &amp; VAT Desk</span>
-                <ArrowUpRight className="size-3.5 text-[#2DD4BF]" />
+                <ArrowUpRight className="size-3.5 text-[#c9a257]" />
               </Link>
             </div>
           </div>
@@ -1736,7 +1736,7 @@ export function FintechDashboardClient({
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-[#E2E8F0] dark:border-[#1E293B] text-[10px] font-bold uppercase text-[#64748B]">
+                <tr className="border-b border-[#e7dccd] dark:border-[#3a2326] text-[10px] font-bold uppercase text-[#766661]">
                   <th className="py-2.5">Deal / Client</th>
                   <th className="py-2.5">Bank &amp; Loan</th>
                   <th className="py-2.5 text-right">Gross Subvention</th>
@@ -1746,46 +1746,46 @@ export function FintechDashboardClient({
                   <th className="py-2.5 text-right">Status &amp; Clawback End</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#E2E8F0] dark:divide-[#1E293B] font-mono">
+              <tbody className="divide-y divide-[#e7dccd] dark:divide-[#3a2326] font-mono">
                 {mergedCommissions.map((row, idx) => (
                   <tr key={`${row.dealId}-${idx}`}>
                     <td className="py-2.5">
-                      <div className="font-bold text-[#0F172A] dark:text-[#F8FAFC]">
+                      <div className="font-bold text-[#2a1418] dark:text-[#faf6f0]">
                         {row.dealId}
                       </div>
-                      <div className="font-sans text-[11px] text-[#64748B]">{row.client}</div>
+                      <div className="font-sans text-[11px] text-[#766661]">{row.client}</div>
                     </td>
                     <td className="py-2.5">
                       <div className="font-bold">{row.bank}</div>
-                      <div className="text-[11px] text-[#64748B]">
+                      <div className="text-[11px] text-[#766661]">
                         AED {(row.loanAed / 1000000).toFixed(2)}M ({row.grossPct})
                       </div>
                     </td>
                     <td className="py-2.5 text-right font-bold">
                       AED {row.grossAed.toLocaleString('en-US')}
                     </td>
-                    <td className="py-2.5 text-right text-[#64748B]">
+                    <td className="py-2.5 text-right text-[#766661]">
                       -AED {row.partnerCutAed.toLocaleString('en-US')}
                     </td>
-                    <td className="py-2.5 text-right font-bold text-[#0D9488]">
+                    <td className="py-2.5 text-right font-bold text-[#7a1f2b]">
                       AED {row.advisorSplitAed.toLocaleString('en-US')}
                     </td>
-                    <td className="py-2.5 text-right text-[#0F172A] dark:text-[#F8FAFC]">
+                    <td className="py-2.5 text-right text-[#2a1418] dark:text-[#faf6f0]">
                       AED {row.vat5PctAed.toLocaleString('en-US')}
                     </td>
                     <td className="py-2.5 text-right">
                       <span
                         className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-bold ${
                           row.status === 'Paid'
-                            ? 'bg-[#F0FDFA] text-[#0D9488]'
+                            ? 'bg-[#f8ecec] text-[#7a1f2b]'
                             : row.status === 'Sent to Bank'
-                              ? 'bg-[#FFFBEB] text-[#D97706]'
-                              : 'bg-[#F1F5F9] text-[#64748B]'
+                              ? 'bg-[#f9f3e3] text-[#a8741a]'
+                              : 'bg-[#f1ebe1] text-[#766661]'
                         }`}
                       >
                         {row.status}
                       </span>
-                      <div className="text-[10px] text-[#64748B] mt-0.5">{row.clawbackEnd}</div>
+                      <div className="text-[10px] text-[#766661] mt-0.5">{row.clawbackEnd}</div>
                     </td>
                   </tr>
                 ))}

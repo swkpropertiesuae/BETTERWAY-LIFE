@@ -71,7 +71,7 @@ export default async function ComplianceAndMlroPage({
               key={d.id}
               href={`/os/compliance?dealId=${d.id}`}
               className={`rounded-lg px-3 py-1.5 text-xs font-semibold border ${
-                d.id === activeDeal.id ? 'bg-[#021125] text-white border-[#021125]' : 'bg-white text-slate-700 border-slate-300'
+                d.id === activeDeal.id ? 'bg-[#2a1418] text-white border-[#2a1418]' : 'bg-white text-slate-700 border-slate-300'
               }`}
             >
               <span className="font-num">{d.deal_ref}</span> · {d.primary_name}
@@ -100,7 +100,7 @@ export default async function ComplianceAndMlroPage({
           <>
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div>
-                <h2 className="font-display font-bold text-base text-[#021125]">
+                <h2 className="font-display font-bold text-base text-[#2a1418]">
                   Joint Applicant KFS &amp; AML/CDD Clearance Matrix — {activeDeal.deal_ref}
                 </h2>
                 <p className="text-xs text-slate-500">
@@ -116,7 +116,7 @@ export default async function ComplianceAndMlroPage({
               {applicants.map((a) => (
                 <div key={a.id} className="rounded-lg border border-slate-200 p-3.5 grid lg:grid-cols-12 gap-3 items-center text-xs">
                   <div className="lg:col-span-4">
-                    <div className="font-bold text-[#021125]">
+                    <div className="font-bold text-[#2a1418]">
                       {a.full_name_en} <span className="bw-badge bg-slate-100 text-slate-700">{a.applicant_role}</span>
                     </div>
                     <div className="text-slate-500 mt-0.5">
@@ -162,7 +162,7 @@ export default async function ComplianceAndMlroPage({
       {/* Sealed UAE FIU goAML Vault (Chinese Wall) */}
       <div className="bw-card p-5 space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="font-display font-bold text-base text-[#021125]">
+          <h2 className="font-display font-bold text-base text-[#2a1418]">
             Sealed UAE FIU `goAML` STR / SAR Vault (Federal Decree-Law No. 20 of 2018)
           </h2>
           <span className={`bw-badge ${user.is_mlro === 1 ? 'bg-emerald-100 text-emerald-900' : 'bg-rose-100 text-rose-900'}`}>
@@ -184,7 +184,7 @@ export default async function ComplianceAndMlroPage({
               {goAmlReports?.map((rep) => (
                 <div key={rep.id} className="rounded-lg border border-slate-200 p-3 flex flex-wrap items-center justify-between gap-2">
                   <div className="space-y-0.5 max-w-md">
-                    <div className="font-bold text-[#021125] font-num">
+                    <div className="font-bold text-[#2a1418] font-num">
                       {rep.report_ref} · <span className="text-rose-700">{rep.report_type}</span> ({rep.status})
                     </div>
                     <div className="text-slate-600">{rep.subject_summary}</div>
@@ -199,7 +199,7 @@ export default async function ComplianceAndMlroPage({
             <form method="POST" action="/api/v1/actions" className="lg:col-span-5 space-y-2.5 bg-slate-50 p-3.5 rounded-lg border border-slate-200">
               <input type="hidden" name="action" value="create_goaml_report" />
               <input type="hidden" name="returnTo" value="/os/compliance" />
-              <div className="font-bold text-[#021125]">File New Sealed STR / SAR Investigation</div>
+              <div className="font-bold text-[#2a1418]">File New Sealed STR / SAR Investigation</div>
               <select name="reportType" className="bw-input">
                 <option value="SAR">SAR — Suspicious Activity Report</option>
                 <option value="STR">STR — Suspicious Transaction Report</option>
@@ -231,7 +231,7 @@ export default async function ComplianceAndMlroPage({
       {/* Sanadak Ombudsman SLA Register + Append-Only Audit Logs */}
       <div className="grid lg:grid-cols-12 gap-6 text-xs">
         <div className="lg:col-span-5 bw-card p-5 space-y-3">
-          <h3 className="font-display font-bold text-sm text-[#021125]">
+          <h3 className="font-display font-bold text-sm text-[#2a1418]">
             CBUAE `Sanadak` Ombudsman Complaint SLA Register (2d Ack / 15d Resolution)
           </h3>
           <form method="POST" action="/api/v1/actions" className="space-y-2">
@@ -266,7 +266,7 @@ export default async function ComplianceAndMlroPage({
 
         <div className="lg:col-span-7 bw-card p-5 space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className="font-display font-bold text-sm text-[#021125]">
+            <h3 className="font-display font-bold text-sm text-[#2a1418]">
               Immutable Append-Only `audit_logs` Ledger (SQLite Trigger Protected)
             </h3>
             <span className="bw-badge bg-slate-100 text-slate-700">NO UPDATE / NO DELETE</span>
@@ -275,7 +275,7 @@ export default async function ComplianceAndMlroPage({
             {auditLogs.map((al) => (
               <div key={String(al.id)} className="py-2 flex items-center justify-between gap-2">
                 <div>
-                  <span className="font-num font-bold text-[#021125]">#{String(al.id)}</span>{' '}
+                  <span className="font-num font-bold text-[#2a1418]">#{String(al.id)}</span>{' '}
                   <span className="font-semibold">{String(al.action)}</span> on{' '}
                   <span className="font-num text-slate-600">{String(al.entity_type)}:{String(al.entity_id)}</span>
                 </div>

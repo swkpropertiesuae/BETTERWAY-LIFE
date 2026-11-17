@@ -33,7 +33,7 @@ export default async function DataHub({ searchParams }: { searchParams: Promise<
       <PageHeader app="Data Hub" appHref="/os/data" title="Data Hub" sub="Setup, migration, export and test files from the requirements register. Download a template, fill it in Excel, import it, review the rejects, sign off." />
 
       <div className="flex gap-1 border-b border-slate-200 text-xs">
-        {TYPES.map((t) => <a key={t} href={`/os/data?type=${t}`} className={`px-3 py-2 ${t === type ? 'border-b-2 border-[#D7B04E] font-semibold text-[#021125]' : 'text-slate-500'}`}>{t} ({SPECS.filter((s) => s.type === t).length})</a>)}
+        {TYPES.map((t) => <a key={t} href={`/os/data?type=${t}`} className={`px-3 py-2 ${t === type ? 'border-b-2 border-[#c9a257] font-semibold text-[#2a1418]' : 'text-slate-500'}`}>{t} ({SPECS.filter((s) => s.type === t).length})</a>)}
       </div>
 
       <div className="grid lg:grid-cols-[1fr_420px] gap-5">
@@ -42,9 +42,9 @@ export default async function DataHub({ searchParams }: { searchParams: Promise<
             const st = stats.get(s.no);
             const exportable = EXPORTABLE.includes(s.no);
             return (
-              <div key={s.no} className={`p-3 text-xs flex flex-wrap items-center gap-3 ${sel?.no === s.no ? 'bg-[#F8F1DC]' : ''}`}>
+              <div key={s.no} className={`p-3 text-xs flex flex-wrap items-center gap-3 ${sel?.no === s.no ? 'bg-[#f3e9cf]' : ''}`}>
                 <a href={`/os/data?spec=${s.no}`} className="flex-1 min-w-[240px]">
-                  <div className="font-semibold text-[#021125]"><span className="font-num text-slate-400">{String(s.no).padStart(2, '0')}</span> {s.file}</div>
+                  <div className="font-semibold text-[#2a1418]"><span className="font-num text-slate-400">{String(s.no).padStart(2, '0')}</span> {s.file}</div>
                   <div className="text-slate-500">{s.area} <span className={`bw-badge ${PHASE[s.phase]}`}>{s.phase}</span>{s.restricted && <span className="bw-badge bg-rose-100 text-rose-800 ms-1">restricted</span>}</div>
                   {st && <div className="text-slate-500">{st.acc ?? 0} accepted · {st.held ?? 0} held · {st.rej ?? 0} rejected</div>}
                 </a>

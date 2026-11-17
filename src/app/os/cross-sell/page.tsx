@@ -54,7 +54,7 @@ export default async function CrossSellAndCommercialPage({
 
       <div className="grid lg:grid-cols-12 gap-6">
         <div className="lg:col-span-6 bw-card p-5 space-y-4">
-          <h2 className="font-display font-bold text-base text-[#021125]">
+          <h2 className="font-display font-bold text-base text-[#2a1418]">
             Commercial Warehouse / Office / Retail DSCR Stress Engine (1.25x Benchmark)
           </h2>
           <form method="GET" action="/os/cross-sell" className="grid grid-cols-2 gap-2.5 text-xs">
@@ -82,11 +82,11 @@ export default async function CrossSellAndCommercialPage({
           <div className="rounded-lg bg-slate-50 border border-slate-200 p-4 grid grid-cols-3 gap-3 text-xs">
             <div>
               <div className="text-slate-500">Annual Debt Service</div>
-              <div className="font-num font-bold text-[#021125] mt-1">{formatAed(dscr.annualDebtServiceFils)}</div>
+              <div className="font-num font-bold text-[#2a1418] mt-1">{formatAed(dscr.annualDebtServiceFils)}</div>
             </div>
             <div>
               <div className="text-slate-500">Calculated DSCR</div>
-              <div className="font-num font-bold text-lg text-[#021125] mt-0.5">{(dscr.dscrBps / 10_000).toFixed(2)}x</div>
+              <div className="font-num font-bold text-lg text-[#2a1418] mt-0.5">{(dscr.dscrBps / 10_000).toFixed(2)}x</div>
             </div>
             <div>
               <div className="text-slate-500">Credit Appetite</div>
@@ -98,7 +98,7 @@ export default async function CrossSellAndCommercialPage({
         </div>
 
         <div className="lg:col-span-6 bw-card p-5 space-y-4">
-          <h2 className="font-display font-bold text-base text-[#021125]">
+          <h2 className="font-display font-bold text-base text-[#2a1418]">
             Banks Accepting External Assigned Life / Takaful Policy ({externalLifeBanks.length} Lenders)
           </h2>
           <p className="text-xs text-slate-600">
@@ -143,7 +143,7 @@ export default async function CrossSellAndCommercialPage({
       </div>
 
       <div className="bw-card overflow-hidden">
-        <div className="px-5 py-3.5 border-b border-slate-200 font-display font-bold text-sm text-[#021125]">
+        <div className="px-5 py-3.5 border-b border-slate-200 font-display font-bold text-sm text-[#2a1418]">
           Active 360° Ancillary Mandates ({referrals.length})
         </div>
         <div className="overflow-x-auto">
@@ -172,7 +172,7 @@ export default async function CrossSellAndCommercialPage({
                     <td className="px-4 py-3">{String(r.provider_name)}</td>
                     <td className="px-4 py-3 text-end font-num font-bold">{formatAed(Number(r.expected_referral_fee_fils))}</td>
                     <td className="px-4 py-3">
-                      <span className="bw-badge bg-amber-100 text-[#8A6518]">{String(r.status)}</span>
+                      <span className="bw-badge bg-amber-100 text-[#7d5f1f]">{String(r.status)}</span>
                     </td>
                   </tr>
                 ))

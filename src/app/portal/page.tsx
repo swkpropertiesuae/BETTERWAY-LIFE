@@ -53,13 +53,13 @@ export default async function BorrowerPortalPage({
     : [];
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA]">
-      <header className="bg-[#021125] text-white px-6 py-4 flex flex-wrap items-center justify-between gap-4">
+    <div className="min-h-screen bg-[#faf6f0]">
+      <header className="bg-[#2a1418] text-white px-6 py-4 flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <img src="/brand/mark.svg" alt="Betterway" className="h-9 w-9 rounded-md" />
           <div>
             <div className="font-display font-bold text-base">Betterway Borrower Smart Vault</div>
-            <div className="text-xs text-[#D7B04E]">
+            <div className="text-xs text-[#c9a257]">
               {tr(lang, 'AES-256-GCM Encrypted Household Workspace', 'خزنة المقترض المشفرة ومتابعة الرهن العقاري')}
             </div>
           </div>
@@ -95,10 +95,10 @@ export default async function BorrowerPortalPage({
             {/* Live Deal Milestone Banner */}
             <div className="bw-card p-6 flex flex-wrap items-center justify-between gap-4">
               <div>
-                <div className="text-xs font-semibold uppercase tracking-wider text-[#8A6518]">
+                <div className="text-xs font-semibold uppercase tracking-wider text-[#7d5f1f]">
                   Active UAE Mortgage File · <span className="font-num">{activeDeal.deal_ref}</span>
                 </div>
-                <h1 className="font-display text-2xl font-bold text-[#021125] mt-1">
+                <h1 className="font-display text-2xl font-bold text-[#2a1418] mt-1">
                   {activeDeal.community_name} — {formatAed(activeDeal.target_loan_fils)} Facility
                 </h1>
                 <p className="text-xs text-slate-500 mt-1">
@@ -108,7 +108,7 @@ export default async function BorrowerPortalPage({
               </div>
               <div className="text-end">
                 <div className="text-xs text-slate-500">Current Progression Stage</div>
-                <div className="mt-1 inline-block rounded-full bg-[#021125] text-[#D7B04E] px-4 py-1.5 text-xs font-bold">
+                <div className="mt-1 inline-block rounded-full bg-[#2a1418] text-[#c9a257] px-4 py-1.5 text-xs font-bold">
                   {DEAL_STAGE_LABELS[activeDeal.stage]?.[lang] ?? activeDeal.stage}
                 </div>
               </div>
@@ -117,7 +117,7 @@ export default async function BorrowerPortalPage({
             {/* Joint CBUAE Key Facts Statement (KFS) Digital Signature Gate */}
             <div className="bw-card p-6 space-y-4">
               <div>
-                <h2 className="font-display font-bold text-base text-[#021125]">
+                <h2 className="font-display font-bold text-base text-[#2a1418]">
                   1. Mandatory CBUAE Key Facts Statement (KFS) — Joint Applicant Signatures
                 </h2>
                 <p className="text-xs text-slate-600 mt-0.5">
@@ -129,7 +129,7 @@ export default async function BorrowerPortalPage({
                 {householdApplicants.map((app) => (
                   <div key={app.id} className="rounded-lg border border-slate-200 p-4 flex items-center justify-between gap-3">
                     <div>
-                      <div className="font-bold text-[#021125]">
+                      <div className="font-bold text-[#2a1418]">
                         {app.full_name_en} <span className="bw-badge bg-slate-100 text-slate-700">{app.applicant_role}</span>
                       </div>
                       <div className="mt-1">
@@ -158,7 +158,7 @@ export default async function BorrowerPortalPage({
             {/* AES-256-GCM Encrypted Smart Vault */}
             <div className="grid lg:grid-cols-12 gap-6">
               <div className="lg:col-span-5 bw-card p-6 space-y-3 text-xs">
-                <h2 className="font-display font-bold text-base text-[#021125]">
+                <h2 className="font-display font-bold text-base text-[#2a1418]">
                   2. Upload to Encrypted Smart Vault (`AES-256-GCM`)
                 </h2>
                 <p className="text-slate-600">
@@ -198,7 +198,7 @@ export default async function BorrowerPortalPage({
               </div>
 
               <div className="lg:col-span-7 bw-card p-6 space-y-3 text-xs">
-                <h2 className="font-display font-bold text-base text-[#021125]">
+                <h2 className="font-display font-bold text-base text-[#2a1418]">
                   Stored Household Vault Documents ({vaultDocs.length})
                 </h2>
                 {vaultDocs.length === 0 ? (
@@ -208,7 +208,7 @@ export default async function BorrowerPortalPage({
                     {vaultDocs.map((d) => (
                       <div key={String(d.id)} className="rounded-lg border border-slate-200 p-3 flex flex-wrap items-center justify-between gap-2">
                         <div>
-                          <div className="font-bold text-[#021125]">
+                          <div className="font-bold text-[#2a1418]">
                             {String(d.doc_category)} · <span className="font-num">{String(d.file_name)}</span>
                           </div>
                           <div className="text-[11px] text-slate-500">
@@ -238,7 +238,7 @@ export default async function BorrowerPortalPage({
 
             {/* Permanent Homeowner Post-Settlement Refinance Radar */}
             <div className="bw-card p-6 space-y-3 text-xs">
-              <h2 className="font-display font-bold text-base text-[#021125]">
+              <h2 className="font-display font-bold text-base text-[#2a1418]">
                 3. Permanent Homeowner Vault & 90-Day Pre-Revert Refinance Radar
               </h2>
               {radar.length === 0 ? (
@@ -249,7 +249,7 @@ export default async function BorrowerPortalPage({
                 <div className="grid md:grid-cols-2 gap-3">
                   {radar.map((r) => (
                     <div key={String(r.id)} className="rounded-lg border border-emerald-200 bg-emerald-50/50 p-4">
-                      <div className="font-bold text-[#021125]">{String(r.bank_name)}</div>
+                      <div className="font-bold text-[#2a1418]">{String(r.bank_name)}</div>
                       <div className="mt-1 font-num">
                         Balance: <strong>{formatAed(Number(r.disbursed_loan_fils))}</strong> · Intro Rate:{' '}
                         <strong>{formatBps(Number(r.current_rate_bps))}</strong> · Fixed Until:{' '}

@@ -15,7 +15,8 @@ import {
   UserPlus,
   X,
 } from 'lucide-react';
-import { CORPORATE_NAV_SECTIONS } from '@/components/swk-shell';
+import { BrandMark } from '@/components/os-chrome';
+import { OS_APPS } from '@/lib/os-apps';
 
 function dubaiGreeting() {
   const hour = Number(
@@ -54,7 +55,7 @@ export function LauncherClient({ firstName }: { firstName: string }) {
   const needle = query.trim().toLowerCase();
 
   const shownApps = useMemo(() => {
-    return CORPORATE_NAV_SECTIONS.filter(
+    return OS_APPS.filter(
       (a) =>
         !needle ||
         a.label.toLowerCase().includes(needle) ||
@@ -64,36 +65,43 @@ export function LauncherClient({ firstName }: { firstName: string }) {
 
   const matchingFeatures = useMemo(() => {
     if (!needle) return [];
-    return CORPORATE_NAV_SECTIONS.flatMap((a) =>
+    return OS_APPS.flatMap((a) =>
       a.items.map((i) => ({ ...i, app: a.label })),
     ).filter(
       (i) =>
-        i.title.toLowerCase().includes(needle) ||
+        i.label.toLowerCase().includes(needle) ||
         i.desc.toLowerCase().includes(needle) ||
         i.app.toLowerCase().includes(needle),
     );
   }, [needle]);
 
   const openFirst = () => {
-    const target = matchingFeatures[0]?.url ?? shownApps[0]?.items[0]?.url;
-    if (target) router.push(target);
+    const target = matchingFeatures[0]?.href ?? shownApps[0]?.items[0]?.href;
+    if (!target) return;
+    if (target.startsWith('/os#')) window.location.href = target;
+    else router.push(target);
   };
 
   return (
     <div className="swk-launch">
-      {/* Dark Obsidian Hero Banner (.swk-launch-hero) */}
       <header className="swk-launch-hero">
-        <img
-          src="/brand/logo-white-gold-transparent.svg"
-          alt="Betterway Mortgages OS"
-          className="swk-launch-logo"
-        />
-        <div className="swk-eyebrow swk-launch-date">
+        <div className="swk-launch-logo">
+          <BrandMark size={52} />
+          <span className="name">
+            Betterway Mortgages<i>OS</i>
+          </span>
+        </div>
+        <div className="swk-launch-date">
           Betterway Mortgages LLC · Business Workspace · {dubaiToday()}
         </div>
         <h1>
           {dubaiGreeting()}
-          {firstName ? `, ${firstName}` : ''}.
+          {firstName ? (
+            <>
+              , <em>{firstName}</em>
+            </>
+          ) : null}
+          .
         </h1>
         <form
           className="swk-launch-search"
@@ -122,7 +130,6 @@ export function LauncherClient({ firstName }: { firstName: string }) {
               type="button"
               onClick={() => setQuery('')}
               aria-label="Clear search"
-              className="text-[#9d9a94] hover:text-white"
             >
               <X size={16} />
             </button>
@@ -151,36 +158,32 @@ export function LauncherClient({ firstName }: { firstName: string }) {
 
       {/* Search Results */}
       {matchingFeatures.length > 0 && (
-        <section aria-label="Matching features" className="mb-6 max-w-[780px] mx-auto">
-          <h2 className="text-[11px] font-bold uppercase tracking-widest text-[var(--muted)] mb-2 px-1">
-            Pages ({matchingFeatures.length})
-          </h2>
-          <ul className="list-none m-0 p-1.5 bg-white border border-[var(--line)] rounded-2xl shadow-sm divide-y divide-[var(--line)]">
+        <section aria-label="Matching features" className="swk-launch-results">
+          <h2>Pages ({matchingFeatures.length})</h2>
+          <ul>
             {matchingFeatures.map((f) => {
               const Icon = f.icon;
               return (
-                <li key={f.url}>
-                  <Link
-                    href={f.url}
-                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-[#eaf2f9] transition-colors"
-                  >
-                    <span className="w-9 h-9 rounded-lg grid place-items-center bg-[var(--soft)] text-[var(--ink)] shrink-0">
+                <li key={f.href}>
+                  <a href={f.href}>
+                    <span className="ic">
                       <Icon size={17} />
                     </span>
-                    <span className="flex flex-col min-w-0 flex-1">
-                      <b className="text-[13.5px] font-semibold text-[var(--ink)]">{f.title}</b>
-                      <small className="text-xs text-[var(--muted)] truncate">{f.desc}</small>
+                    <span style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+                      <b className="t">{f.label}</b>
+                      <small className="s">{f.desc}</small>
                     </span>
-                    <span className="text-[11px] font-semibold uppercase tracking-wider text-[#0f4c81] shrink-0">
-                      {f.app}
-                    </span>
-                    <ArrowUpRight size={16} className="text-[var(--muted)] shrink-0" />
-                  </Link>
+                    <span className="swk-eyebrow" style={{ margin: '0 0 0 auto' }}>{f.app}</span>
+                    <ArrowUpRight size={16} className="go" />
+                  </a>
                 </li>
               );
             })}
           </ul>
         </section>
+      )}
+      {needle && matchingFeatures.length === 0 && shownApps.length === 0 && (
+        <p className="swk-launch-empty">Nothing matches “{query}”. Try “DBR”, “KFS”, “payroll” or “bank”.</p>
       )}
 
       {/* 4-Column App Tile Grid (.swk-launch-grid) */}
@@ -188,19 +191,16 @@ export function LauncherClient({ firstName }: { firstName: string }) {
         <section className="swk-launch-grid" aria-label="Apps">
           {shownApps.map((app) => {
             const Icon = app.icon;
+            const first = app.items[0]!.href;
             return (
-              <Link
-                key={app.key}
-                href={app.items[0]!.url}
-                className="swk-app-tile"
-                title={app.blurb}
-              >
+              <a key={app.key} href={first} className={`swk-app-tile tone-${app.tone}`} title={app.blurb}>
                 <span className="swk-app-icon">
-                  <Icon size={28} strokeWidth={1.8} />
+                  <Icon size={30} strokeWidth={1.7} />
                 </span>
                 <span className="swk-app-name">{app.label}</span>
                 <span className="swk-app-sub">{app.items.length} apps</span>
-              </Link>
+                <span className="swk-app-blurb">{app.blurb}</span>
+              </a>
             );
           })}
         </section>
