@@ -1,274 +1,250 @@
-import { redirect } from 'next/navigation';
-import { defaultHomeForRole, getActiveLang, getCurrentUser } from '@/server/auth/request';
-import { tr } from '@/lib/format';
-import { OsBanner } from '@/components/os-banner';
+import Link from 'next/link';
+import { defaultHomeForRole, getCurrentUser } from '@/server/auth/request';
+import { ArrowRight, CheckCircle2, Lock, Mail, ShieldCheck } from 'lucide-react';
 
-const DEMO_ACCOUNTS = [
-  { email: 'md@betterwaymortgages.com', label: 'Managing Director (SUPER_ADMIN + MLRO + Checker)', badge: 'All 12 Modules' },
-  { email: 'ops.director@betterwaymortgages.com', label: 'Ops Director (SUPER_ADMIN · Non-MLRO)', badge: 'Tests goAML 403 Wall' },
-  { email: 'tariq.advisor@betterwaymortgages.com', label: 'Tariq Al Mansoori (SALES_ADVISOR)', badge: 'CRM + LOS' },
-  { email: 'layla.credit@betterwaymortgages.com', label: 'Layla Khoury (CREDIT_UNDERWRITER · Checker)', badge: 'Rate Checker + APL' },
-  { email: 'omar.underwriter@betterwaymortgages.com', label: 'Omar Siddiqui (CREDIT_UNDERWRITER · Maker)', badge: 'Rate Maker' },
-  { email: 'nadia.conveyancing@betterwaymortgages.com', label: 'Nadia Al Zaabi (PROGRESSION_MANAGER)', badge: 'Form F + 72h Cheques' },
-  { email: 'farid.mlro@betterwaymortgages.com', label: 'Farid Qureshi (COMPLIANCE_MLRO)', badge: 'KFS + goAML Vault' },
-  { email: 'sana.finance@betterwaymortgages.com', label: 'Sana Nair (FINANCE_ADMIN)', badge: 'ERP + VAT + PINT-AE' },
-  { email: 'reem.hr@betterwaymortgages.com', label: 'Reem Al Hashimi (HR_MANAGER · Arabic)', badge: 'WPS .SIF + EOSB' },
-  { email: 'owner@partner.ae', label: 'Harbour Crest Owner (PARTNER_AGENCY_ADMIN)', badge: 'Agency ORN + Invoices' },
-  { email: 'agent.brn1@partner.ae', label: 'Karim Darwish (PARTNER_AGENT · BRN-48219)', badge: 'Isolated BRN #1' },
-  { email: 'client.khalid@example.ae', label: 'Khalid Al Nuaimi (CLIENT · Joint Borrower)', badge: 'Smart Vault + KFS' },
-];
+function FloatingPathsSvg({ position }: { position: number }) {
+  const paths = Array.from({ length: 30 }, (_, i) => ({
+    id: i,
+    width: 0.5 + i * 0.03,
+    d: `M-${380 - i * 5 * position} -${189 + i * 6}C-${380 - i * 5 * position} -${189 + i * 6} -${
+      312 - i * 5 * position
+    } ${216 - i * 6} ${152 - i * 5 * position} ${343 - i * 6}C${616 - i * 5 * position} ${
+      470 - i * 6
+    } ${684 - i * 5 * position} ${875 - i * 6} ${684 - i * 5 * position} ${875 - i * 6}`,
+  }));
+
+  return (
+    <div className="pointer-events-none absolute inset-0">
+      <svg className="h-full w-full" style={{ color: '#d7b04e' }} fill="none" viewBox="0 0 696 316">
+        {paths.map((p) => (
+          <path
+            key={p.id}
+            d={p.d}
+            stroke="currentColor"
+            strokeOpacity={0.06 + p.id * 0.018}
+            strokeWidth={p.width}
+          />
+        ))}
+      </svg>
+    </div>
+  );
+}
 
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ tab?: string; error?: string; notice?: string }>;
+  searchParams: Promise<{ error?: string }>;
 }) {
   const user = await getCurrentUser();
-  if (user) {
-    redirect(defaultHomeForRole(user.role));
-  }
   const sp = await searchParams;
-  const tab = sp.tab === 'partner' || sp.tab === 'borrower' ? sp.tab : 'staff';
-  const lang = await getActiveLang(null);
+
+  const staffProfiles = [
+    {
+      label: 'Shabib Siraj',
+      role: 'Founder & Managing Director',
+      email: 'shabib@betterwaymortgages.com',
+    },
+    {
+      label: 'Betterway Admin',
+      role: 'System Administrator',
+      email: 'admin@betterwaymortgages.com',
+    },
+    {
+      label: 'Mohammad Haseeb',
+      role: 'Operations Manager',
+      email: 'haseeb@betterwaymortgages.com',
+    },
+    {
+      label: 'Talha Shabbir',
+      role: 'BDM & IT Specialist',
+      email: 'talha@betterwaymortgages.com',
+    },
+    {
+      label: 'Fareed',
+      role: 'Compliance & MLRO',
+      email: 'fareed@betterwaymortgages.com',
+    },
+    {
+      label: 'Shahid',
+      role: 'Senior Mortgage Advisor',
+      email: 'shahid@betterwaymortgages.com',
+    },
+    {
+      label: 'Umar',
+      role: 'Credit Underwriter',
+      email: 'umar@betterwaymortgages.com',
+    },
+    {
+      label: 'Saifullah',
+      role: 'DLD & Conveyancing',
+      email: 'saifullah@betterwaymortgages.com',
+    },
+    {
+      label: 'Samarth',
+      role: 'Finance & Accounting',
+      email: 'samarth@betterwaymortgages.com',
+    },
+  ];
 
   return (
-    <div className="min-h-screen grid lg:grid-cols-12 bg-[#021125] text-white">
-      <div className="lg:col-span-7 p-8 lg:p-12 flex flex-col justify-between border-b lg:border-b-0 lg:border-e border-white/10">
-        <div>
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <img src="/brand/mark.svg" alt="Betterway Mortgages" className="h-10 w-10 rounded-lg" />
-              <div>
-                <div className="font-display text-lg font-bold tracking-tight text-white">Betterway Mortgages</div>
-                <div className="text-xs text-[#D7B04E] font-medium">
-                  {tr(lang, 'UAE Sovereign Mortgage Operating System', 'نظام تشغيل الوساطة العقارية والتمويل — الإمارات')}
-                </div>
+    <div className="swk-login2">
+      {/* Left Sovereign Midnight Banking Navy Aside (.swk-login2-aside) */}
+      <aside className="swk-login2-aside">
+        <div className="swk-login2-fade" aria-hidden />
+        <FloatingPathsSvg position={1} />
+        <FloatingPathsSvg position={-1} />
+        <div className="relative z-10 flex items-center gap-3.5">
+          <img
+            src="/brand/icon-gold-squircle-midnight.svg"
+            alt="Betterway Mortgages Icon"
+            className="h-12 w-12 rounded-xl border border-[#d7b04e]/40 shadow-lg"
+          />
+          <div>
+            <div className="text-xl font-bold tracking-tight text-white">
+              Betterway <span className="text-[#d7b04e]">Mortgages</span>
+            </div>
+            <div className="font-mono text-[10.5px] uppercase tracking-[0.18em] text-[#94a3b8]">
+              Corporate Operating System
+            </div>
+          </div>
+        </div>
+        <figure className="swk-login2-quote">
+          <blockquote>
+            Every enquiry, 24-bank underwriting and DLD transfer in one place,{' '}
+            <em>from first call to disbursal</em>.
+          </blockquote>
+          <figcaption>
+            Betterway Mortgages LLC <span aria-hidden>|</span> Dubai, UAE
+          </figcaption>
+        </figure>
+      </aside>
+
+      {/* Right Main Editorial Sign-In Panel (.swk-login2-main) */}
+      <main className="swk-login2-main">
+        <div className="swk-login2-glow" aria-hidden />
+        <div className="swk-login2-panel">
+          <div className="flex items-center gap-3 mb-6">
+            <img
+              src="/brand/icon-gold-squircle-midnight.svg"
+              alt="Betterway Mortgages"
+              className="h-10 w-10 rounded-xl border border-[#0b1f3a]/15 shadow-xs"
+            />
+            <div>
+              <div className="text-base font-bold tracking-tight text-[#0b1f3a]">
+                Betterway <span className="text-[#0f4c81] font-mono">OS</span>
+              </div>
+              <div className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#64748b]">
+                Betterway Mortgages LLC · Dubai
               </div>
             </div>
-            <form method="POST" action="/api/v1/auth/quick-role">
-              <input type="hidden" name="action" value="set_lang" />
-              <input type="hidden" name="lang" value={lang === 'ar' ? 'en' : 'ar'} />
-              <input type="hidden" name="returnTo" value={`/login?tab=${tab}`} />
-              <button type="submit" className="rounded-md border border-white/20 px-3 py-1.5 text-xs font-semibold text-white hover:bg-white/10">
-                {lang === 'ar' ? 'English (LTR)' : 'العربية (RTL)'}
-              </button>
-            </form>
           </div>
 
-          <h1 className="mt-8 font-display text-3xl lg:text-4xl font-bold leading-tight text-white">
-            {tr(
-              lang,
-              'Unified CRM, 24-Bank CBUAE LOS, RERA Conveyancing, FTA ERP & MOHRE WPS.',
-              'منصة موحدة لإدارة العملاء، الائتمان لدى 24 بنكاً، نقل الملكية، المحاسبة الضريبية وحماية الأجور.',
-            )}
-          </h1>
-          <p className="mt-3 text-sm text-slate-300 max-w-2xl">
-            Al Nasr Plaza, Oud Metha, Dubai, UAE · CBUAE Reg <span className="font-num text-[#D7B04E]">CBUAE-MB-2025-041</span> · RERA{' '}
-            <span className="font-num text-[#D7B04E]">ORN-31910</span> · FTA TRN <span className="font-num text-[#D7B04E]">100482910400003</span>
-          </p>
+          <h1>Welcome back.</h1>
+          <p className="swk-login2-sub">Sign in to your Betterway Mortgages OS workspace.</p>
 
-          <div className="mt-8">
-            <div className="text-xs font-semibold uppercase tracking-wider text-[#D7B04E] mb-3">
-              {tr(lang, '1-Click Role Switcher (Local Verification Matrix — Password: Betterway#2026)', 'تبديل فوري للأدوار (للفحص المباشر)')}
+          {user && (
+            <div className="mb-4 rounded-xl bg-[#eaf2f9] border border-[#b8c4d4] p-3 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2 min-w-0">
+                <CheckCircle2 size={16} className="text-[#0f4c81] shrink-0" />
+                <div className="text-xs text-[#0b1f3a] truncate">
+                  Active session: <b>{user.full_name_en}</b>
+                </div>
+              </div>
+              <Link
+                href={defaultHomeForRole(user.role)}
+                className="inline-flex items-center gap-1 rounded-lg bg-[#0b1f3a] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#0f4c81] transition shrink-0"
+              >
+                <span>Open OS</span>
+                <ArrowRight size={13} />
+              </Link>
             </div>
-            <div className="grid sm:grid-cols-2 gap-2.5">
-              {DEMO_ACCOUNTS.map((acc) => (
-                <form key={acc.email} method="POST" action="/api/v1/auth/quick-role">
-                  <input type="hidden" name="action" value="switch_role" />
-                  <input type="hidden" name="email" value={acc.email} />
+          )}
+
+          {sp.error && (
+            <div className="mb-4 rounded-xl bg-[#fde8e8] border border-[#f8b4b4] p-3 text-[#991b1b] text-xs font-medium">
+              {sp.error}
+            </div>
+          )}
+
+          <form className="grid gap-4" method="POST" action="/api/v1/auth/login" aria-label="Sign in">
+            <div>
+              <label
+                htmlFor="email"
+                className="block mb-1.5 text-[12.5px] font-semibold text-[#334155]"
+              >
+                Email address
+              </label>
+              <div className="swk-login2-field">
+                <Mail size={17} />
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  autoComplete="username"
+                  defaultValue="shabib@betterwaymortgages.com"
+                  required
+                  placeholder="you@betterwaymortgages.com"
+                />
+              </div>
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label htmlFor="password" className="text-[12.5px] font-semibold text-[#334155]">
+                  Password
+                </label>
+                <span className="text-xs font-semibold text-[#0f4c81]">Internal SSO Active</span>
+              </div>
+              <div className="swk-login2-field">
+                <Lock size={17} />
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  autoComplete="current-password"
+                  defaultValue="Betterway#2026"
+                  required
+                  placeholder="••••••••••"
+                />
+              </div>
+            </div>
+
+            <div className="pt-1">
+              <button type="submit" className="swk-login2-btn">
+                <span>Sign in</span>
+                <ArrowRight size={17} />
+              </button>
+            </div>
+          </form>
+
+          {/* 1-Click Authorized Internal Staff Directory Access */}
+          <div className="mt-6 pt-5 border-t border-[#e2e8f0]">
+            <div className="text-[10.5px] font-mono font-bold uppercase tracking-wider text-[#64748b] mb-2.5">
+              1-Click Internal Staff Directory Sign-In
+            </div>
+            <div className="grid grid-cols-2 gap-1.5">
+              {staffProfiles.map((u) => (
+                <form key={u.email} method="POST" action="/api/v1/auth/login">
+                  <input type="hidden" name="email" value={u.email} />
+                  <input type="hidden" name="password" value="Betterway#2026" />
                   <button
                     type="submit"
-                    className="w-full text-start rounded-lg border border-white/15 bg-white/5 hover:bg-white/10 hover:border-[#D7B04E]/60 px-3.5 py-2.5 transition cursor-pointer"
+                    className="w-full text-left p-2 border border-[#d5dde7] rounded-lg bg-[#f8fafc] hover:bg-[#eaf2f9] hover:border-[#0f4c81] transition cursor-pointer"
                   >
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="text-xs font-semibold text-white truncate">{acc.label}</span>
-                      <span className="shrink-0 rounded bg-[#D7B04E]/20 px-2 py-0.5 text-[10px] font-semibold text-[#D7B04E]">
-                        {acc.badge}
-                      </span>
-                    </div>
-                    <div className="mt-0.5 text-[11px] font-num text-slate-400">{acc.email}</div>
+                    <div className="text-xs font-semibold text-[#0b1f3a] truncate">{u.label}</div>
+                    <div className="text-[10px] text-[#64748b] truncate">{u.role}</div>
                   </button>
                 </form>
               ))}
             </div>
           </div>
+
+          <p className="mt-6 flex items-center gap-1.5 text-[11.5px] text-[#64748b]">
+            <ShieldCheck size={14} className="text-[#0f4c81]" />
+            Encrypted session · activity is audited · © {new Date().getFullYear()} Betterway Mortgages LLC
+          </p>
         </div>
-
-        <div className="mt-8 pt-4 border-t border-white/10 text-xs text-slate-400 flex flex-wrap justify-between gap-2">
-          <span>AES-256-GCM Smart Vault · Append-Only Audit Ledger</span>
-          <span>Peppol PINT-AE UBL 2.1 · MOHRE WPS .SIF · UAE FIU goAML XML</span>
-        </div>
-      </div>
-
-      <div className="lg:col-span-5 bg-[#F8F9FA] text-slate-900 p-8 lg:p-12 flex flex-col justify-center">
-        <div className="max-w-md w-full mx-auto">
-          <OsBanner notice={sp.notice} error={sp.error} />
-
-          <div className="grid grid-cols-3 gap-1 rounded-lg bg-slate-200/80 p-1 mb-6 text-xs font-semibold">
-            <a
-              href="/login?tab=staff"
-              className={`text-center py-2 rounded-md ${tab === 'staff' ? 'bg-[#021125] text-white shadow-xs' : 'text-slate-700'}`}
-            >
-              {tr(lang, 'Sign In', 'تسجيل الدخول')}
-            </a>
-            <a
-              href="/login?tab=partner"
-              className={`text-center py-2 rounded-md ${tab === 'partner' ? 'bg-[#021125] text-white shadow-xs' : 'text-slate-700'}`}
-            >
-              {tr(lang, 'RERA Partner', 'شريك عقاري')}
-            </a>
-            <a
-              href="/login?tab=borrower"
-              className={`text-center py-2 rounded-md ${tab === 'borrower' ? 'bg-[#021125] text-white shadow-xs' : 'text-slate-700'}`}
-            >
-              {tr(lang, 'Borrower Vault', 'بوابة المقترض')}
-            </a>
-          </div>
-
-          {tab === 'staff' && (
-            <form method="POST" action="/api/v1/auth/login" className="bw-card p-6 space-y-4">
-              <input type="hidden" name="mode" value="login" />
-              <h2 className="font-display text-xl font-bold text-[#021125]">
-                {tr(lang, 'Betterway OS Sign In', 'الدخول إلى نظام بيترواي')}
-              </h2>
-              <p className="text-xs text-slate-600">
-                {tr(
-                  lang,
-                  'Authenticate into Internal OS, RERA Partner Hub, or Borrower Smart Vault.',
-                  'سجّل الدخول إلى النظام الداخلي أو بوابة الوسطاء أو خزنة المقترض.',
-                )}
-              </p>
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">Email</label>
-                <input name="email" type="email" required defaultValue="md@betterwaymortgages.com" className="bw-input" />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">Password</label>
-                <input name="password" type="password" required defaultValue="Betterway#2026" className="bw-input" />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">Authenticator code <span className="font-normal text-slate-400">(only if MFA is on)</span></label>
-                <input name="otp" inputMode="numeric" autoComplete="one-time-code" maxLength={6} placeholder="123456" className="bw-input font-num" />
-              </div>
-              <button type="submit" className="bw-btn-gold w-full">
-                {tr(lang, 'Authenticate & Enter Workspace', 'دخول آمن إلى مساحة العمل')}
-              </button>
-            </form>
-          )}
-
-          {tab === 'partner' && (
-            <form method="POST" action="/api/v1/auth/login" className="bw-card p-6 space-y-3">
-              <input type="hidden" name="mode" value="register_partner" />
-              <h2 className="font-display text-lg font-bold text-[#021125]">
-                {tr(lang, '30-Second RERA Broker Onboarding', 'تسجيل وسيط عقاري مرخص (ريرا)')}
-              </h2>
-              <p className="text-xs text-slate-600">
-                Drop buyer leads immediately upon signup. Commission payouts release once Betterway verifies your corporate ORN & signed Referral Agreement.
-              </p>
-              <div className="grid grid-cols-2 gap-2.5">
-                <div>
-                  <label className="block text-xs font-semibold mb-1">Brokerage Name</label>
-                  <input name="companyName" required placeholder="Marina Prime Realty LLC" className="bw-input" />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold mb-1">RERA ORN</label>
-                  <input name="reraOrn" required placeholder="ORN-29410" className="bw-input" />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-2.5">
-                <div>
-                  <label className="block text-xs font-semibold mb-1">DED Licence No.</label>
-                  <input name="tradeLicenceNo" required placeholder="DED-992811" className="bw-input" />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold mb-1">Agent RERA BRN</label>
-                  <input name="reraBrn" required placeholder="BRN-55821" className="bw-input" />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-2.5">
-                <div>
-                  <label className="block text-xs font-semibold mb-1">Full Name</label>
-                  <input name="fullNameEn" required placeholder="Yousef Al Marri" className="bw-input" />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold mb-1">UAE Mobile</label>
-                  <input name="phone" required placeholder="+971501234567" className="bw-input" />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-2.5">
-                <div>
-                  <label className="block text-xs font-semibold mb-1">Work Email</label>
-                  <input name="email" type="email" required placeholder="agent@agency.ae" className="bw-input" />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold mb-1">Password</label>
-                  <input name="password" type="password" required defaultValue="Betterway#2026" className="bw-input" />
-                </div>
-              </div>
-              <label className="flex items-center gap-2 text-xs text-slate-700 pt-1">
-                <input type="checkbox" name="isAgencyAdmin" value="1" />
-                I am the authorized Brokerage Owner / Managing Partner (ORN Signatory)
-              </label>
-              <button type="submit" className="bw-btn-gold w-full">
-                Create Partner Account & Open Hub
-              </button>
-            </form>
-          )}
-
-          {tab === 'borrower' && (
-            <form method="POST" action="/api/v1/auth/login" className="bw-card p-6 space-y-3">
-              <input type="hidden" name="mode" value="register_borrower" />
-              <h2 className="font-display text-lg font-bold text-[#021125]">
-                {tr(lang, 'Borrower Smart Vault Registration', 'فتح خزنة المقترض الذكية')}
-              </h2>
-              <p className="text-xs text-slate-600">
-                Create your encrypted UAE mortgage workspace, review your CBUAE Key Facts Statement, and track live IPA/FOL milestones.
-              </p>
-              <div className="grid grid-cols-2 gap-2.5">
-                <div>
-                  <label className="block text-xs font-semibold mb-1">Full Name (EN)</label>
-                  <input name="fullNameEn" required placeholder="Amira Al Shamsi" className="bw-input" />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold mb-1">Mobile</label>
-                  <input name="phone" required placeholder="+971509876543" className="bw-input" />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-2.5">
-                <div>
-                  <label className="block text-xs font-semibold mb-1">Email</label>
-                  <input name="email" type="email" required placeholder="amira@example.ae" className="bw-input" />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold mb-1">Password</label>
-                  <input name="password" type="password" required defaultValue="Betterway#2026" className="bw-input" />
-                </div>
-              </div>
-              <div className="grid grid-cols-3 gap-2">
-                <div>
-                  <label className="block text-xs font-semibold mb-1">Residency</label>
-                  <select name="residencyType" className="bw-input">
-                    <option value="EXPAT_RESIDENT">UAE Resident</option>
-                    <option value="UAE_NATIONAL">UAE National</option>
-                    <option value="NON_RESIDENT">Non-Resident</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold mb-1">Property (AED)</label>
-                  <input name="purchasePriceAed" type="number" defaultValue={3000000} className="bw-input font-num" />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold mb-1">Loan (AED)</label>
-                  <input name="targetLoanAed" type="number" defaultValue={2400000} className="bw-input font-num" />
-                </div>
-              </div>
-              <button type="submit" className="bw-btn-gold w-full">
-                Open Encrypted Borrower Smart Vault
-              </button>
-            </form>
-          )}
-        </div>
-      </div>
+      </main>
     </div>
   );
 }

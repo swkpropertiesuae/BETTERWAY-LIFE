@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { getDb } from '@/server/db';
 import { getActiveLang, requireStaffUser } from '@/server/auth/request';
 import { formatAed, tr } from '@/lib/format';
@@ -40,7 +41,27 @@ export default async function CrmPage({
     <div className="space-y-5 max-w-7xl mx-auto">
       <OsBanner notice={sp.notice} error={sp.error} />
 
-      <PageHeader app="Sales" appHref="/os/crm" title="Leads" sub={tr(lang, 'Mortgage Lead Pipeline, Desk Routing & Unified Threader', 'خط أنابيب العملاء وتوجيه المكاتب والمحادثات الموحدة')} />
+      <PageHeader
+        app="Sales & Origination"
+        appHref="/os/crm"
+        title={
+          <>
+            UAE Leads &amp; <span className="serif">5m SLA Desk</span>
+          </>
+        }
+        sub={tr(
+          lang,
+          'Betterway Mortgages Internal Omnichannel Lead Pipeline, 5-Minute GST Response Clock, 24-Bank Deal Conversion & Threader',
+          'خط أنابيب العملاء وتوجيه المكاتب والمحادثات الموحدة',
+        )}
+      >
+        <Link href="/os/deals" className="bw-btn-ghost">
+          Open 10-Stage Kanban
+        </Link>
+        <Link href="/os/inbox" className="bw-btn-navy">
+          Open Unified Inbox
+        </Link>
+      </PageHeader>
 
       <div className="bw-card p-5">
         <h2 className="font-display font-bold text-sm text-[#021125] mb-3">
@@ -123,11 +144,11 @@ export default async function CrmPage({
                         </span>
                       </td>
                       <td className="px-4 py-3">
-                        <form method="POST" action="/api/v1/actions" className="flex items-center gap-1">
+                        <form method="POST" action="/api/v1/actions" className="flex items-center gap-1.5 justify-end">
                           <input type="hidden" name="action" value="update_lead_stage" />
                           <input type="hidden" name="leadId" value={id} />
                           <input type="hidden" name="returnTo" value={`/os/crm?leadId=${id}`} />
-                          <select name="stage" defaultValue={String(l.stage)} className="rounded border border-slate-300 px-1.5 py-1 text-[11px]">
+                          <select name="stage" defaultValue={String(l.stage)} className="bw-input !h-8 !w-36 !text-xs">
                             <option value="NEW">NEW</option>
                             <option value="CONTACTED">CONTACTED</option>
                             <option value="FACT_FIND">FACT_FIND</option>
@@ -135,8 +156,8 @@ export default async function CrmPage({
                             <option value="NURTURE">NURTURE</option>
                             <option value="DISQUALIFIED">DISQUALIFIED</option>
                           </select>
-                          <input name="lostReason" defaultValue={String(l.lost_reason ?? '')} placeholder="Lost reason (needed to disqualify)" className="rounded border border-slate-300 px-1.5 py-1 text-[11px] w-44" />
-                          <button type="submit" className="rounded bg-slate-800 text-white px-2 py-1 text-[10px] cursor-pointer">
+                          <input name="lostReason" defaultValue={String(l.lost_reason ?? '')} placeholder="Lost reason (if disqualified)" className="bw-input !h-8 !w-40 !text-xs" />
+                          <button type="submit" className="bw-btn-navy !py-1.5 !px-3 !text-xs">
                             Save
                           </button>
                         </form>
@@ -212,8 +233,8 @@ export default async function CrmPage({
                     <label className="block font-semibold mb-1">Direct Client Fee (AED)</label>
                     <input name="directClientFeeAed" type="number" defaultValue={0} className="bw-input font-num" />
                   </div>
-                  <div className="col-span-2 pt-1">
-                    <button type="submit" className="bw-btn-gold w-full">
+                  <div className="col-span-2 pt-2 flex justify-end">
+                    <button type="submit" className="bw-btn-gold">
                       Convert Lead to Active Mortgage Deal →
                     </button>
                   </div>

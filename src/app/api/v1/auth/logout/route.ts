@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import { getDb } from '@/server/db';
 import { revokeSession, SESSION_COOKIE_NAME } from '@/server/auth';
 
-export async function POST(req: Request) {
+async function handleLogout(req: Request) {
   const jar = await cookies();
   const raw = jar.get(SESSION_COOKIE_NAME)?.value;
   if (raw) {
@@ -12,4 +12,12 @@ export async function POST(req: Request) {
   const res = NextResponse.redirect(new URL('/login', req.url), 303);
   res.cookies.delete(SESSION_COOKIE_NAME);
   return res;
+}
+
+export async function GET(req: Request) {
+  return handleLogout(req);
+}
+
+export async function POST(req: Request) {
+  return handleLogout(req);
 }

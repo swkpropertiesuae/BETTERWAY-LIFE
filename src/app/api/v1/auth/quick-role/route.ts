@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { getDb } from '@/server/db';
 import { createSession, SESSION_COOKIE_NAME, type UserRole } from '@/server/auth';
 import { defaultHomeForRole, LANG_COOKIE_NAME } from '@/server/auth/request';
+import { normalizeLoginAlias } from '@/server/engines/swk-enterprise-engine';
+import { getProductionSecurityStatus } from '@/server/engines/commercial-workflows-engine';
 
 export async function POST(req: Request) {
   const db = getDb();
@@ -39,7 +41,15 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Quick role switcher is only enabled on loopback localhost' }, { status: 403 });
   }
 
-  const email = String(form.get('email') || '').trim().toLowerCase();
+  const prodStatus = getProductionSecurityStatus(db);
+  if (prodStatus.productionLockEnabled) {
+    return NextResponse.redirect(
+      new URL('/os/security?error=Production+Security+Lock+is+active.+Role+switcher+is+disabled+in+production+mode.', req.url),
+      303,
+    );
+  }
+
+  const email = normalizeLoginAlias(String(form.get('email') || ''));
   const user = db
     .prepare('SELECT id, role, preferred_lang FROM users WHERE email = ? AND status = ?')
     .get(email, 'ACTIVE') as { id: number; role: UserRole; preferred_lang: string } | undefined;

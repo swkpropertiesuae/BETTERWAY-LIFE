@@ -3,6 +3,7 @@ import { getActiveLang, requirePartnerUser } from '@/server/auth/request';
 import { getPartnerVisibleDeals } from '@/server/auth';
 import { DEAL_STAGE_LABELS, formatAed, formatBps, tr } from '@/lib/format';
 import { OsBanner } from '@/components/os-banner';
+import { getPreApprovedBuyerPropertyMatcherPool } from '@/server/engines/commercial-workflows-engine';
 
 export default async function ReraPartnerHubPage({
   searchParams,
@@ -16,6 +17,7 @@ export default async function ReraPartnerHubPage({
 
   const overview = getPartnerVisibleDeals(db, user);
   const { agentProfile, deals, agencyFinancials } = overview;
+  const matcherPool = getPreApprovedBuyerPropertyMatcherPool(db);
 
   return (
     <div className="min-h-screen bg-[#F8F9FA]">
@@ -149,6 +151,54 @@ export default async function ReraPartnerHubPage({
         </div>
 
         {/* Agency Owner Only: Corporate ORN Agreement, IBAN/TRN & Self-Billed Tax Invoices */}
+        <div className="bw-card p-6 space-y-4 text-xs">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-3">
+            <div>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                B2B Partner Non-Circumvention &amp; Inventory Matcher
+              </span>
+              <h2 className="font-display font-bold text-base text-[#021125]">
+                Pre-Approved Buyers Seeking Property Matches (&ldquo;You Keep the Client, We Handle the Mortgage&rdquo;)
+              </h2>
+            </div>
+            <span className="bw-badge bg-emerald-100 text-emerald-900">
+              100% RERA Non-Circumvention Client Protection Active
+            </span>
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {matcherPool.map((m) => (
+              <div key={m.dealId} className="rounded-lg border border-slate-200 bg-slate-50/70 p-4 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="font-num font-bold text-[#021125]">{m.dealRef} · {m.buyerMaskedCode}</span>
+                  <span className="px-2 py-0.5 rounded bg-slate-900 text-[#D7B04E] text-[10px] font-bold font-num">
+                    {m.nonCircumventionCertId}
+                  </span>
+                </div>
+                <div className="text-[11px] text-slate-600">
+                  Target Community: <strong>{m.preferredCommunity}</strong> ({m.preferredProject})
+                </div>
+                <div className="grid grid-cols-2 gap-2 pt-1 font-num text-[11px]">
+                  <div className="rounded bg-white border border-slate-200 p-2">
+                    <div className="text-[10px] text-slate-500 font-sans">Verified Max Budget</div>
+                    <div className="font-bold text-slate-900">{formatAed(m.verifiedMaxBudgetFils)}</div>
+                  </div>
+                  <div className="rounded bg-white border border-slate-200 p-2">
+                    <div className="text-[10px] text-slate-500 font-sans">Approved Bank Loan</div>
+                    <div className="font-bold text-emerald-800">{formatAed(m.approvedLoanFacilityFils)}</div>
+                  </div>
+                </div>
+                <div className="text-[10px] text-slate-500 font-num flex items-center justify-between pt-1">
+                  <span>Protected Agent: <strong>{m.protectedAgentBrn}</strong></span>
+                  <a href={`/os/print/aip/${m.dealId}`} className="font-semibold text-[#021125] underline">
+                    Download 60d AIP Cert →
+                  </a>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {agencyFinancials && (
           <div className="grid lg:grid-cols-12 gap-6 text-xs">
             <div className="lg:col-span-6 bw-card p-6 space-y-3">

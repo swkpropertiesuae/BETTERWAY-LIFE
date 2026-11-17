@@ -34,12 +34,38 @@ import { importLegacyBackbookCsv } from '@/server/engines/backbook-importer';
 import { runMonthlyWpsPayroll } from '@/server/engines/wps-gratuity-engine';
 import { assertWithinApprovalLimit } from '@/server/engines/approvals';
 import { runBackupAndRestoreTest } from '@/server/ops/backup';
+import {
+  createDealWithdrawalRequest,
+  decideDealWithdrawal,
+  decideManagerAdminDecision,
+  decideRecycleBinRequest,
+  executeOwnerAdminControl,
+  generateOwnerBriefing,
+  recordReceptionQrCheckIn,
+  requestRecordDeletionToBin,
+  submitManagerAdminDecision,
+  syncDailyDldTransactions,
+} from '@/server/engines/swk-enterprise-engine';
 import { recordPartnerPayout, reversePartnerPayout } from '@/server/engines/payouts';
 import { startMfa, confirmMfa, disableMfa, openIncident, closeIncident, purgeRetention } from '@/server/engines/privacy';
 import { saveQuote, approveQuote } from '@/server/engines/quotes';
 import { reviewBatch } from '@/server/data-hub/import';
 import { generateUatCases } from '@/server/data-hub/uat';
 import { advanceDeal, applyException, type ExceptionKind, type Stage } from '@/server/engines/workflow-engine';
+import {
+  evaluateCreditRiskAndDunning,
+  generateFixedToFloatingAmortizationSchedule,
+  registerAndValueRealEstateAsset,
+  registerPdcCheque,
+  transitionPdcChequeStatus,
+} from '@/server/engines/oca-los-engine';
+import {
+  decidePendingVendorBill,
+  renewEmployeeStatutoryDocument,
+  submitVendorBillWithApprovalGate,
+  toggleProductionSecurityLock,
+  updateSalesProgressionAndBlockingDesk,
+} from '@/server/engines/commercial-workflows-engine';
 
 const STAFF_ROLES: UserRole[] = [
   'SUPER_ADMIN',
@@ -562,12 +588,12 @@ export async function POST(req: Request) {
       }
 
       case 'create_vendor_bill': {
-        assertRole(user, ['SUPER_ADMIN', 'FINANCE_ADMIN']);
+        assertRole(user, STAFF_ROLES);
         const subtotalFils = Math.round(Number(body.subtotalAed || 0) * 100);
         const inputVatFils = Math.round(Number(body.inputVatAed ?? (Number(body.subtotalAed || 0) * 0.05)) * 100);
-        recordVendorBill(db, user, {
-          vendorName: String(body.vendorName || ''),
-          vendorTrn15: String(body.vendorTrn15 || ''),
+        const res = submitVendorBillWithApprovalGate(db, user, {
+          vendorName: String(body.vendorName || 'Office Vendor'),
+          vendorTrn15: String(body.vendorTrn15 || '100000000000003'),
           billDate: String(body.billDate || new Date().toISOString().slice(0, 10)),
           expenseAccountCode: String(body.expenseAccountCode || '6200'),
           marketingChannel: body.marketingChannel ? String(body.marketingChannel) : undefined,
@@ -575,8 +601,61 @@ export async function POST(req: Request) {
           inputVatFils,
           inputVatCategory: (body.inputVatCategory as 'DIRECT_TAXABLE') || 'DIRECT_TAXABLE',
           ctDeductibility: (body.ctDeductibility as 'FULL_100') || 'FULL_100',
+          requireMakerCheckerGate: body.requireMakerCheckerGate === '1',
         });
-        return respondOk('Vendor expense bill recorded with FTA VAT & Corporate Tax classification');
+        if (res.approvalStatus === 'PENDING_OWNER_APPROVAL') {
+          return respondOk(
+            `Expense ${res.billNumber} (> AED 5,000) queued in Maker-Checker Approval Gate awaiting Owner Shabib Siraj / Manager Mohammad Haseeb sign-off`,
+          );
+        }
+        return respondOk(`Company expense ${res.billNumber} recorded in General Ledger with UAE VAT & Corporate Tax rules`);
+      }
+
+      case 'decide_vendor_bill': {
+        const decision = String(body.decision) === 'REJECTED' ? 'REJECTED' : 'APPROVED';
+        const res = decidePendingVendorBill(db, user, {
+          billId: Number(body.billId),
+          decision,
+        });
+        return respondOk(
+          `Vendor bill ${res.billNumber} ${res.approvalStatus === 'APPROVED' ? 'approved and posted to Double-Entry General Ledger' : 'rejected (zero GL impact)'}`,
+        );
+      }
+
+      case 'renew_employee_document': {
+        assertRole(user, ['SUPER_ADMIN', 'HR_MANAGER']);
+        renewEmployeeStatutoryDocument(db, user, {
+          employeeId: Number(body.employeeId),
+          docField: body.docField as 'visa_expiry_date',
+          newExpiryDate: String(body.newExpiryDate || '2028-12-31'),
+        });
+        return respondOk('Employee statutory document expiry date renewed & compliance hold cleared');
+      }
+
+      case 'toggle_production_lock': {
+        const enabled = String(body.enabled) === '1';
+        const res = toggleProductionSecurityLock(db, user, enabled);
+        return respondOk(
+          res.productionLockEnabled
+            ? 'Production Security Lock ENABLED: Quick Role Switcher disabled across workspace'
+            : 'Production Security Lock DISABLED: Executive Role Switcher re-enabled',
+        );
+      }
+
+      case 'update_sales_progression_blocking': {
+        assertRole(user, STAFF_ROLES);
+        updateSalesProgressionAndBlockingDesk(db, user, {
+          dealId: Number(body.dealId || 1),
+          valuationFirm: String(body.valuationFirm || 'ValuStrat RICS Panel'),
+          valuationAccessStatus: String(body.valuationAccessStatus || 'ACCESS_CONFIRMED'),
+          developerPortalName: String(body.developerPortalName || 'Emaar Sakani Portal'),
+          nocStatus: (body.nocStatus as 'ISSUED') || 'APPLIED',
+          dldBlockingStage: String(body.dldBlockingStage || 'TITLE_BLOCKED_AT_TRUSTEE'),
+          trusteeOffice: String(body.trusteeOffice || 'Al Manara Registration Trustee'),
+        });
+        return respondOk(
+          'In-House Sales Progression updated: RICS Valuer Access, Developer E-NOC Portal & Finance-to-Finance DLD Blocking stage recorded',
+        );
       }
 
       case 'post_manual_journal': {
@@ -876,6 +955,231 @@ export async function POST(req: Request) {
         const r = runBackupAndRestoreTest(db, user);
         if (r.status === 'FAIL') throw new Error(`Backup drill FAILED: ${r.problems.join('; ')}`);
         return respondOk(`Backup and restore drill passed in ${r.seconds}s. Evidence logged (sha256 ${r.sha256.slice(0, 12)}…)`);
+      }
+
+      case 'send_owner_briefing': {
+        assertRole(user, STAFF_ROLES);
+        const kind = String(body.kind) === 'attendance-1030' ? 'attendance-1030' : 'morning';
+        const r = generateOwnerBriefing(db, user, kind);
+        return respondOk(r.summaryText, r);
+      }
+
+      case 'queue_delete_to_bin': {
+        assertRole(user, STAFF_ROLES);
+        const binId = requestRecordDeletionToBin(db, user, {
+          entityType: String(body.entityType || 'deals'),
+          entityId: String(body.entityId || '1'),
+          recordTitle: String(body.recordTitle || 'Record'),
+          deleteReason: String(body.deleteReason || ''),
+        });
+        return respondOk(`Record queued in Pending Delete Bin (#${binId}) awaiting Owner Shabib Siraj sign-off`);
+      }
+
+      case 'decide_recycle_bin': {
+        const decision = String(body.decision) === 'APPROVED_DELETED' ? 'APPROVED_DELETED' : 'REJECTED_RESTORED';
+        const r = decideRecycleBinRequest(db, user, {
+          binId: Number(body.binId),
+          decision,
+          ownerNotes: String(body.ownerNotes || ''),
+        });
+        return respondOk(`Pending Delete Bin item #${r.id} marked ${r.status} by Owner Shabib Siraj`);
+      }
+
+      case 'submit_manager_decision': {
+        assertRole(user, STAFF_ROLES);
+        const id = submitManagerAdminDecision(db, user, {
+          subject: String(body.subject || ''),
+          category: String(body.category || 'Operational Policy / Budget Decision'),
+          reason: String(body.reason || ''),
+          amountFils: Math.round(Number(body.amountAed || 0) * 100),
+        });
+        return respondOk(`Administrative decision #${id} submitted to Owner Shabib Siraj for sign-off`);
+      }
+
+      case 'decide_manager_decision': {
+        const decision = String(body.decision) === 'REJECTED' ? 'REJECTED' : 'APPROVED';
+        const r = decideManagerAdminDecision(db, user, {
+          decisionId: Number(body.decisionId),
+          decision,
+          ownerComment: String(body.ownerComment || ''),
+        });
+        return respondOk(`Decision ${r.decision_ref} ${r.status.toLowerCase()} by Owner Shabib Siraj`);
+      }
+
+      case 'owner_admin_control': {
+        const act = String(body.controlAction || 'activate') as 'suspend' | 'activate' | 'force_signout' | 'reset_password' | 'unlock';
+        const r = executeOwnerAdminControl(db, user, {
+          action: act,
+          notes: String(body.notes || ''),
+        });
+        return respondOk(`Owner Action Executed: ${r.action.toUpperCase()} on ${r.adminEmail} (status: ${r.adminStatus})`);
+      }
+
+      case 'create_deal_withdrawal': {
+        assertRole(user, STAFF_ROLES);
+        const wId = createDealWithdrawalRequest(db, user, {
+          dealId: Number(body.dealId || 1),
+          department: (body.department as 'READY_SECONDARY') || 'READY_SECONDARY',
+          withdrawalReason: String(body.withdrawalReason || ''),
+          collectedFeeFils: Math.round(Number(body.collectedFeeAed || 0) * 100),
+          incurredCostFils: Math.round(Number(body.incurredCostAed || 0) * 100),
+          paymentChannel: String(body.paymentChannel || 'Betterway Company Bank Account (AED/FX)'),
+        });
+        return respondOk(`Deal withdrawal & refund request #${wId} routed to Owner Shabib Siraj for final approval`);
+      }
+
+      case 'decide_deal_withdrawal': {
+        const decision = String(body.decision) === 'REJECTED' ? 'REJECTED' : 'APPROVED_REFUNDED';
+        const r = decideDealWithdrawal(db, user, {
+          withdrawalId: Number(body.withdrawalId),
+          decision,
+          ownerNotes: String(body.ownerNotes || ''),
+        });
+        return respondOk(`Withdrawal ${r.withdrawal_ref} marked ${r.status} by Owner Shabib Siraj`);
+      }
+
+      case 'reception_qr_checkin': {
+        const r = recordReceptionQrCheckIn(db, user, {
+          checkInDate: body.checkInDate ? String(body.checkInDate) : undefined,
+          checkInTimeGst: body.checkInTimeGst ? String(body.checkInTimeGst) : undefined,
+          networkSsid: String(body.networkSsid || 'Betterway-Office-5G'),
+          qrStandCode: String(body.qrStandCode || 'BW-RECEPTION-STAND-DXB-1'),
+        });
+        return respondOk(
+          `Attendance Check-In Recorded (${r.checkInTimeGst} GST · ${r.status}${r.isLate ? ` · ${r.lateMinutes}m late` : ''}${r.contemptorAlertTriggered ? ' · CONTEMPTOR ALERT SENT TO OWNER' : ''})`,
+        );
+      }
+
+      case 'submit_daily_report': {
+        assertRole(user, STAFF_ROLES);
+        const reportDate = String(body.reportDate || new Date().toISOString().slice(0, 10));
+        db.prepare(
+          `INSERT INTO daily_work_reports (user_id, employee_name, report_date, calls_count, leads_qualified, site_visits_count, ipas_submitted, summary_notes, status)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'SUBMITTED')`,
+        ).run(
+          user.id,
+          user.full_name_en,
+          reportDate,
+          Number(body.callsCount || 0),
+          Number(body.leadsQualified || 0),
+          Number(body.siteVisitsCount || 0),
+          Number(body.ipasSubmitted || 0),
+          String(body.summaryNotes || 'Daily mortgage advisory summary submitted'),
+        );
+        return respondOk('End-of-day staff work report logged to Company Operations Centre');
+      }
+
+      case 'sync_dld_feed': {
+        assertRole(user, STAFF_ROLES);
+        const r = syncDailyDldTransactions(db, user);
+        return respondOk(`DLD Open Data Synced for ${r.date} (${r.insertedCount} new daily transfers added)`);
+      }
+
+      case 'create_ops_task': {
+        assertRole(user, STAFF_ROLES);
+        const title = String(body.title || '').trim();
+        if (!title) throw new Error('Task title is required');
+        const assignedRole = String(body.assignedRole || 'SALES_ADVISOR');
+        const priority = ['CRITICAL', 'HIGH', 'NORMAL'].includes(String(body.priority))
+          ? String(body.priority)
+          : 'HIGH';
+        const dueAt = String(body.dueAt || new Date(Date.now() + 86_400_000).toISOString().slice(0, 16));
+        const dealId = body.dealId ? Number(body.dealId) : null;
+        const r = db
+          .prepare(
+            `INSERT INTO ops_tasks (deal_id, assigned_role, priority, title, due_at, status)
+             VALUES (?, ?, ?, ?, ?, 'OPEN')`,
+          )
+          .run(dealId, assignedRole, priority, title, dueAt);
+        writeAuditLog(db, user, 'ops_tasks', Number(r.lastInsertRowid), 'CREATE_OPS_TASK', null, {
+          title,
+          assignedRole,
+          priority,
+        });
+        return respondOk(`Internal task "${title}" assigned to ${assignedRole.replace(/_/g, ' ')}`);
+      }
+
+      case 'generate_amortization_schedule': {
+        assertRole(user, STAFF_ROLES);
+        const s = generateFixedToFloatingAmortizationSchedule(db, user, {
+          dealId: Number(body.dealId || 1),
+          principalFils: Math.round(Number(body.principalAed || 2800000) * 100),
+          tenureMonths: Number(body.tenureMonths || 300),
+          fixedYears: Number(body.fixedYears || 3),
+          introRateBps: Math.round(Number(body.introRatePct || 3.99) * 100),
+          revertEiborBps: Math.round(Number(body.revertEiborPct || 3.68) * 100),
+          revertMarginBps: Math.round(Number(body.revertMarginPct || 1.65) * 100),
+          floorRateBps: Math.round(Number(body.floorRatePct || 2.99) * 100),
+        });
+        return respondOk(
+          `Amortization Schedule ${s.scheduleRef} generated: Intro EMI AED ${(s.introMonthlyEmiFils / 100).toFixed(0)} · Revert EMI AED ${(s.revertMonthlyEmiFils / 100).toFixed(0)}`,
+        );
+      }
+
+      case 'evaluate_credit_risk': {
+        assertRole(user, STAFF_ROLES);
+        const r = evaluateCreditRiskAndDunning(db, user, {
+          dealId: Number(body.dealId || 1),
+          aecbScore: Number(body.aecbScore || 750),
+          stressedDbrBps: Math.round(Number(body.stressedDbrPct || 41.5) * 100),
+          ltvBps: Math.round(Number(body.ltvPct || 78) * 100),
+          employerTier: String(body.employerTier || 'APPROVED_LISTED'),
+          bouncedChequesCount: Number(body.bouncedChequesCount || 0),
+          overdueDays: Number(body.overdueDays || 0),
+          overdueAmountFils: Math.round(Number(body.overdueAmountAed || 0) * 100),
+        });
+        return respondOk(
+          `Credit Risk Evaluated: ${r.compositeScore}/100 (${r.riskGrade}) · Decision: ${r.creditCommitteeDecision} · Dunning: ${r.dunningLevel}`,
+        );
+      }
+
+      case 'register_real_estate_asset': {
+        assertRole(user, STAFF_ROLES);
+        const a = registerAndValueRealEstateAsset(db, user, {
+          dealId: Number(body.dealId || 1),
+          registrationType: String(body.registrationType) === 'OQOOD_PRE_TITLE' ? 'OQOOD_PRE_TITLE' : 'TITLE_DEED',
+          titleDeedOrOqoodNo: String(body.titleDeedOrOqoodNo || 'DLD-TD-2026-90122'),
+          dldPlotNo: String(body.dldPlotNo || 'PLOT-631-0880'),
+          makaniNo: String(body.makaniNo || '29481 94880'),
+          communityName: String(body.communityName || 'Dubai Hills Estate'),
+          buildingOrProjectName: String(body.buildingOrProjectName || 'Park Gate Villas'),
+          unitNo: String(body.unitNo || 'V-208'),
+          propertyType: String(body.propertyType || 'VILLA'),
+          builtUpAreaSqft: Number(body.builtUpAreaSqft || 3200),
+          purchasePriceFils: Math.round(Number(body.purchasePriceAed || 4500000) * 100),
+          latestValuationFils: Math.round(Number(body.latestValuationAed || 4600000) * 100),
+          annualServiceChargeFils: Math.round(Number(body.annualServiceChargeAed || 22400) * 100),
+          ejariAnnualRentFils: Math.round(Number(body.ejariAnnualRentAed || 280000) * 100),
+          firstRankMortgageeBank: String(body.firstRankMortgageeBank || 'Emirates NBD'),
+        });
+        return respondOk(
+          `Asset ${a.propertyCode} registered: AED ${a.pricePerSqftAed}/sqft · Gross Yield ${(a.grossYieldBps / 100).toFixed(2)}% · Net Yield ${(a.netYieldBps / 100).toFixed(2)}%`,
+        );
+      }
+
+      case 'register_pdc_cheque': {
+        assertRole(user, STAFF_ROLES);
+        const c = registerPdcCheque(db, user, {
+          dealId: Number(body.dealId || 1),
+          chequeType: (body.chequeType as 'SECURITY_DEPOSIT_10PCT') || 'SECURITY_DEPOSIT_10PCT',
+          chequeNumber: String(body.chequeNumber || 'CHQ-900112'),
+          drawerName: String(body.drawerName || 'Khalid Al Nuaimi'),
+          drawerBank: String(body.drawerBank || 'Emirates NBD'),
+          payeeName: String(body.payeeName || 'Betterway Mortgages LLC'),
+          amountFils: Math.round(Number(body.amountAed || 25000) * 100),
+          maturityDate: String(body.maturityDate || '2026-12-15'),
+        });
+        return respondOk(`Cheque ${c.chequeRef} logged in Safe Vault (${c.vaultStatus})`);
+      }
+
+      case 'transition_pdc_cheque': {
+        assertRole(user, STAFF_ROLES);
+        const t = transitionPdcChequeStatus(db, user, {
+          chequeId: Number(body.chequeId),
+          newStatus: (body.newStatus as 'CLEARED') || 'CLEARED',
+          bounceReason: String(body.bounceReason || ''),
+        });
+        return respondOk(`Cheque ${t.chequeRef} transitioned to ${t.newStatus}`);
       }
 
       default:

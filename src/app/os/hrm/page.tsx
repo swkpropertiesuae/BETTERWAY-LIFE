@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { getDb } from '@/server/db';
 import { getActiveLang, requireStaffUser } from '@/server/auth/request';
 import { formatAed, tr } from '@/lib/format';
@@ -6,8 +7,9 @@ import { OsBanner } from '@/components/os-banner';
 import {
   calculateUaeGratuityFils,
   computeNafisComplianceStatus,
-  getDocumentExpiryWatchlist,
 } from '@/server/engines/wps-gratuity-engine';
+import { computeStaffDocumentExpiryRadar } from '@/server/engines/commercial-workflows-engine';
+import { FileText, ShieldCheck } from 'lucide-react';
 
 export default async function HrmAndWpsPage({
   searchParams,
@@ -17,20 +19,21 @@ export default async function HrmAndWpsPage({
   const user = await requireStaffUser();
   const lang = await getActiveLang(user);
   const sp = await searchParams;
-  if (!['SUPER_ADMIN', 'HR_MANAGER', 'FINANCE_ADMIN'].includes(user.role)) {
-    return (
-      <div className="bw-card p-8 text-sm text-rose-900 bg-rose-50 border-rose-200">
-        🔒 403 — Staff salaries, IBANs, draws and WPS .SIF files are restricted to HR, Finance and Managing Director roles ({user.role} is not permitted).
-      </div>
-    );
-  }
   const db = getDb();
 
   const nafis = computeNafisComplianceStatus(db);
-  const expiryAlerts = getDocumentExpiryWatchlist(db, 365);
+  const radar = computeStaffDocumentExpiryRadar(db);
 
   const employees = db.prepare('SELECT * FROM employees ORDER BY id ASC').all() as Record<string, unknown>[];
   const payrollRuns = db.prepare('SELECT * FROM payroll_runs ORDER BY id DESC').all() as Record<string, unknown>[];
+  const leaveRecords = db
+    .prepare(
+      `SELECT lr.*, e.full_name, e.emp_code
+       FROM leave_records lr
+       JOIN employees e ON e.id = lr.employee_id
+       ORDER BY lr.id DESC LIMIT 12`,
+    )
+    .all() as Record<string, unknown>[];
 
   const nowMs = Date.now();
 
@@ -38,17 +41,30 @@ export default async function HrmAndWpsPage({
     <div className="space-y-5 max-w-7xl mx-auto">
       <OsBanner notice={sp.notice} error={sp.error} />
 
-      <PageHeader app="Employees" appHref="/os/hrm" title="Staff & Payroll" sub={tr(lang, 'UAE Workforce Roster, Recoverable Advisor Draws & Wage Protection System', 'سجل الموظفين، السلف المستردة للمستشارين ونظام حماية الأجور')} />
+      <PageHeader
+        app="Employees"
+        appHref="/os/hrm"
+        title="Staff, MOHRE WPS Payroll & Statutory Document Radar"
+        sub={tr(
+          lang,
+          'UAE Workforce Roster, Recoverable Advisor Draws, 90/60/30-Day Visa/BRN Expiry Radar & Official Payslips',
+          'سجل الموظفين، السلف المستردة للمستشارين ونظام حماية الأجور',
+        )}
+      >
+        <Link href="/os/print/payslip/1" className="bw-btn-navy text-xs">
+          Print Official MOHRE Payslip →
+        </Link>
+      </PageHeader>
 
-      {/* Nafis + WPS Summary */}
-      <div className="grid md:grid-cols-3 gap-4 text-xs">
+      {/* Nafis + WPS + Expiry Radar Summary */}
+      <div className="grid md:grid-cols-4 gap-4 text-xs">
         <div className="bw-card p-5">
           <div className="text-slate-500">MOHRE Emiratisation / Nafis Status</div>
           <div className="font-display text-lg font-bold text-[#021125] mt-1">
             {nafis.emiratiCount} Qualifying Emiratis / {nafis.totalHeadcount} Staff
           </div>
           <div className={`mt-1 font-semibold ${nafis.compliant ? 'text-emerald-700' : 'text-rose-700'}`}>
-            {nafis.compliant ? '✓ Compliant with Mainland Skilled Target' : `⚠ Shortfall: ${nafis.shortfallSlots} slot(s)`}
+            {nafis.compliant ? 'Compliant with Mainland Skilled Target' : `Shortfall: ${nafis.shortfallSlots} slot(s)`}
           </div>
         </div>
 
@@ -61,7 +77,17 @@ export default async function HrmAndWpsPage({
         <div className="bw-card p-5">
           <div className="text-slate-500">Statutory EOSB Formula (Decree-Law 33/2021)</div>
           <div className="font-display text-lg font-bold text-[#021125] mt-1">21d (Yrs 1–5) · 30d (Yr 5+)</div>
-          <div className="text-slate-600 mt-1">Strictly on Basic Salary (allowances & commissions excluded)</div>
+          <div className="text-slate-600 mt-1">Strictly on Basic Salary (allowances &amp; commissions excluded)</div>
+        </div>
+
+        <div className="bw-card p-5">
+          <div className="text-slate-500">90/60/30-Day Visa, EID &amp; RERA BRN Radar</div>
+          <div className="font-display text-lg font-bold text-[#021125] mt-1 font-num">
+            {radar.expiredCount} Expired · {radar.critical30dCount + radar.warning60dCount + radar.upcoming90dCount} Due &le;90d
+          </div>
+          <div className="text-slate-600 mt-1">
+            Expired RERA BRN or Visa halts commission release automatically
+          </div>
         </div>
       </div>
 
@@ -92,7 +118,7 @@ export default async function HrmAndWpsPage({
               </div>
             </div>
             <button type="submit" className="bw-btn-gold w-full">
-              Execute Payroll & Generate MOHRE .SIF
+              Execute Payroll &amp; Generate MOHRE .SIF
             </button>
           </form>
         </div>
@@ -114,7 +140,7 @@ export default async function HrmAndWpsPage({
                       <strong className="font-num">{formatAed(Number(pr.total_net_fils))}</strong>
                     </div>
                     <a href={`/api/v1/exports/sif/${String(pr.id)}`} className="bw-btn-navy">
-                      ⬇ Download .SIF File
+                      Download .SIF File
                     </a>
                   </div>
                   <pre className="overflow-x-auto rounded bg-slate-900 text-emerald-300 p-2.5 text-[10px] font-num">
@@ -127,10 +153,15 @@ export default async function HrmAndWpsPage({
         </div>
       </div>
 
-      {/* Employee Directory & EOSB Accrual Table */}
+      {/* Employee Directory, EOSB Accrual & Official Payslip Table */}
       <div className="bw-card overflow-hidden">
-        <div className="px-5 py-3.5 border-b border-slate-200 font-display font-bold text-sm text-[#021125]">
-          UAE Active Staff, Recoverable Draw Deficits & Live Statutory EOSB Gratuity Accrual
+        <div className="px-5 py-3.5 border-b border-slate-200 flex items-center justify-between">
+          <span className="font-display font-bold text-sm text-[#021125]">
+            UAE Active Staff, Recoverable Draw Deficits, Live Statutory EOSB Gratuity &amp; Printable Payslips
+          </span>
+          <span className="text-[11px] font-semibold text-slate-500 font-num">
+            {employees.length} Active MOHRE / Freezone Contracts
+          </span>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-xs">
@@ -141,7 +172,8 @@ export default async function HrmAndWpsPage({
                 <th className="px-4 py-2.5 text-end">Basic Salary</th>
                 <th className="px-4 py-2.5 text-end">Allowances</th>
                 <th className="px-4 py-2.5 text-end">Monthly Draw / Deficit</th>
-                <th className="px-4 py-2.5 text-end">Accrued EOSB (Expat) / GPSSA</th>
+                <th className="px-4 py-2.5 text-end">Accrued EOSB / GPSSA</th>
+                <th className="px-4 py-2.5 text-end">Official Payslip</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -163,7 +195,7 @@ export default async function HrmAndWpsPage({
                       });
 
                 return (
-                  <tr key={String(e.id)}>
+                  <tr key={String(e.id)} className="hover:bg-slate-50/70">
                     <td className="px-4 py-3">
                       <div className="font-bold text-[#021125]">
                         {String(e.full_name)}{' '}
@@ -188,6 +220,15 @@ export default async function HrmAndWpsPage({
                     <td className="px-4 py-3 text-end font-num font-bold text-[#021125]">
                       {eosb ? `${formatAed(eosb.gratuityFils)} (${eosb.netServiceYears}y)` : `GPSSA ${String(e.gpssa_number)}`}
                     </td>
+                    <td className="px-4 py-3 text-end">
+                      <Link
+                        href={`/os/print/payslip/${String(e.id)}`}
+                        className="inline-flex items-center gap-1 rounded border border-slate-300 bg-white hover:bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-800"
+                      >
+                        <FileText className="h-3 w-3 text-[#8A6518]" />
+                        Payslip PDF
+                      </Link>
+                    </td>
                   </tr>
                 );
               })}
@@ -196,23 +237,84 @@ export default async function HrmAndWpsPage({
         </div>
       </div>
 
-      {/* Document Expiry Watchlist + Leave Logger */}
+      {/* 90/60/30-Day Staff Statutory Document Expiry Radar + Renewal Form */}
       <div className="grid lg:grid-cols-12 gap-6 text-xs">
-        <div className="lg:col-span-6 bw-card p-5 space-y-2.5">
-          <h3 className="font-display font-bold text-sm text-[#021125]">
-            UAE Residence Visa, Emirates ID, RERA Broker Card & Medical Insurance Watchlist
-          </h3>
-          {expiryAlerts.map((a, idx) => (
-            <div key={idx} className="rounded border border-amber-200 bg-amber-50/50 px-3 py-2 flex justify-between">
-              <span>
-                <strong>{a.fullName}</strong> ({a.empCode}) — {a.docType}
-              </span>
-              <span className="font-num font-semibold text-[#8A6518]">Expires {a.expiryDate}</span>
-            </div>
-          ))}
+        <div className="lg:col-span-7 bw-card p-5 space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="font-display font-bold text-sm text-[#021125] flex items-center gap-1.5">
+              <ShieldCheck className="h-4 w-4 text-[#8A6518]" />
+              90/60/30-Day Staff Visa, Emirates ID, RERA BRN &amp; Medical Expiry Radar
+            </h3>
+            <span className="font-num text-[11px] font-semibold text-slate-500">
+              {radar.items.length} Monitored Documents
+            </span>
+          </div>
+
+          <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
+            {radar.items.map((item, idx) => (
+              <div
+                key={idx}
+                className={`rounded-lg border px-3.5 py-2.5 flex flex-wrap items-center justify-between gap-2 ${
+                  item.severityBand === 'EXPIRED_BLOCKED'
+                    ? 'border-rose-300 bg-rose-50/70'
+                    : item.severityBand === 'CRITICAL_30D' || item.severityBand === 'WARNING_60D'
+                      ? 'border-amber-200 bg-amber-50/60'
+                      : 'border-slate-200 bg-slate-50/50'
+                }`}
+              >
+                <div>
+                  <div className="font-bold text-slate-900">
+                    {item.fullName} <span className="font-num text-slate-500">({item.empCode})</span> — {item.docLabel}
+                  </div>
+                  <div className="text-[11px] text-slate-600">
+                    {item.designation}
+                    {item.blocksCommissionRelease ? (
+                      <span className="ms-2 font-bold text-rose-700">· RERA COMMISSION RELEASE HOLD ACTIVE</span>
+                    ) : null}
+                  </div>
+                </div>
+                <div className="text-right font-num">
+                  <span
+                    className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                      item.severityBand === 'EXPIRED_BLOCKED'
+                        ? 'bg-rose-700 text-white'
+                        : item.severityBand === 'CRITICAL_30D'
+                          ? 'bg-amber-600 text-white'
+                          : item.severityBand === 'WARNING_60D' || item.severityBand === 'UPCOMING_90D'
+                            ? 'bg-amber-100 text-amber-900'
+                            : 'bg-emerald-100 text-emerald-900'
+                    }`}
+                  >
+                    {item.severityBand} ({item.daysRemaining}d)
+                  </span>
+                  <div className="text-[11px] text-slate-600 mt-0.5">Expires: {item.expiryDate}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Renew Employee Statutory Document Form */}
+          <form method="POST" action="/api/v1/actions" className="pt-3 border-t border-slate-200 grid sm:grid-cols-4 gap-2">
+            <input type="hidden" name="action" value="renew_employee_document" />
+            <input type="hidden" name="returnTo" value="/os/hrm" />
+            <select name="employeeId" className="bw-input">
+              {employees.map((e) => (
+                <option key={String(e.id)} value={String(e.id)}>{String(e.full_name)}</option>
+              ))}
+            </select>
+            <select name="docField" className="bw-input">
+              <option value="rera_card_expiry_date">RERA Broker Card (BRN)</option>
+              <option value="visa_expiry_date">UAE Residency Visa</option>
+              <option value="emirates_id_expiry_date">UAE Emirates ID</option>
+              <option value="medical_ins_expiry_date">DHA Medical Insurance</option>
+            </select>
+            <input type="date" name="newExpiryDate" defaultValue="2028-12-31" className="bw-input font-num" />
+            <button type="submit" className="bw-btn-navy">Renew Document</button>
+          </form>
         </div>
 
-        <div className="lg:col-span-6 bw-card p-5 space-y-3">
+        {/* Leave Logger + Approved Leave Ledger */}
+        <div className="lg:col-span-5 bw-card p-5 space-y-3">
           <h3 className="font-display font-bold text-sm text-[#021125]">
             Record Statutory Annual / Sick / Parental / Unpaid Leave
           </h3>
@@ -226,7 +328,7 @@ export default async function HrmAndWpsPage({
             </select>
             <select name="leaveType" className="bw-input">
               <option value="ANNUAL">Annual Leave</option>
-              <option value="UNPAID">Unpaid Leave (Deducts WPS & EOSB)</option>
+              <option value="UNPAID">Unpaid Leave (Deducts WPS &amp; EOSB)</option>
               <option value="SICK">Sick Leave</option>
               <option value="MATERNITY">Maternity Leave</option>
               <option value="PARENTAL">Parental Leave</option>
@@ -235,9 +337,25 @@ export default async function HrmAndWpsPage({
             <input type="number" name="daysCount" defaultValue={3} placeholder="Days" className="bw-input font-num" />
             <input type="hidden" name="endDate" value="2026-11-12" />
             <div className="col-span-2">
-              <button type="submit" className="bw-btn-navy w-full">Log Approved Leave Record</button>
+              <button type="submit" className="bw-btn-gold w-full">Log Approved Leave Record</button>
             </div>
           </form>
+
+          <div className="pt-3 border-t border-slate-200 space-y-2">
+            <div className="font-bold text-slate-800">Approved Staff Leave Ledger ({leaveRecords.length})</div>
+            {leaveRecords.map((lr) => (
+              <div key={String(lr.id)} className="rounded border border-slate-200 bg-slate-50 px-3 py-2 flex items-center justify-between">
+                <div>
+                  <span className="font-bold text-slate-900">{String(lr.full_name)}</span> ·{' '}
+                  <span className="font-semibold text-slate-700">{String(lr.leave_type)}</span>
+                  <div className="text-[10px] text-slate-500 font-num">
+                    {String(lr.start_date)} to {String(lr.end_date)} ({String(lr.days_count)} days)
+                  </div>
+                </div>
+                <span className="bw-badge bg-emerald-100 text-emerald-900">{String(lr.status)}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>

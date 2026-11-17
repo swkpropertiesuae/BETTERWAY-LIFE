@@ -5,6 +5,11 @@ import { PageHeader } from '@/components/page-header';
 import { OsBanner } from '@/components/os-banner';
 import { evaluateDealAcross24Banks } from '@/server/engines/underwriting-engine';
 import { checkBankSubmissionGate } from '@/server/engines/compliance-aml-engine';
+import {
+  computeBuyoutRefinanceAnalysis,
+  computeLtiAndAgeAtMaturityDiagnostics,
+  computeRentVsBuyWealthAnalysis,
+} from '@/server/engines/commercial-workflows-engine';
 
 export default async function LosUnderwritingPage({
   searchParams,
@@ -25,6 +30,43 @@ export default async function LosUnderwritingPage({
     )
     .all() as Record<string, unknown>[];
 
+  if (deals.length === 0) {
+    return (
+      <div className="space-y-5 max-w-7xl mx-auto">
+        <OsBanner notice={sp.notice} error={sp.error} />
+        <PageHeader
+          app="Origination & LOS"
+          appHref="/os/los"
+          title="24-Bank CBUAE Underwriting & LOS Desk"
+          sub="50% Stressed DBR Gate, 3% vs 5% Card Stress, 7x Annual Salary LTI Cap & Multi-Bank Comparison"
+        >
+          <a href="/os/toolkit" className="bw-btn-ghost">
+            Open Standalone DBR Calculator
+          </a>
+          <a href="/os/crm" className="bw-btn-gold">
+            + Capture Lead in CRM →
+          </a>
+        </PageHeader>
+        <div className="bw-card p-10 text-center space-y-3">
+          <h2 className="text-base font-bold text-[var(--ink)]">
+            No Active Mortgage Files in LOS Yet
+          </h2>
+          <p className="text-xs text-[var(--muted)] max-w-md mx-auto">
+            All 24 UAE banks and active rate cards are configured in production. Capture a borrower lead in the CRM &amp; 5m SLA Desk and click &ldquo;Convert Lead to Active Mortgage Deal&rdquo; to evaluate their household here.
+          </p>
+          <div className="pt-2 flex justify-center gap-2">
+            <a href="/os/crm" className="bw-btn-gold">
+              + Open Leads &amp; 5m SLA Desk
+            </a>
+            <a href="/os/banks-apl" className="bw-btn-navy">
+              Inspect 24-Bank Rate Cards
+            </a>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const activeDealId = sp.dealId ? Number(sp.dealId) : Number(deals[0]?.id || 1);
   const deal = (deals.find((d) => Number(d.id) === activeDealId) ?? deals[0]) as Record<string, unknown>;
   const dealId = Number(deal.id);
@@ -43,6 +85,20 @@ export default async function LosUnderwritingPage({
 
   const uw = evaluateDealAcross24Banks(db, dealId);
   const gate = checkBankSubmissionGate(db, dealId);
+  const buyout = computeBuyoutRefinanceAnalysis({
+    existingPrincipalFils: uw.netLoanNeededFils,
+    remainingMonths: Number(deal.tenure_months || 240),
+    currentRateBps: 549,
+    newIntroRateBps: uw.eligibleOffers[0]?.introRateBps ?? 399,
+    financeMode: (uw.eligibleOffers[0]?.financeMode as 'CONVENTIONAL') || 'CONVENTIONAL',
+  });
+  const rentVsBuy = computeRentVsBuyWealthAnalysis({
+    currentAnnualRentFils: Math.round(Number(deal.purchase_price_fils) * 0.062),
+    targetPropertyPriceFils: Number(deal.purchase_price_fils),
+    mortgageRateBps: uw.eligibleOffers[0]?.introRateBps ?? 399,
+    tenureMonths: Number(deal.tenure_months || 300),
+  });
+  const ltiAge = computeLtiAndAgeAtMaturityDiagnostics(db, dealId);
 
   const submissions = db
     .prepare(
@@ -66,7 +122,14 @@ export default async function LosUnderwritingPage({
       <OsBanner notice={sp.notice} error={sp.error} />
 
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <PageHeader app="Mortgage Desk" appHref="/os/deals" title={<>{String(deal.deal_ref)} — {String(deal.primary_name)} ({DEAL_STAGE_LABELS[String(deal.stage)]?.[lang] ?? String(deal.stage)})</>} sub={tr(lang, 'Module 02 · 24-Bank CBUAE Underwriting LOS & Proposal Studio', 'الوحدة 02 · نظام الائتمان والمقارنة بين 24 بنكاً')}><a className="bw-btn-navy" href={`/os/deals/${deal.id}`}>Deal form →</a></PageHeader>
+        <PageHeader app="Mortgage Desk" appHref="/os/deals" title={<>{String(deal.deal_ref)} — {String(deal.primary_name)} ({DEAL_STAGE_LABELS[String(deal.stage)]?.[lang] ?? String(deal.stage)})</>} sub={tr(lang, 'Module 02 · 24-Bank CBUAE Underwriting LOS & Proposal Studio', 'الوحدة 02 · نظام الائتمان والمقارنة بين 24 بنكاً')}>
+          <div className="flex flex-wrap items-center gap-2">
+            <a className="bw-btn-gold text-xs" href={`/os/print/proposal/${deal.id}`}>3-Bank Proposal PDF →</a>
+            <a className="bw-btn-navy text-xs" href={`/os/print/aip/${deal.id}`}>60-Day Pre-Qual (AIP) →</a>
+            <a className="bw-btn-navy text-xs" href={`/os/print/coversheet/${deal.id}`}>Bank BDM Fast-Pass →</a>
+            <a className="bw-btn-ghost text-xs" href={`/os/deals/${deal.id}`}>Deal form →</a>
+          </div>
+        </PageHeader>
 
         <div className="flex flex-wrap gap-2">
           {deals.map((d) => (
@@ -354,6 +417,127 @@ export default async function LosUnderwritingPage({
       </div>
 
       {/* Dual-Bank Parallel IPA Submission & FOL Tracker */}
+      <div className="bw-card p-5 space-y-3 text-xs">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-3">
+          <div>
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
+              UAE Refinance &amp; Sharia Structuring Desk
+            </span>
+            <h3 className="font-display font-bold text-sm text-[#021125]">
+              Buyout Break-Even Calculator (CBUAE AED 10,000 Penalty Cap) &amp; Islamic Structure
+            </h3>
+          </div>
+          <span
+            className={`bw-badge ${
+              buyout.recommendation === 'RECOMMEND_BUYOUT'
+                ? 'bg-emerald-100 text-emerald-900'
+                : 'bg-amber-100 text-amber-900'
+            }`}
+          >
+            {buyout.recommendation} · Break-Even: {buyout.breakEvenMonths ?? 'N/A'} Months · LL Window: {buyout.liabilityLetterValidityDays} Days
+          </span>
+        </div>
+
+        <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-3 font-num">
+          <div className="p-3 rounded-lg bg-slate-50 border border-slate-200">
+            <div className="text-[10px] text-slate-500 font-sans">Current EMI (5.49%) vs New EMI ({formatBps(buyout.newIntroRateBps)})</div>
+            <div className="font-bold text-slate-900 mt-1">
+              {formatAed(buyout.currentMonthlyEmiFils)} → {formatAed(buyout.newMonthlyEmiFils)}
+            </div>
+          </div>
+          <div className="p-3 rounded-lg bg-slate-50 border border-slate-200">
+            <div className="text-[10px] text-slate-500 font-sans">Monthly Cash-Flow Savings</div>
+            <div className="font-bold text-emerald-800 mt-1">{formatAed(buyout.monthlySavingsFils)} / mo</div>
+          </div>
+          <div className="p-3 rounded-lg bg-slate-50 border border-slate-200">
+            <div className="text-[10px] text-slate-500 font-sans">CBUAE Early Settlement Cap (Incl. 5% VAT)</div>
+            <div className="font-bold text-slate-900 mt-1">{formatAed(buyout.cbuaeEarlySettlementPenaltyInclVatFils)}</div>
+          </div>
+          <div className="p-3 rounded-lg bg-slate-50 border border-slate-200">
+            <div className="text-[10px] text-slate-500 font-sans">Total Switching Cost (CBUAE + DLD 0.25% + Val)</div>
+            <div className="font-bold text-slate-900 mt-1">{formatAed(buyout.totalSwitchingCostFils)}</div>
+          </div>
+          <div className="p-3 rounded-lg bg-emerald-50/70 border border-emerald-200">
+            <div className="text-[10px] text-emerald-800 font-sans">Net 60-Month Refinance Savings</div>
+            <div className="font-bold text-emerald-950 mt-1">{formatAed(buyout.fiveYearNetSavingsFils)}</div>
+          </div>
+        </div>
+        <div className="text-[11px] text-slate-600">
+          <strong>Contract Structure:</strong> {buyout.shariaStructureSummary}
+        </div>
+      </div>
+
+      {/* Mortgage Finder Style: Rent vs. Buy 5-Year Wealth Calculator + 7x LTI & Age-at-Maturity Diagnostics */}
+      <div className="grid lg:grid-cols-12 gap-6 text-xs">
+        <div className="lg:col-span-7 bw-card p-5 space-y-3">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-2.5">
+            <div>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                Tenant-to-Buyer Conversion Engine (Dubai Ejari vs. Mortgage Equity)
+              </span>
+              <h3 className="font-display font-bold text-sm text-[#021125]">
+                5-Year Rent vs. Buy Wealth Comparison (Includes 4% DLD, 0.25% Mortgage Reg &amp; Principal Equity)
+              </h3>
+            </div>
+            <span className="bw-badge bg-emerald-100 text-emerald-900 font-num">
+              {rentVsBuy.verdict} · Break-Even Year {rentVsBuy.breakEvenYear}
+            </span>
+          </div>
+
+          <div className="grid sm:grid-cols-4 gap-2.5 font-num">
+            <div className="p-3 rounded-lg bg-rose-50/70 border border-rose-200">
+              <div className="text-[10px] text-rose-800 font-sans">5-Yr Sunk Ejari Rent + Renewals</div>
+              <div className="font-bold text-rose-950 mt-1">- {formatAed(rentVsBuy.fiveYearTotalRentOutflowFils)}</div>
+            </div>
+            <div className="p-3 rounded-lg bg-slate-50 border border-slate-200">
+              <div className="text-[10px] text-slate-500 font-sans">5-Yr Mortgage Principal Equity Paid</div>
+              <div className="font-bold text-slate-900 mt-1">+ {formatAed(rentVsBuy.fiveYearPrincipalEquityBuiltFils)}</div>
+            </div>
+            <div className="p-3 rounded-lg bg-slate-50 border border-slate-200">
+              <div className="text-[10px] text-slate-500 font-sans">5-Yr Est. Capital Appreciation (4.5%/yr)</div>
+              <div className="font-bold text-slate-900 mt-1">+ {formatAed(rentVsBuy.fiveYearCapitalAppreciationFils)}</div>
+            </div>
+            <div className="p-3 rounded-lg bg-emerald-50 border border-emerald-200">
+              <div className="text-[10px] text-emerald-800 font-sans">Net 5-Yr Buyer Wealth Advantage</div>
+              <div className="font-bold text-emerald-950 mt-1">+ {formatAed(rentVsBuy.netFiveYearWealthAdvantageFils)}</div>
+            </div>
+          </div>
+          <div className="text-[11px] text-slate-500 font-num">
+            Upfront DLD 4% + Agency 2% + Trustee/Valuation Sunk Costs Factored: <strong>{formatAed(rentVsBuy.upfrontDldAndAgencyFeesFils)}</strong> · Down Payment Equity Retained: <strong>{formatAed(rentVsBuy.downPaymentFils)}</strong>
+          </div>
+        </div>
+
+        <div className="lg:col-span-5 bw-card p-5 space-y-3">
+          <div className="border-b border-slate-200 pb-2.5">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
+              UAE Bank Credit Policy Stress Checks
+            </span>
+            <h3 className="font-display font-bold text-sm text-[#021125]">
+              7x Annual Income Cap (LTI) &amp; Age-at-Maturity (65/70) Diagnostics
+            </h3>
+          </div>
+
+          <div className="space-y-2 font-num">
+            <div className="flex items-center justify-between p-2.5 rounded bg-slate-50 border border-slate-200">
+              <span className="font-sans text-slate-600">Loan-to-Income (LTI) Multiple (Max 7.0x Annual)</span>
+              <span className={`font-bold ${ltiAge.ltiCompliant ? 'text-emerald-800' : 'text-rose-700'}`}>
+                {ltiAge.ltiMultipleX}x ({ltiAge.ltiCompliant ? 'CLEARED' : 'EXCEEDS 7.0x CAP'})
+              </span>
+            </div>
+            <div className="flex items-center justify-between p-2.5 rounded bg-slate-50 border border-slate-200">
+              <span className="font-sans text-slate-600">Max Facility at 7.0x Annual Income</span>
+              <span className="font-bold text-slate-900">{formatAed(ltiAge.maxLoanAt7xIncomeFils)}</span>
+            </div>
+            <div className="flex items-center justify-between p-2.5 rounded bg-slate-50 border border-slate-200">
+              <span className="font-sans text-slate-600">Age at Loan Maturity (Current {ltiAge.currentAgeYears}y + {ltiAge.tenureYears}y)</span>
+              <span className={`font-bold ${ltiAge.ageAtMaturityCompliant ? 'text-emerald-800' : 'text-rose-700'}`}>
+                {ltiAge.ageAtMaturityYears} Yrs / Cap {ltiAge.maxMaturityAgeYears} Yrs
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="grid lg:grid-cols-12 gap-6">
         <div className="lg:col-span-5 bw-card p-5 space-y-3">
           <h3 className="font-display font-bold text-sm text-[#021125]">

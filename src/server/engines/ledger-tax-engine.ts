@@ -438,7 +438,9 @@ export function computeVat201Summary(db: DatabaseSync) {
   const taxableRatio =
     totalSupplies > 0 ? Math.max(0, standardRatedSuppliesFils + zeroRatedSuppliesFils) / totalSupplies : 1;
 
-  const bills = db.prepare('SELECT input_vat_fils, input_vat_category FROM vendor_bills').all() as {
+  const bills = db
+    .prepare("SELECT input_vat_fils, input_vat_category FROM vendor_bills WHERE COALESCE(approval_status, 'APPROVED') = 'APPROVED'")
+    .all() as {
     input_vat_fils: number;
     input_vat_category: string;
   }[];
@@ -480,7 +482,9 @@ export function computeCorporateTaxSummary(db: DatabaseSync) {
 
   const accountingNetProfitFils = totalRevenueFils - totalExpenseFils;
 
-  const bills = db.prepare('SELECT subtotal_fils, ct_deductibility FROM vendor_bills').all() as {
+  const bills = db
+    .prepare("SELECT subtotal_fils, ct_deductibility FROM vendor_bills WHERE COALESCE(approval_status, 'APPROVED') = 'APPROVED'")
+    .all() as {
     subtotal_fils: number;
     ct_deductibility: string;
   }[];

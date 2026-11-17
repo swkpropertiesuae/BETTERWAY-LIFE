@@ -1,6 +1,6 @@
-import type { Metadata } from 'next';
-import '@fontsource-variable/inter';
+import type { Metadata, Viewport } from 'next';
 import '@fontsource-variable/plus-jakarta-sans';
+import '@fontsource-variable/inter';
 import '@fontsource-variable/jetbrains-mono';
 import '@fontsource/ibm-plex-sans-arabic/400.css';
 import '@fontsource/ibm-plex-sans-arabic/600.css';
@@ -9,12 +9,16 @@ import './globals.css';
 import { getActiveLang, getCurrentUser } from '@/server/auth/request';
 
 export const metadata: Metadata = {
-  title: 'Betterway OS — UAE Mortgage Operating System',
+  title: 'Betterway Mortgages LLC — Corporate Operating System',
   description:
-    'Proprietary UAE Mortgage Brokerage CRM, 24-Bank LOS, RERA Conveyancing, Double-Entry FTA ERP, MOHRE WPS HRM & CBUAE Compliance Operating System.',
+    'Betterway Mortgages LLC institutional operating system for client origination, credit underwriting, conveyancing, treasury, human capital, and regulatory compliance.',
   icons: {
     icon: '/favicon.svg',
   },
+};
+
+export const viewport: Viewport = {
+  maximumScale: 1,
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
@@ -23,8 +27,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const dir = lang === 'ar' ? 'rtl' : 'ltr';
 
   return (
-    <html lang={lang} dir={dir}>
-      <body className="min-h-screen bg-[#F8F9FA] text-slate-900">{children}</body>
+    <html lang={lang} dir={dir} className="bg-[#f8fafc] text-[#0f172a]">
+      <body className="min-h-[100dvh] bg-[#f8fafc] text-[#0f172a] antialiased">{children}</body>
     </html>
   );
 }
