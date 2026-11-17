@@ -95,7 +95,7 @@ export function resolveSession(db: DatabaseSync, rawToken?: string | null): User
          FROM users WHERE id = ? AND status = 'ACTIVE'`,
       )
       .get(Number(id)) as UserRecord | undefined;
-    return u ?? null;
+    return u ? { ...u } : null;
   }
   const tokenHash = sha256Hex(rawToken);
   const row = db
