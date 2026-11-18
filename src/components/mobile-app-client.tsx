@@ -1301,13 +1301,22 @@ export function MobileAppClient({
                     Tap <strong>&ldquo;Install App Now&rdquo;</strong> below or tap Chrome&apos;s menu (⋮) → <strong>&ldquo;Install app&rdquo;</strong>. Pre-configured with <code>assetlinks.json</code> &amp; <code>capacitor.config.ts</code> for Google Play Store (`.aab`) &amp; Apple App Store (`.ipa`).
                   </div>
                 </div>
-                <button
-                  type="button"
-                  onClick={triggerNativeInstall}
-                  className="w-full py-2.5 rounded-xl bg-[#D7B04E] text-[#021125] font-bold flex items-center justify-center gap-2"
-                >
-                  <Download className="h-4 w-4" /> Install Betterway ONE on This Device
-                </button>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <a
+                    href="/downloads/Betterway-ONE.apk"
+                    download="Betterway-ONE.apk"
+                    className="w-full py-2.5 rounded-xl bg-[#D7B04E] text-[#021125] font-bold flex items-center justify-center gap-2"
+                  >
+                    <Download className="h-4 w-4" /> Download Android APK (.apk)
+                  </a>
+                  <button
+                    type="button"
+                    onClick={triggerNativeInstall}
+                    className="w-full py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold flex items-center justify-center gap-2"
+                  >
+                    <Smartphone className="h-4 w-4 text-[#D7B04E]" /> Install PWA / iOS Home Screen
+                  </button>
+                </div>
               </div>
 
               {/* PDPL Quiet-Hours Lock-Screen Redaction Card */}
