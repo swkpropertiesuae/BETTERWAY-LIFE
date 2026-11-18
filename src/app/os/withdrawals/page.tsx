@@ -116,7 +116,7 @@ export default async function WithdrawalsPage({
             </p>
           </div>
 
-          <div className="p-4 rounded-[6px] bg-[#2a1418] text-white border border-[#3a2326] space-y-2 text-xs">
+          <div className="p-4 rounded-[6px] bg-[#021125] text-white border border-[#3a2326] space-y-2 text-xs">
             <div className="text-[10px] font-bold uppercase tracking-widest text-[#c9a257]">
               Live Split Illustration (AED 45,000 Gross Subvention · 20% B2B Partner)
             </div>

@@ -34,7 +34,7 @@ export default async function UnifiedInboxPage({
     transactionType: String(l.transaction_type || 'READY_PURCHASE'),
     targetPropertyAed: Math.round(Number(l.target_property_fils || 300_000_000) / 100),
     stage: String(l.stage || 'NEW'),
-    advisorName: String(l.advisor_name || 'Tariq Al-Mansoori'),
+    advisorName: String(l.advisor_name || 'Daniel Xavier'),
     responded: Boolean(l.first_responded_at),
     createdAt: String(l.created_at || 'Today'),
   }));

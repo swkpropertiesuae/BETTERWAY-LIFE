@@ -142,7 +142,7 @@ export default async function HandoverPortalPage({
             <ul className="list-disc pl-5 space-y-2">
               <li>
                 <strong>Runtime &amp; UI:</strong> Next.js 16 App Router, TypeScript 5, Tailwind CSS 4 with the
-                signature <em>Oxblood (#7a1f2b), Brass (#c9a257), and Bone (#f6f1ea)</em>{' '}
+                signature <em>Oxblood (#021125), Brass (#c9a257), and Bone (#f6f1ea)</em>{' '}
                 design system, SWK-style header and per-app sidebar.
               </li>
               <li>

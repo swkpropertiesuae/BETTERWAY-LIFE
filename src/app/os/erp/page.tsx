@@ -54,7 +54,7 @@ export default async function ErpFinancePage({
       <div className="grid md:grid-cols-2 gap-6">
         <div className="bw-card p-5 space-y-2.5 text-xs">
           <div className="flex items-center justify-between">
-            <h2 className="font-display font-bold text-base text-[#2a1418]">FTA Form VAT 201 Return Summary</h2>
+            <h2 className="font-display font-bold text-base text-[#021125]">FTA Form VAT 201 Return Summary</h2>
             <span className="bw-badge bg-emerald-100 text-emerald-900">Partial-Exemption Aware</span>
           </div>
           <div className="flex justify-between"><span>Standard-Rated Supplies (5%)</span><span className="font-num font-semibold">{formatAed(vat.standardRatedSuppliesFils)}</span></div>
@@ -62,7 +62,7 @@ export default async function ErpFinancePage({
           <div className="flex justify-between"><span>Residual Input VAT Recovery Ratio</span><span className="font-num font-semibold">{vat.taxableRecoveryRatioPct}%</span></div>
           <div className="flex justify-between"><span>Output VAT Collected (5%)</span><span className="font-num font-semibold">{formatAed(vat.outputVatFils)}</span></div>
           <div className="flex justify-between"><span>Recoverable Input VAT (Partner + Overhead)</span><span className="font-num text-emerald-700">- {formatAed(vat.recoverableInputVatFils)}</span></div>
-          <div className="pt-2 border-t border-slate-200 flex justify-between font-bold text-sm text-[#2a1418]">
+          <div className="pt-2 border-t border-slate-200 flex justify-between font-bold text-sm text-[#021125]">
             <span>Net FTA VAT Payable / (Refundable)</span>
             <span className="font-num">{formatAed(vat.netVatPayableFils)}</span>
           </div>
@@ -70,7 +70,7 @@ export default async function ErpFinancePage({
 
         <div className="bw-card p-5 space-y-2.5 text-xs">
           <div className="flex items-center justify-between">
-            <h2 className="font-display font-bold text-base text-[#2a1418]">UAE 9% Corporate Tax Provision</h2>
+            <h2 className="font-display font-bold text-base text-[#021125]">UAE 9% Corporate Tax Provision</h2>
             <span className="bw-badge bg-amber-100 text-[#7d5f1f]">AED 375,000 0% Bracket</span>
           </div>
           <div className="flex justify-between"><span>Recognized Brokerage Revenue</span><span className="font-num font-semibold">{formatAed(ct.totalRevenueFils)}</span></div>
@@ -78,7 +78,7 @@ export default async function ErpFinancePage({
           <div className="flex justify-between"><span>Non-Deductible Add-Backs (50% Ent. / Fines)</span><span className="font-num">+ {formatAed(ct.nonDeductibleAddBacksFils)}</span></div>
           <div className="flex justify-between"><span>FTA Taxable Income</span><span className="font-num font-semibold">{formatAed(ct.taxableIncomeFils)}</span></div>
           <div className="flex justify-between"><span>Subject to 9% Above AED 375,000</span><span className="font-num">{formatAed(ct.subjectTo9PctFils)}</span></div>
-          <div className="pt-2 border-t border-slate-200 flex justify-between font-bold text-sm text-[#2a1418]">
+          <div className="pt-2 border-t border-slate-200 flex justify-between font-bold text-sm text-[#021125]">
             <span>Estimated 9% Corporate Tax Payable</span>
             <span className="font-num">{formatAed(ct.corporateTaxPayableFils)}</span>
           </div>
@@ -90,7 +90,7 @@ export default async function ErpFinancePage({
         <form method="POST" action="/api/v1/actions" className="bw-card p-5 space-y-3 text-xs">
           <input type="hidden" name="action" value="record_disbursal" />
           <input type="hidden" name="returnTo" value="/os/erp" />
-          <h3 className="font-display font-bold text-sm text-[#2a1418]">1. Record Bank Loan Disbursal</h3>
+          <h3 className="font-display font-bold text-sm text-[#021125]">1. Record Bank Loan Disbursal</h3>
           <p className="text-slate-500">Books Bank Subvention Receivable (`GL 1200`) + 10% House Clawback Reserve (`GL 2200`). Partner & Advisor stay unpaid until bank cash arrives.</p>
           <select name="dealId" className="bw-input">
             {deals.map((d) => (
@@ -108,7 +108,7 @@ export default async function ErpFinancePage({
         <form method="POST" action="/api/v1/actions" className="bw-card p-5 space-y-3 text-xs">
           <input type="hidden" name="action" value="record_bordereau_cash" />
           <input type="hidden" name="returnTo" value="/os/erp" />
-          <h3 className="font-display font-bold text-sm text-[#2a1418]">2. Receive Bank Bordereau Cash</h3>
+          <h3 className="font-display font-bold text-sm text-[#021125]">2. Receive Bank Bordereau Cash</h3>
           <p className="text-slate-500">Pay-when-paid waterfall: releases Partner split (strictly on Bank Subvention) & Advisor commission pro-rata on received cash.</p>
           <select name="dealId" className="bw-input">
             {deals.map((d) => (
@@ -123,7 +123,7 @@ export default async function ErpFinancePage({
         <form method="POST" action="/api/v1/actions" className="bw-card p-5 space-y-3 text-xs">
           <input type="hidden" name="action" value="trigger_clawback" />
           <input type="hidden" name="returnTo" value="/os/erp" />
-          <h3 className="font-display font-bold text-sm text-[#2a1418]">3. Early Refinance Clawback</h3>
+          <h3 className="font-display font-bold text-sm text-[#021125]">3. Early Refinance Clawback</h3>
           <p className="text-slate-500">Utilizes House `GL 2200` reserve and books recoverable Partner (`GL 1300`) & Advisor (`GL 1310`) debit balances for next-deal offset.</p>
           <select name="dealId" className="bw-input">
             {deals.map((d) => (
@@ -140,7 +140,7 @@ export default async function ErpFinancePage({
 
       {/* Commission Settlements Table */}
       <div className="bw-card overflow-hidden">
-        <div className="px-5 py-3.5 border-b border-slate-200 font-display font-bold text-sm text-[#2a1418]">
+        <div className="px-5 py-3.5 border-b border-slate-200 font-display font-bold text-sm text-[#021125]">
           Commission Settlements, Partner Subvention Splits & Clawback Reserve Sub-Ledger
         </div>
         <div className="overflow-x-auto">
@@ -192,7 +192,7 @@ export default async function ErpFinancePage({
 
       {/* Partner Agency ORN Verification & Hold Release */}
       <div className="bw-card p-5 space-y-3">
-        <h2 className="font-display font-bold text-sm text-[#2a1418]">
+        <h2 className="font-display font-bold text-sm text-[#021125]">
           B2B RERA Partner Agencies — ORN Verification, Clawback Debit Balance & Hold Release
         </h2>
         <div className="space-y-2">
@@ -207,7 +207,7 @@ export default async function ErpFinancePage({
               <input type="hidden" name="agencyId" value={String(ag.id)} />
               <input type="hidden" name="returnTo" value="/os/erp" />
               <div className="sm:col-span-2">
-                <div className="font-bold text-[#2a1418]">{String(ag.company_name)}</div>
+                <div className="font-bold text-[#021125]">{String(ag.company_name)}</div>
                 <div className="font-num text-[11px] text-slate-500">
                   ORN: {String(ag.rera_orn)} · Split {formatBps(Number(ag.default_split_bps))} · Clawback Debit: {formatAed(Number(ag.clawback_debit_balance_fils))}
                 </div>
@@ -230,14 +230,14 @@ export default async function ErpFinancePage({
       {/* Peppol PINT-AE Tax Invoices + Vendor Bill + Backbook CSV Importer */}
       <div className="grid lg:grid-cols-12 gap-6">
         <div className="lg:col-span-7 bw-card p-5 space-y-3">
-          <h2 className="font-display font-bold text-sm text-[#2a1418]">
+          <h2 className="font-display font-bold text-sm text-[#021125]">
             UAE Peppol PINT-AE (`UBL 2.1`) Tax & Self-Billed Partner Invoices ({invoices.length})
           </h2>
           <div className="space-y-2">
             {invoices.map((inv) => (
               <div key={String(inv.id)} className="rounded border border-slate-200 px-3 py-2 flex flex-wrap items-center justify-between gap-2 text-xs">
                 <div>
-                  <span className="font-num font-bold text-[#2a1418]">{String(inv.invoice_number)}</span> · {String(inv.counterparty_name)}
+                  <span className="font-num font-bold text-[#021125]">{String(inv.invoice_number)}</span> · {String(inv.counterparty_name)}
                   <div className="text-[11px] text-slate-500 font-num">
                     {String(inv.invoice_type)} · Total incl. VAT: {formatAed(Number(inv.total_fils))}
                   </div>
@@ -260,7 +260,7 @@ export default async function ErpFinancePage({
         </div>
 
         <div className="lg:col-span-5 bw-card p-5 space-y-3 text-xs">
-          <h2 className="font-display font-bold text-sm text-[#2a1418]">
+          <h2 className="font-display font-bold text-sm text-[#021125]">
             Legacy Back-Book CSV Importer (`LEGACY_BACKBOOK` Mode)
           </h2>
           <p className="text-slate-500">
@@ -283,7 +283,7 @@ export default async function ErpFinancePage({
       {/* Trial Balance */}
       <div className="bw-card overflow-hidden">
         <div className="px-5 py-3.5 border-b border-slate-200 flex items-center justify-between">
-          <span className="font-display font-bold text-sm text-[#2a1418]">28-Account UAE Double-Entry Trial Balance</span>
+          <span className="font-display font-bold text-sm text-[#021125]">28-Account UAE Double-Entry Trial Balance</span>
           <span className="bw-badge bg-emerald-100 text-emerald-900 font-num">
             Debits {formatAed(totalDebit)} = Credits {formatAed(totalCredit)}
           </span>

@@ -1,12 +1,16 @@
 import type { DatabaseSync } from 'node:sqlite';
-import { ForbiddenError, hashPassword, writeAuditLog, type UserRecord } from '@/server/auth';
+import { ForbiddenError, hashPassword, verifyPassword, writeAuditLog, type UserRecord } from '@/server/auth';
+import { getStaffAvatarUrl, getStaffProfileByNameOrEmail } from '@/lib/staff-directory';
 
 export const SUPREME_OWNER_EMAILS = new Set([
   'shabib@betterwaymortgages.com',
+  'warda@betterwaymortgages.com',
   'md@betterwaymortgages.com',
   'shabib@swk.properties',
   'shabib@swk.property',
   'shabib@swkpropertiesuae.com',
+  'warda@swk.property',
+  'warda@swk.properties',
 ]);
 
 export const ADMIN_ACCOUNT_EMAILS = new Set([
@@ -17,6 +21,7 @@ export const ADMIN_ACCOUNT_EMAILS = new Set([
 ]);
 
 export const MANAGER_EMAILS = new Set([
+  'daniel@betterwaymortgages.com',
   'haseeb@betterwaymortgages.com',
   'ops.director@betterwaymortgages.com',
   'haseeb@swk.property',
@@ -34,6 +39,9 @@ export function normalizeLoginAlias(rawEmail: string): string {
   ) {
     return 'shabib@betterwaymortgages.com';
   }
+  if (clean === 'warda@swk.property' || clean === 'warda@swk.properties') {
+    return 'warda@betterwaymortgages.com';
+  }
   if (
     clean === 'admin@swk.properties' ||
     clean === 'admin@swk.property' ||
@@ -42,10 +50,16 @@ export function normalizeLoginAlias(rawEmail: string): string {
     return 'admin@betterwaymortgages.com';
   }
   if (
+    clean === 'daniel.xavier@betterwaymortgages.com' ||
+    clean === 'manager@betterwaymortgages.com' ||
+    clean === 'manager@swkpropertiesuae.com'
+  ) {
+    return 'daniel@betterwaymortgages.com';
+  }
+  if (
     clean === 'ops.director@betterwaymortgages.com' ||
     clean === 'haseeb@swk.property' ||
-    clean === 'haseeb@swk.properties' ||
-    clean === 'manager@swkpropertiesuae.com'
+    clean === 'haseeb@swk.properties'
   ) {
     return 'haseeb@betterwaymortgages.com';
   }
@@ -56,26 +70,20 @@ export function normalizeLoginAlias(rawEmail: string): string {
   ) {
     return 'talha@betterwaymortgages.com';
   }
-  if (clean === 'tariq.advisor@betterwaymortgages.com') {
-    return 'shahid@betterwaymortgages.com';
+  if (clean === 'rahaba.azeez@betterwaymortgages.com' || clean === 'hr@betterwaymortgages.com') {
+    return 'rahaba@betterwaymortgages.com';
   }
-  if (
-    clean === 'layla.credit@betterwaymortgages.com' ||
-    clean === 'omar.underwriter@betterwaymortgages.com'
-  ) {
-    return 'umar@betterwaymortgages.com';
+  if (clean === 'mohammad.nusrik@betterwaymortgages.com' || clean === 'marketing@betterwaymortgages.com') {
+    return 'nusrik@betterwaymortgages.com';
   }
-  if (clean === 'nadia.conveyancing@betterwaymortgages.com') {
-    return 'saifullah@betterwaymortgages.com';
+  if (clean === 'elton.frank@betterwaymortgages.com' || clean === 'coordinator@betterwaymortgages.com') {
+    return 'elton@betterwaymortgages.com';
   }
-  if (clean === 'farid.mlro@betterwaymortgages.com') {
-    return 'fareed@betterwaymortgages.com';
+  if (clean === 'reshma.rajan@betterwaymortgages.com' || clean === 'telesales@betterwaymortgages.com') {
+    return 'reshma@betterwaymortgages.com';
   }
-  if (
-    clean === 'sana.finance@betterwaymortgages.com' ||
-    clean === 'reem.hr@betterwaymortgages.com'
-  ) {
-    return 'samarth@betterwaymortgages.com';
+  if (clean === 'asif.khan@betterwaymortgages.com' || clean === 'advisor@betterwaymortgages.com') {
+    return 'asif@betterwaymortgages.com';
   }
   return clean;
 }
@@ -898,4 +906,335 @@ export function syncDailyDldTransactions(db: DatabaseSync, actor: UserRecord) {
 
   writeAuditLog(db, actor, 'dld_market_transactions', today, 'SYNC_DAILY_DLD_FEED', null, { insertedCount });
   return { date: today, insertedCount };
+}
+
+/**
+ * Generates a high-contrast, deterministic 29x29 QR Matrix SVG with finder patterns,
+ * timing tracks, alignment pattern, and deterministic payload modules for the Reception Stand QR.
+ */
+export function generateReceptionStandQrSvg(scanUrl: string, darkColor = '#021125', lightColor = '#ffffff'): string {
+  const size = 29;
+  const grid: boolean[][] = Array.from({ length: size }, () => Array(size).fill(false));
+  const reserved: boolean[][] = Array.from({ length: size }, () => Array(size).fill(false));
+
+  const placeFinder = (r0: number, c0: number) => {
+    for (let r = -1; r <= 7; r++) {
+      for (let c = -1; c <= 7; c++) {
+        const rr = r0 + r;
+        const cc = c0 + c;
+        if (rr < 0 || rr >= size || cc < 0 || cc >= size) continue;
+        reserved[rr]![cc] = true;
+        const inOuter = r >= 0 && r <= 6 && c >= 0 && c <= 6 && (r === 0 || r === 6 || c === 0 || c === 6);
+        const inInner = r >= 2 && r <= 4 && c >= 2 && c <= 4;
+        grid[rr]![cc] = inOuter || inInner;
+      }
+    }
+  };
+
+  placeFinder(0, 0);
+  placeFinder(0, size - 7);
+  placeFinder(size - 7, 0);
+
+  // Alignment pattern at (20, 20)
+  for (let r = -2; r <= 2; r++) {
+    for (let c = -2; c <= 2; c++) {
+      const rr = 20 + r;
+      const cc = 20 + c;
+      reserved[rr]![cc] = true;
+      grid[rr]![cc] = Math.abs(r) === 2 || Math.abs(c) === 2 || (r === 0 && c === 0);
+    }
+  }
+
+  // Timing patterns
+  for (let i = 8; i < size - 8; i++) {
+    reserved[6]![i] = true;
+    reserved[i]![6] = true;
+    grid[6]![i] = i % 2 === 0;
+    grid[i]![6] = i % 2 === 0;
+  }
+
+  // Deterministic bit stream from scanUrl
+  let hash = 2166136261;
+  for (let i = 0; i < scanUrl.length; i++) {
+    hash ^= scanUrl.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+
+  let state = (hash >>> 0) || 0x9e3779b9;
+  for (let r = 0; r < size; r++) {
+    for (let c = 0; c < size; c++) {
+      if (reserved[r]![c]) continue;
+      state ^= state << 13;
+      state ^= state >>> 17;
+      state ^= state << 5;
+      const charBit = scanUrl.charCodeAt((r * size + c) % Math.max(1, scanUrl.length)) & (1 << ((r + c) % 7));
+      grid[r]![c] = ((state >>> 0) & 1) === 1 ? !charBit : Boolean(charBit);
+    }
+  }
+
+  const rects: string[] = [];
+  for (let r = 0; r < size; r++) {
+    for (let c = 0; c < size; c++) {
+      if (grid[r]![c]) {
+        rects.push(`<rect x="${c + 2}" y="${r + 2}" width="1" height="1" fill="${darkColor}" />`);
+      }
+    }
+  }
+
+  const total = size + 4;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${total} ${total}" width="260" height="260" role="img" aria-label="Betterway Mortgages LLC Reception Attendance QR Code"><rect width="${total}" height="${total}" rx="2" fill="${lightColor}" />${rects.join('')}</svg>`;
+}
+
+export function verifyAndRecordPublicQrCheckIn(
+  db: DatabaseSync,
+  input: {
+    email: string;
+    password: string;
+    connectionType?: string;
+    networkSsid?: string;
+    qrStandCode?: string;
+    deviceId?: string;
+    checkInDate?: string;
+    checkInTimeGst?: string;
+  },
+) {
+  const conn = String(input.connectionType || 'wifi').toLowerCase();
+  if (conn.includes('cellular') || conn === '3g' || conn === '2g' || conn === '4g' || conn === '5g-mobile') {
+    throw new Error(
+      'Anti-Loophole Network Gate: Cellular data check-in is blocked. Please connect your phone to the Betterway Mortgages Office Wi-Fi (Betterway-Office-5G) and scan again.',
+    );
+  }
+
+  const normalizedEmail = normalizeLoginAlias(input.email);
+  const user = db
+    .prepare('SELECT * FROM users WHERE lower(email) = ?')
+    .get(normalizedEmail) as (UserRecord & { password_hash: string; avatar_url?: string | null }) | undefined;
+
+  if (!user || !verifyPassword(input.password, user.password_hash)) {
+    throw new Error('Invalid Betterway Mortgages email or password.');
+  }
+  if (user.status !== 'ACTIVE') {
+    throw new Error('This staff account is currently suspended.');
+  }
+
+  const rec = recordReceptionQrCheckIn(db, user, {
+    checkInDate: input.checkInDate,
+    checkInTimeGst: input.checkInTimeGst,
+    networkSsid: input.networkSsid || 'Betterway-Office-5G',
+    qrStandCode: input.qrStandCode || 'BW-RECEPTION-STAND-DXB-1',
+    deviceId: input.deviceId || 'BW-MOBILE-SCAN',
+  });
+
+  const empRow = db
+    .prepare('SELECT designation, department, avatar_url FROM employees WHERE user_id = ?')
+    .get(user.id) as { designation?: string; department?: string; avatar_url?: string | null } | undefined;
+
+  const staffMeta = getStaffProfileByNameOrEmail(user.email);
+  const avatarUrl =
+    user.avatar_url || empRow?.avatar_url || staffMeta?.avatarUrl || getStaffAvatarUrl(user.full_name_en);
+
+  return {
+    ...rec,
+    referenceNo: `BW-ATT-${rec.checkInDate.replace(/-/g, '')}-${String(rec.logId).padStart(4, '0')}`,
+    employee: {
+      userId: user.id,
+      email: user.email,
+      fullNameEn: user.full_name_en,
+      role: user.role,
+      designation: empRow?.designation || staffMeta?.designation || user.role,
+      department: empRow?.department || staffMeta?.department || 'Operations',
+      avatarUrl,
+    },
+  };
+}
+
+export function ingestWebsiteLeadToOs(
+  db: DatabaseSync,
+  input: {
+    fullName: string;
+    phone: string;
+    email?: string;
+    residency?: string;
+    goal?: string;
+    propertyValueAed?: number;
+    downPaymentPct?: number;
+    monthlyIncomeAed?: number;
+    topic?: string;
+    preferredSlot?: string;
+    sourcePage?: string;
+    reraOrn?: string;
+    reraBrn?: string;
+    agencyName?: string;
+  },
+) {
+  const fullName = String(input.fullName || 'Website Client').trim();
+  const phone = String(input.phone || '').trim();
+  if (!fullName || !phone) {
+    throw new Error('Full name and mobile phone number are required.');
+  }
+
+  const email = String(input.email || `${phone.replace(/\D/g, '') || 'enquiry'}@client.betterwaymortgages.com`)
+    .trim()
+    .toLowerCase();
+
+  // Pick advisor from official Betterway advisory team (Daniel Xavier, Reshma Rajan, Asif Khan)
+  const advisorCandidates = db
+    .prepare(
+      `SELECT id, email, full_name_en, avatar_url FROM users
+       WHERE email IN ('daniel@betterwaymortgages.com', 'reshma@betterwaymortgages.com', 'asif@betterwaymortgages.com')
+         AND status = 'ACTIVE'
+       ORDER BY id ASC`,
+    )
+    .all() as Array<{ id: number; email: string; full_name_en: string; avatar_url: string | null }>;
+
+  let chosenAdvisor = advisorCandidates[0];
+  if (advisorCandidates.length > 0) {
+    const countRow = db.prepare('SELECT COUNT(*) as c FROM leads').get() as { c: number };
+    chosenAdvisor = advisorCandidates[countRow.c % advisorCandidates.length]!;
+  } else {
+    chosenAdvisor = db
+      .prepare("SELECT id, email, full_name_en, avatar_url FROM users WHERE status = 'ACTIVE' ORDER BY id ASC LIMIT 1")
+      .get() as { id: number; email: string; full_name_en: string; avatar_url: string | null };
+  }
+
+  const residencyRaw = String(input.residency || 'Expat resident').toUpperCase();
+  const segment = residencyRaw.includes('NATIONAL')
+    ? 'UAE_NATIONAL'
+    : residencyRaw.includes('NON')
+      ? 'NON_RESIDENT'
+      : 'RESIDENT_SALARIED';
+  const residencyType = residencyRaw.includes('NATIONAL')
+    ? 'UAE_NATIONAL'
+    : residencyRaw.includes('GCC')
+      ? 'GCC_NATIONAL'
+      : residencyRaw.includes('NON')
+        ? 'NON_RESIDENT'
+        : 'EXPAT_RESIDENT';
+
+  const priceAed = Math.max(0, Number(input.propertyValueAed || 2_500_000));
+  const incomeAed = Math.max(0, Number(input.monthlyIncomeAed || 45_000));
+  const salaryFils = Math.round(incomeAed * 100);
+  const priceFils = Math.round(priceAed * 100);
+
+  const hhId = Number(
+    db
+      .prepare('INSERT INTO households (primary_name, segment) VALUES (?, ?)')
+      .run(fullName, segment).lastInsertRowid,
+  );
+
+  db.prepare(
+    `INSERT INTO applicants (
+      household_id, applicant_role, full_name_en, email, phone,
+      nationality_code, residence_country, residency_type, employment_type,
+      employer_name, basic_salary_fils
+    ) VALUES (?, 'PRIMARY', ?, ?, ?, 'AE', 'AE', ?, 'SALARIED', ?, ?)`,
+  ).run(
+    hhId,
+    fullName,
+    email,
+    phone,
+    residencyType,
+    input.agencyName || 'Website Enquiry',
+    salaryFils,
+  );
+
+  const slaDue = new Date(Date.now() + 5 * 60_000).toISOString();
+  const campaignName = [
+    input.topic || 'Website Mortgage Enquiry',
+    input.goal ? `Goal: ${input.goal}` : '',
+    input.preferredSlot ? `Slot: ${input.preferredSlot}` : '',
+    input.sourcePage ? `Page: ${input.sourcePage}` : '',
+  ]
+    .filter(Boolean)
+    .join(' · ');
+
+  const goalUpper = String(input.goal || '').toUpperCase();
+  const txType = goalUpper.includes('OFF-PLAN') || goalUpper.includes('HANDOVER')
+    ? 'OFFPLAN_HANDOVER'
+    : goalUpper.includes('SWITCH') || goalUpper.includes('BUYOUT')
+      ? 'BUYOUT'
+      : goalUpper.includes('EQUITY')
+        ? 'EQUITY_RELEASE'
+        : goalUpper.includes('COMMERCIAL')
+          ? 'COMMERCIAL'
+          : 'READY_PURCHASE';
+  const desk =
+    residencyType === 'NON_RESIDENT'
+      ? 'NON_RESIDENT_DESK'
+      : txType === 'OFFPLAN_HANDOVER'
+        ? 'HANDOVER_DESK'
+        : txType === 'COMMERCIAL'
+          ? 'COMMERCIAL_DESK'
+          : 'RESIDENT_DESK';
+
+  const leadId = Number(
+    db
+      .prepare(
+        `INSERT INTO leads (
+          household_id, contact_name, contact_phone, contact_email, source_channel,
+          assigned_advisor_id, desk, transaction_type, target_property_fils,
+          calculator_snapshot_json, stage, first_response_due_at, client_consent_logged_at
+        ) VALUES (?, ?, ?, ?, 'WEBSITE_CALC', ?, ?, ?, ?, ?, 'NEW', ?, datetime('now'))`,
+      )
+      .run(
+        hhId,
+        fullName,
+        phone,
+        email,
+        chosenAdvisor?.id ?? null,
+        desk,
+        txType,
+        priceFils,
+        JSON.stringify({
+          topic: input.topic,
+          goal: input.goal,
+          residency: input.residency,
+          propertyValueAed: priceAed,
+          downPaymentPct: input.downPaymentPct ?? 20,
+          monthlyIncomeAed: incomeAed,
+          preferredSlot: input.preferredSlot ?? null,
+          sourcePage: input.sourcePage ?? '/',
+        }),
+        slaDue,
+      ).lastInsertRowid,
+  );
+
+  // Log omnichannel message & follow-up task if consultation slot requested
+  db.prepare(
+    `INSERT INTO comm_messages (lead_id, channel, direction, sender_name, body, internal_only)
+     VALUES (?, 'WHATSAPP', 'INBOUND', ?, ?, 0)`,
+  ).run(
+    leadId,
+    fullName,
+    `Website enquiry (${campaignName}) — Property AED ${priceAed.toLocaleString('en-US')}`,
+  );
+
+  if (input.preferredSlot) {
+    db.prepare(
+      `INSERT INTO ops_tasks (assigned_role, priority, title, due_at, status)
+       VALUES ('SALES_ADVISOR', 'HIGH', ?, ?, 'OPEN')`,
+    ).run(
+      `Website Consultation Slot (${input.preferredSlot}) — ${fullName} (${phone})`,
+      slaDue,
+    );
+  }
+
+  const refCode = `BW-ENQ-${new Date().getFullYear()}-${String(leadId).padStart(4, '0')}`;
+  const staffProfile = getStaffProfileByNameOrEmail(chosenAdvisor?.email);
+
+  return {
+    referenceCode: refCode,
+    leadId,
+    householdId: hhId,
+    assignedAdvisor: {
+      id: chosenAdvisor?.id ?? 0,
+      email: chosenAdvisor?.email ?? 'daniel@betterwaymortgages.com',
+      fullNameEn: chosenAdvisor?.full_name_en ?? 'Daniel Xavier',
+      designation: staffProfile?.designation ?? 'Team Manager & Mortgage Advisor',
+      avatarUrl:
+        chosenAdvisor?.avatar_url ||
+        staffProfile?.avatarUrl ||
+        '/staff/daniel-xavier.jpg',
+    },
+  };
 }

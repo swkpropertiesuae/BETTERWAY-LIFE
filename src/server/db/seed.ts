@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { UAE_BANKS, UAE_CHART_OF_ACCOUNTS, UAE_DEVELOPERS, UAE_PROJECTS } from '@/data/uae-registry';
 import { hashPassword } from '@/server/auth';
+import { OFFICIAL_STAFF_DIRECTORY } from '@/lib/staff-directory';
 
 export function seedInitialData(db: DatabaseSync) {
   const existing = db.prepare('SELECT COUNT(*) as c FROM company_settings').get() as { c: number };
@@ -535,134 +536,7 @@ export function seedInitialData(db: DatabaseSync) {
   }
 }
 
-export const OFFICIAL_BETTERWAY_STAFF = [
-  {
-    email: 'shabib@betterwaymortgages.com',
-    phone: '+971501000001',
-    fullNameEn: 'Shabib Siraj',
-    fullNameAr: 'شبيب سراج',
-    role: 'SUPER_ADMIN',
-    isMlro: 1,
-    canApproveRates: 1,
-    empCode: 'EMP-SHABIB',
-    department: 'Executive Management',
-    designation: 'Founder & Managing Director',
-    isNational: 0,
-    basicSalaryFils: 0,
-  },
-  {
-    email: 'admin@betterwaymortgages.com',
-    phone: '+971501000000',
-    fullNameEn: 'Betterway Admin',
-    fullNameAr: 'مسؤول النظام',
-    role: 'SUPER_ADMIN',
-    isMlro: 1,
-    canApproveRates: 1,
-    empCode: 'EMP-ADMIN',
-    department: 'System Administration',
-    designation: 'System Administrator',
-    isNational: 0,
-    basicSalaryFils: 0,
-  },
-  {
-    email: 'haseeb@betterwaymortgages.com',
-    phone: '+971501000002',
-    fullNameEn: 'Mohammad Haseeb',
-    fullNameAr: 'محمد حسيب',
-    role: 'SUPER_ADMIN',
-    isMlro: 0,
-    canApproveRates: 1,
-    empCode: 'EMP-HASEEB',
-    department: 'Operations & Management',
-    designation: 'Operations Manager',
-    isNational: 0,
-    basicSalaryFils: 0,
-  },
-  {
-    email: 'talha@betterwaymortgages.com',
-    phone: '+971501000003',
-    fullNameEn: 'Talha Shabbir',
-    fullNameAr: 'طلحة شبير',
-    role: 'SALES_ADVISOR',
-    isMlro: 0,
-    canApproveRates: 0,
-    empCode: 'EMP-TALHA',
-    department: 'Business Development & IT',
-    designation: 'BDM & IT Specialist',
-    isNational: 0,
-    basicSalaryFils: 0,
-  },
-  {
-    email: 'fareed@betterwaymortgages.com',
-    phone: '+971501000004',
-    fullNameEn: 'Fareed',
-    fullNameAr: 'فريد',
-    role: 'COMPLIANCE_MLRO',
-    isMlro: 1,
-    canApproveRates: 0,
-    empCode: 'EMP-FAREED',
-    department: 'Compliance & AML',
-    designation: 'Compliance & MLRO Officer',
-    isNational: 0,
-    basicSalaryFils: 0,
-  },
-  {
-    email: 'shahid@betterwaymortgages.com',
-    phone: '+971501000005',
-    fullNameEn: 'Shahid',
-    fullNameAr: 'شاهد',
-    role: 'SALES_ADVISOR',
-    isMlro: 0,
-    canApproveRates: 0,
-    empCode: 'EMP-SHAHID',
-    department: 'Mortgage Advisory',
-    designation: 'Senior Mortgage Advisor',
-    isNational: 0,
-    basicSalaryFils: 0,
-  },
-  {
-    email: 'umar@betterwaymortgages.com',
-    phone: '+971501000006',
-    fullNameEn: 'Umar',
-    fullNameAr: 'عمر',
-    role: 'CREDIT_UNDERWRITER',
-    isMlro: 0,
-    canApproveRates: 1,
-    empCode: 'EMP-UMAR',
-    department: 'Credit & Underwriting',
-    designation: 'Credit Underwriter',
-    isNational: 0,
-    basicSalaryFils: 0,
-  },
-  {
-    email: 'saifullah@betterwaymortgages.com',
-    phone: '+971501000007',
-    fullNameEn: 'Saifullah',
-    fullNameAr: 'سيف الله',
-    role: 'PROGRESSION_MANAGER',
-    isMlro: 0,
-    canApproveRates: 0,
-    empCode: 'EMP-SAIFULLAH',
-    department: 'DLD & Conveyancing',
-    designation: 'Progression & Conveyancing Officer',
-    isNational: 0,
-    basicSalaryFils: 0,
-  },
-  {
-    email: 'samarth@betterwaymortgages.com',
-    phone: '+971501000008',
-    fullNameEn: 'Samarth',
-    fullNameAr: 'سامارث',
-    role: 'FINANCE_ADMIN',
-    isMlro: 0,
-    canApproveRates: 0,
-    empCode: 'EMP-SAMARTH',
-    department: 'Finance & Accounting',
-    designation: 'Finance & Mortgage Consultant',
-    isNational: 0,
-    basicSalaryFils: 0,
-  },
-] as const;
+export const OFFICIAL_BETTERWAY_STAFF = OFFICIAL_STAFF_DIRECTORY;
 
 /**
  * Ensures the live production database contains ONLY statutory reference master data
@@ -685,7 +559,7 @@ export function ensureCommercialProductionReady(db: DatabaseSync) {
   }
 
   const resetDone = db
-    .prepare("SELECT flag_value FROM system_flags WHERE flag_key = 'reset:commercial-production-v1'")
+    .prepare("SELECT flag_value FROM system_flags WHERE flag_key = 'reset:commercial-production-v2'")
     .get() as { flag_value: string } | undefined;
 
   if (resetDone?.flag_value === '1') return;
@@ -747,28 +621,14 @@ export function ensureCommercialProductionReady(db: DatabaseSync) {
     // Remove demo pending rate card
     db.prepare("DELETE FROM bank_rate_cards WHERE product_code = 'ENBD-5Y-CAMPAIGN'").run();
 
-    // Keep only official Betterway Mortgages LLC staff users
-    const keepEmails = OFFICIAL_BETTERWAY_STAFF.map((s) => s.email.toLowerCase());
-    const placeholders = keepEmails.map(() => '?').join(',');
-    db.prepare(`DELETE FROM sessions WHERE user_id IN (SELECT id FROM users WHERE lower(email) NOT IN (${placeholders}))`).run(
-      ...keepEmails,
-    );
-    db.prepare(`DELETE FROM users WHERE lower(email) NOT IN (${placeholders})`).run(...keepEmails);
+    // Reset sessions & users cleanly and insert Official Betterway Mortgages LLC Staff in canonical order
+    db.exec('DELETE FROM sessions;');
+    db.exec('DELETE FROM users;');
 
     const defaultPass = hashPassword('Betterway#2026');
-    const upsertUser = db.prepare(`
-      INSERT INTO users (email, phone, full_name_en, full_name_ar, password_hash, role, is_mlro, can_approve_rates, preferred_lang, status)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'en', 'ACTIVE')
-      ON CONFLICT(email) DO UPDATE SET
-        phone = excluded.phone,
-        full_name_en = excluded.full_name_en,
-        full_name_ar = excluded.full_name_ar,
-        password_hash = excluded.password_hash,
-        role = excluded.role,
-        is_mlro = excluded.is_mlro,
-        can_approve_rates = excluded.can_approve_rates,
-        mfa_enabled = 0,
-        status = 'ACTIVE'
+    const insertUser = db.prepare(`
+      INSERT INTO users (email, phone, full_name_en, full_name_ar, password_hash, role, is_mlro, can_approve_rates, preferred_lang, status, avatar_url)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'en', 'ACTIVE', ?)
     `);
 
     const planRow = db.prepare('SELECT id FROM advisor_comp_plans ORDER BY id ASC LIMIT 1').get() as { id: number } | undefined;
@@ -780,12 +640,12 @@ export function ensureCommercialProductionReady(db: DatabaseSync) {
         mohre_person_id_14, routing_agent_id_9, employee_iban_23, contract_type, department, designation,
         comp_plan_id, join_date, basic_salary_fils, housing_allowance_fils, transport_allowance_fils,
         monthly_draw_fils, is_draw_recoverable, draw_deficit_fils, visa_expiry_date, emirates_id_expiry_date,
-        rera_card_expiry_date, medical_ins_expiry_date
-      ) VALUES (?, ?, ?, 'AE', ?, 0, '', ?, '302620122', ?, 'MAINLAND_MOHRE', ?, ?, ?, '2026-01-01', ?, 0, 0, 0, 1, 0, '2028-12-31', '2028-12-31', '2027-12-31', '2027-12-31')
+        rera_card_expiry_date, medical_ins_expiry_date, avatar_url
+      ) VALUES (?, ?, ?, 'AE', ?, 0, '', ?, '302620122', ?, 'MAINLAND_MOHRE', ?, ?, ?, '2026-01-01', ?, 0, 0, 0, 1, 0, '2028-12-31', '2028-12-31', '2027-12-31', '2027-12-31', ?)
     `);
 
     OFFICIAL_BETTERWAY_STAFF.forEach((s, idx) => {
-      upsertUser.run(
+      const uRes = insertUser.run(
         s.email,
         s.phone,
         s.fullNameEn,
@@ -794,10 +654,11 @@ export function ensureCommercialProductionReady(db: DatabaseSync) {
         s.role,
         s.isMlro,
         s.canApproveRates,
+        s.avatarUrl,
       );
-      const uRow = db.prepare('SELECT id FROM users WHERE email = ?').get(s.email) as { id: number };
+      const userId = Number(uRes.lastInsertRowid);
       insertEmployee.run(
-        uRow.id,
+        userId,
         s.empCode,
         s.fullNameEn,
         s.isNational,
@@ -807,6 +668,7 @@ export function ensureCommercialProductionReady(db: DatabaseSync) {
         s.designation,
         planId,
         s.basicSalaryFils,
+        s.avatarUrl,
       );
     });
 
@@ -819,7 +681,7 @@ export function ensureCommercialProductionReady(db: DatabaseSync) {
 
     db.prepare(`
       INSERT INTO system_flags (flag_key, flag_value, updated_at)
-      VALUES ('reset:commercial-production-v1', '1', datetime('now'))
+      VALUES ('reset:commercial-production-v2', '1', datetime('now'))
       ON CONFLICT(flag_key) DO UPDATE SET flag_value = '1', updated_at = datetime('now')
     `).run();
 

@@ -43,7 +43,7 @@ export default async function WorkflowPage({
           <div className="text-xs font-semibold uppercase tracking-wider text-[#7d5f1f]">
             {tr(lang, 'Deal Desk · one track for every mortgage case', 'مكتب الصفقات · مسار واحد لكل حالة')}
           </div>
-          <h1 className="font-display text-2xl font-bold text-[#2a1418] mt-1">
+          <h1 className="font-display text-2xl font-bold text-[#021125] mt-1">
             {showPlaybooks ? tr(lang, 'Scenario Playbooks', 'أدلة الحالات') : tr(lang, 'Where every deal is, what blocks it, who acts next', 'أين كل صفقة وما يعيقها ومن يتحرك')}
           </h1>
         </div>
@@ -57,12 +57,12 @@ export default async function WorkflowPage({
         <div className="space-y-6">
           {GROUPS.map((g) => (
             <section key={g}>
-              <h2 className="font-display font-bold text-sm text-[#2a1418] mb-2">{g.replace('_', ' ')}</h2>
+              <h2 className="font-display font-bold text-sm text-[#021125] mb-2">{g.replace('_', ' ')}</h2>
               <div className="grid md:grid-cols-2 gap-3">
                 {PLAYBOOKS.filter((p) => p.group === g).map((p) => (
                   <div key={p.id} className="bw-card p-4 text-xs">
                     <div className="flex justify-between gap-2">
-                      <div className="font-semibold text-[#2a1418]">{p.title}</div>
+                      <div className="font-semibold text-[#021125]">{p.title}</div>
                       <span className="font-num text-[10px] text-[#7d5f1f]">{p.id}</span>
                     </div>
                     <div className="text-slate-500 mt-1">{p.trigger}</div>
@@ -80,7 +80,7 @@ export default async function WorkflowPage({
             {rows.length === 0 && <div className="p-4 text-xs text-slate-500">No live deals yet. Convert a lead in CRM.</div>}
             {rows.map((r) => (
               <a key={r.id} href={`/os/workflow?dealId=${r.id}`} className={`block p-3 text-xs hover:bg-slate-50 ${r.id === selId ? 'bg-[#f3e9cf]' : ''}`}>
-                <div className="flex justify-between"><span className="font-semibold text-[#2a1418]">{r.deal_ref}</span>
+                <div className="flex justify-between"><span className="font-semibold text-[#021125]">{r.deal_ref}</span>
                   {r.crit > 0 && <span className="text-red-700 font-bold">{r.crit} ⚠</span>}</div>
                 <div className="text-slate-600">{r.client ?? '—'} · {r.transaction_type.replace('_', ' ')}</div>
                 <div className="text-[#7d5f1f]">{r.w.closed ? r.stage : STAGE_META[r.stage as Stage]?.label}</div>
@@ -94,7 +94,7 @@ export default async function WorkflowPage({
               <div className="bw-card p-4">
                 <div className="flex flex-wrap gap-1">
                   {sel.w.track.map((t) => (
-                    <div key={t.stage} className={`px-2 py-1 rounded text-[10px] font-medium border ${t.state === 'done' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : t.state === 'current' ? 'bg-[#2a1418] border-[#2a1418] text-white' : 'bg-white border-slate-200 text-slate-400'}`}>
+                    <div key={t.stage} className={`px-2 py-1 rounded text-[10px] font-medium border ${t.state === 'done' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : t.state === 'current' ? 'bg-[#021125] border-[#021125] text-white' : 'bg-white border-slate-200 text-slate-400'}`}>
                       {t.label}
                     </div>
                   ))}
@@ -107,7 +107,7 @@ export default async function WorkflowPage({
 
               <div className="bw-card p-4 border-s-4 border-[#c9a257]">
                 <div className="text-[10px] uppercase tracking-wider text-slate-500">Next action · owner {sel.w.nextAction.owner}{sel.w.nextAction.slaHours ? ` · SLA ${sel.w.nextAction.slaHours}h` : ''}</div>
-                <div className="font-semibold text-[#2a1418] mt-1">{sel.w.nextAction.text}</div>
+                <div className="font-semibold text-[#021125] mt-1">{sel.w.nextAction.text}</div>
                 {sel.w.blockers.filter((b) => !b.startsWith('Use "')).length > 0 && (
                   <ul className="mt-2 text-xs text-red-700 list-disc ms-4">
                     {sel.w.blockers.filter((b) => !b.startsWith('Use "')).map((b) => <li key={b}>{b}</li>)}
@@ -136,13 +136,13 @@ export default async function WorkflowPage({
 
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="bw-card p-4 text-xs">
-                  <div className="font-display font-bold text-sm text-[#2a1418] mb-2">Documents ({sel.w.documents.required.length - sel.w.documents.missing.length}/{sel.w.documents.required.length})</div>
+                  <div className="font-display font-bold text-sm text-[#021125] mb-2">Documents ({sel.w.documents.required.length - sel.w.documents.missing.length}/{sel.w.documents.required.length})</div>
                   {sel.w.documents.missing.length === 0 ? <div className="text-emerald-700">All required documents present.</div> : (
                     <ul className="list-disc ms-4 text-red-700">{sel.w.documents.missing.map((m) => <li key={m}>{m}</li>)}</ul>
                   )}
                 </div>
                 <div className="bw-card p-4 text-xs">
-                  <div className="font-display font-bold text-sm text-[#2a1418] mb-2">Exceptions</div>
+                  <div className="font-display font-bold text-sm text-[#021125] mb-2">Exceptions</div>
                   <form method="POST" action="/api/v1/actions" className="space-y-2">
                     <input type="hidden" name="action" value="wf_exception" />
                     <input type="hidden" name="dealId" value={sel.id} />
@@ -161,7 +161,7 @@ export default async function WorkflowPage({
               </div>
 
               <div className="bw-card p-4 text-xs">
-                <div className="font-display font-bold text-sm text-[#2a1418] mb-2">Playbooks that apply to this deal ({sel.w.playbooks.length})</div>
+                <div className="font-display font-bold text-sm text-[#021125] mb-2">Playbooks that apply to this deal ({sel.w.playbooks.length})</div>
                 <div className="grid md:grid-cols-2 gap-3">
                   {sel.w.playbooks.map((p) => (
                     <div key={p.id} className="rounded border border-slate-200 p-3">

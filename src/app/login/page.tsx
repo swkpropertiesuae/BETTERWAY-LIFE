@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { defaultHomeForRole, getCurrentUser } from '@/server/auth/request';
 import { ArrowRight, CheckCircle2, Lock, Mail, ShieldCheck } from 'lucide-react';
+import { OFFICIAL_STAFF_DIRECTORY } from '@/lib/staff-directory';
+import { StaffAvatar } from '@/components/staff-avatar';
 
 function FloatingPathsSvg({ position }: { position: number }) {
   const paths = Array.from({ length: 30 }, (_, i) => ({
@@ -38,53 +40,12 @@ export default async function LoginPage({
   const user = await getCurrentUser();
   const sp = await searchParams;
 
-  const staffProfiles = [
-    {
-      label: 'Shabib Siraj',
-      role: 'Founder & Managing Director',
-      email: 'shabib@betterwaymortgages.com',
-    },
-    {
-      label: 'Betterway Admin',
-      role: 'System Administrator',
-      email: 'admin@betterwaymortgages.com',
-    },
-    {
-      label: 'Mohammad Haseeb',
-      role: 'Operations Manager',
-      email: 'haseeb@betterwaymortgages.com',
-    },
-    {
-      label: 'Talha Shabbir',
-      role: 'BDM & IT Specialist',
-      email: 'talha@betterwaymortgages.com',
-    },
-    {
-      label: 'Fareed',
-      role: 'Compliance & MLRO',
-      email: 'fareed@betterwaymortgages.com',
-    },
-    {
-      label: 'Shahid',
-      role: 'Senior Mortgage Advisor',
-      email: 'shahid@betterwaymortgages.com',
-    },
-    {
-      label: 'Umar',
-      role: 'Credit Underwriter',
-      email: 'umar@betterwaymortgages.com',
-    },
-    {
-      label: 'Saifullah',
-      role: 'DLD & Conveyancing',
-      email: 'saifullah@betterwaymortgages.com',
-    },
-    {
-      label: 'Samarth',
-      role: 'Finance & Accounting',
-      email: 'samarth@betterwaymortgages.com',
-    },
-  ];
+  const staffProfiles = OFFICIAL_STAFF_DIRECTORY.map((s) => ({
+    label: s.fullNameEn,
+    role: s.designation,
+    email: s.email,
+    avatarUrl: s.avatarUrl,
+  }));
 
   return (
     <div className="swk-login2">
@@ -127,11 +88,11 @@ export default async function LoginPage({
             <img
               src="/brand/icon-gold-squircle-midnight.svg"
               alt="Betterway Mortgages"
-              className="h-10 w-10 rounded-xl border border-[#2a1418]/15 shadow-xs"
+              className="h-10 w-10 rounded-xl border border-[#021125]/15 shadow-xs"
             />
             <div>
-              <div className="text-base font-bold tracking-tight text-[#2a1418]">
-                Betterway <span className="text-[#7a1f2b] font-mono">OS</span>
+              <div className="text-base font-bold tracking-tight text-[#021125]">
+                Betterway <span className="text-[#021125] font-mono">OS</span>
               </div>
               <div className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#766661]">
                 Betterway Mortgages LLC · Dubai
@@ -143,16 +104,16 @@ export default async function LoginPage({
           <p className="swk-login2-sub">Sign in to your Betterway Mortgages OS workspace.</p>
 
           {user && (
-            <div className="mb-4 rounded-xl bg-[#f6e6e6] border border-[#c9b9a2] p-3 flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2 min-w-0">
-                <CheckCircle2 size={16} className="text-[#7a1f2b] shrink-0" />
-                <div className="text-xs text-[#2a1418] truncate">
+            <div className="mb-4 rounded-xl bg-[#faf3e0] border border-[#c9b9a2] p-3 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <StaffAvatar name={user.full_name_en} email={user.email} size={32} />
+                <div className="text-xs text-[#021125] truncate">
                   Active session: <b>{user.full_name_en}</b>
                 </div>
               </div>
               <Link
                 href={defaultHomeForRole(user.role)}
-                className="inline-flex items-center gap-1 rounded-lg bg-[#2a1418] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#7a1f2b] transition shrink-0"
+                className="inline-flex items-center gap-1 rounded-lg bg-[#021125] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#072244] transition shrink-0"
               >
                 <span>Open OS</span>
                 <ArrowRight size={13} />
@@ -193,7 +154,7 @@ export default async function LoginPage({
                 <label htmlFor="password" className="text-[12.5px] font-semibold text-[#4d3a3c]">
                   Password
                 </label>
-                <span className="text-xs font-semibold text-[#7a1f2b]">Internal SSO Active</span>
+                <span className="text-xs font-semibold text-[#021125]">Internal SSO Active</span>
               </div>
               <div className="swk-login2-field">
                 <Lock size={17} />
@@ -222,17 +183,20 @@ export default async function LoginPage({
             <div className="text-[10.5px] font-mono font-bold uppercase tracking-wider text-[#766661] mb-2.5">
               1-Click Internal Staff Directory Sign-In
             </div>
-            <div className="grid grid-cols-2 gap-1.5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {staffProfiles.map((u) => (
                 <form key={u.email} method="POST" action="/api/v1/auth/login">
                   <input type="hidden" name="email" value={u.email} />
                   <input type="hidden" name="password" value="Betterway#2026" />
                   <button
                     type="submit"
-                    className="w-full text-left p-2 border border-[#e0d4c2] rounded-lg bg-[#faf6f0] hover:bg-[#f6e6e6] hover:border-[#7a1f2b] transition cursor-pointer"
+                    className="w-full text-left p-2.5 border border-[#e0d4c2] rounded-xl bg-[#faf6f0] hover:bg-[#faf3e0] hover:border-[#021125] transition cursor-pointer flex items-center gap-2.5"
                   >
-                    <div className="text-xs font-semibold text-[#2a1418] truncate">{u.label}</div>
-                    <div className="text-[10px] text-[#766661] truncate">{u.role}</div>
+                    <StaffAvatar name={u.label} email={u.email} avatarUrl={u.avatarUrl} size={36} />
+                    <div className="min-w-0">
+                      <div className="text-xs font-semibold text-[#021125] truncate">{u.label}</div>
+                      <div className="text-[10.5px] text-[#4a5868] truncate">{u.role}</div>
+                    </div>
                   </button>
                 </form>
               ))}
@@ -240,7 +204,7 @@ export default async function LoginPage({
           </div>
 
           <p className="mt-6 flex items-center gap-1.5 text-[11.5px] text-[#766661]">
-            <ShieldCheck size={14} className="text-[#7a1f2b]" />
+            <ShieldCheck size={14} className="text-[#021125]" />
             Encrypted session · activity is audited · © {new Date().getFullYear()} Betterway Mortgages LLC
           </p>
         </div>

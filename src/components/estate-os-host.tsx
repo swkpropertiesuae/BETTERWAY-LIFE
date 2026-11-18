@@ -30,7 +30,7 @@ export function EstateOsHost({ userEmail }: { userEmail?: string }) {
 
   if (!mounted) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#f6f1ea] text-[#2a1418] text-sm font-medium">
+      <div className="min-h-screen flex items-center justify-center bg-[#f6f1ea] text-[#021125] text-sm font-medium">
         Loading Betterway Mortgages OS…
       </div>
     );

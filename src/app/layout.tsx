@@ -27,8 +27,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const dir = lang === 'ar' ? 'rtl' : 'ltr';
 
   return (
-    <html lang={lang} dir={dir} className="bg-[#faf6f0] text-[#2a1418]">
-      <body className="min-h-[100dvh] bg-[#faf6f0] text-[#2a1418] antialiased">{children}</body>
+    <html lang={lang} dir={dir} className="bg-[#faf6f0] text-[#021125]">
+      <body className="min-h-[100dvh] bg-[#faf6f0] text-[#021125] antialiased">{children}</body>
     </html>
   );
 }

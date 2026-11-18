@@ -605,7 +605,7 @@ export async function POST(req: Request) {
         });
         if (res.approvalStatus === 'PENDING_OWNER_APPROVAL') {
           return respondOk(
-            `Expense ${res.billNumber} (> AED 5,000) queued in Maker-Checker Approval Gate awaiting Owner Shabib Siraj / Manager Mohammad Haseeb sign-off`,
+            `Expense ${res.billNumber} (> AED 5,000) queued in Maker-Checker Approval Gate awaiting Owner Shabib Siraj / Warda / Team Manager Daniel Xavier sign-off`,
           );
         }
         return respondOk(`Company expense ${res.billNumber} recorded in General Ledger with UAE VAT & Corporate Tax rules`);

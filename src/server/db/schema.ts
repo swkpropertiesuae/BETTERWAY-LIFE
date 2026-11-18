@@ -36,6 +36,7 @@ CREATE TABLE IF NOT EXISTS users (
   status TEXT NOT NULL DEFAULT 'ACTIVE' CHECK (status IN ('ACTIVE','SUSPENDED')),
   totp_secret TEXT NOT NULL DEFAULT '',
   mfa_enabled INTEGER NOT NULL DEFAULT 0,
+  avatar_url TEXT DEFAULT NULL,
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
@@ -640,6 +641,7 @@ CREATE TABLE IF NOT EXISTS employees (
   emirates_id_expiry_date TEXT NOT NULL,
   rera_card_expiry_date TEXT,
   medical_ins_expiry_date TEXT NOT NULL,
+  avatar_url TEXT DEFAULT NULL,
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 

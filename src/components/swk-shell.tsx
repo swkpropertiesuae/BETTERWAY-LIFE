@@ -10,6 +10,7 @@ import '@/estate-os/styles/motion.css';
 import '@/estate-os/styles/assistant.css';
 import '@/estate-os/styles/integrations.css';
 import { DubaiClock, OsFrame, QuickAdd } from '@/components/os-chrome';
+import { StaffAvatar } from '@/components/staff-avatar';
 import { OS_ITEMS } from '@/lib/os-apps';
 import {
   Activity,
@@ -365,7 +366,7 @@ export function OsLayoutFrame({
       <div className="swk-rel">
         <button
           type="button"
-          className="swk-avatar"
+          className="swk-avatar overflow-hidden p-0"
           onClick={() => {
             setUserMenuOpen((o) => !o);
             setNotifOpen(false);
@@ -373,14 +374,17 @@ export function OsLayoutFrame({
           aria-label="Account menu"
           aria-expanded={userMenuOpen}
         >
-          {initials}
+          <StaffAvatar name={user.full_name_en} email={user.email} size={36} />
         </button>
         {userMenuOpen && (
-          <div className="swk-menu" style={{ minWidth: 250 }}>
-            <div className="head">
-              <b>{user.full_name_en}</b>
-              <div>
-                {user.email} · {user.role}
+          <div className="swk-menu" style={{ minWidth: 260 }}>
+            <div className="head flex items-center gap-2.5">
+              <StaffAvatar name={user.full_name_en} email={user.email} size={38} />
+              <div className="min-w-0">
+                <b className="truncate block">{user.full_name_en}</b>
+                <div className="truncate text-[11px]">
+                  {user.email} · {user.role}
+                </div>
               </div>
             </div>
             <div className="sep" />

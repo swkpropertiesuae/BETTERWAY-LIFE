@@ -17,6 +17,7 @@ import { useGlide } from '@/estate-os/lib/motion';
 import { initials } from '@/estate-os/lib/format';
 import type { Tone } from '@/estate-os/lib/domain';
 import { PROPERTY_IMAGES } from '@/estate-os/store/seed';
+import { getStaffAvatarUrl } from '@/lib/staff-directory';
 
 /* ─────────── Button ─────────── */
 
@@ -76,6 +77,20 @@ export function AiBadge({ title = 'Extracted by AI — editable, not yet verifie
 /* ─────────── Avatar ─────────── */
 
 export function Avatar({ name, hue, size = 'md', title }: { name: string; hue?: number; size?: 'sm' | 'md' | 'lg' | 'xl'; title?: string }) {
+  const staffPhoto = getStaffAvatarUrl(name);
+  if (staffPhoto) {
+    const px = size === 'sm' ? 26 : size === 'lg' ? 40 : size === 'xl' ? 52 : 32;
+    return (
+      <img
+        src={staffPhoto}
+        alt={title ?? name}
+        title={title ?? name}
+        width={px}
+        height={px}
+        style={{ width: px, height: px, borderRadius: '50%', objectFit: 'cover', objectPosition: 'top center', flexShrink: 0, border: '1px solid rgba(215, 176, 78, 0.45)' }}
+      />
+    );
+  }
   const h = hue ?? hashHue(name);
   return (
     <span

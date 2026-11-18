@@ -13,130 +13,76 @@
   --font-serif: "Instrument Serif", Georgia, "Times New Roman", serif;
   --font-mono: "JetBrains Mono Variable", ui-monospace, SFMono-Regular, Menlo, monospace;
 
-  /* Betterway palette: oxblood, brass, bone. Tailwind's default cool ramps are remapped so every utility class follows the brand. */
-  --color-navy-950: #1f0d10;
-  --color-navy-900: #2a1418;
-  --color-navy-800: #3b161d;
-  --color-gold-500: #7a1f2b;
-  --color-gold-600: #651822;
-  --color-gold-400: #96303d;
-  --color-teal-600: #4d6b3a;
-  --color-teal-400: #6a8a42;
-  --color-amber-600: #9a6f1f;
+  /* Betterway Master Brand Kit palette (shared 1:1 with BetterwayMortgages website):
+     Midnight Banking Navy #021125 · Royal Navy #072244 · Sovereign Gold #D7B04E · Deep Bullion #A67C21 · Institutional Alabaster #F8F9FA */
+  --color-navy-950: #010915;
+  --color-navy-900: #021125;
+  --color-navy-800: #072244;
+  --color-gold-500: #d7b04e;
+  --color-gold-600: #a67c21;
+  --color-gold-400: #f2dcb3;
+  --color-teal-600: #8a6518;
+  --color-teal-400: #d7b04e;
+  --color-amber-600: #b45309;
   --color-crimson-600: #bc3a26;
-
-  /* neutrals: warm stone instead of cool slate */
-  --color-slate-50: #faf6f0; --color-slate-100: #f3ece1; --color-slate-200: #e7dccd; --color-slate-300: #d3c4ae; --color-slate-400: #a89a90;
-  --color-slate-500: #76665f; --color-slate-600: #66564f; --color-slate-700: #4d3a3c; --color-slate-800: #3a2326; --color-slate-900: #2a1418; --color-slate-950: #1f0d10;
-  --color-gray-50: #faf6f0; --color-gray-100: #f3ece1; --color-gray-200: #e7dccd; --color-gray-300: #d3c4ae; --color-gray-400: #a89a90;
-  --color-gray-500: #76665f; --color-gray-600: #66564f; --color-gray-700: #4d3a3c; --color-gray-800: #3a2326; --color-gray-900: #2a1418; --color-gray-950: #1f0d10;
-  --color-zinc-50: #faf6f0; --color-zinc-100: #f3ece1; --color-zinc-200: #e7dccd; --color-zinc-300: #d3c4ae; --color-zinc-400: #a89a90;
-  --color-zinc-500: #76665f; --color-zinc-600: #66564f; --color-zinc-700: #4d3a3c; --color-zinc-800: #3a2326; --color-zinc-900: #2a1418; --color-zinc-950: #1f0d10;
-  --color-neutral-50: #faf6f0; --color-neutral-100: #f3ece1; --color-neutral-200: #e7dccd; --color-neutral-300: #d3c4ae; --color-neutral-400: #a89a90;
-  --color-neutral-500: #76665f; --color-neutral-600: #66564f; --color-neutral-700: #4d3a3c; --color-neutral-800: #3a2326; --color-neutral-900: #2a1418; --color-neutral-950: #1f0d10;
-  --color-stone-50: #faf6f0; --color-stone-100: #f3ece1; --color-stone-200: #e7dccd; --color-stone-300: #d3c4ae; --color-stone-400: #a89a90;
-  --color-stone-500: #76665f; --color-stone-600: #66564f; --color-stone-700: #4d3a3c; --color-stone-800: #3a2326; --color-stone-900: #2a1418; --color-stone-950: #1f0d10;
-
-  /* success: moss */
-  --color-emerald-50: #f1f5ea; --color-emerald-100: #e2ebd3; --color-emerald-200: #c6d6a9; --color-emerald-300: #a5bd7c; --color-emerald-400: #86a459;
-  --color-emerald-500: #6a8a42; --color-emerald-600: #587536; --color-emerald-700: #475f2d; --color-emerald-800: #3a4c26; --color-emerald-900: #2f3e21; --color-emerald-950: #1a2512;
-  --color-green-50: #f1f5ea; --color-green-100: #e2ebd3; --color-green-200: #c6d6a9; --color-green-300: #a5bd7c; --color-green-400: #86a459;
-  --color-green-500: #6a8a42; --color-green-600: #587536; --color-green-700: #475f2d; --color-green-800: #3a4c26; --color-green-900: #2f3e21; --color-green-950: #1a2512;
-  --color-lime-50: #f1f5ea; --color-lime-100: #e2ebd3; --color-lime-200: #c6d6a9; --color-lime-300: #a5bd7c; --color-lime-400: #86a459;
-  --color-lime-500: #6a8a42; --color-lime-600: #587536; --color-lime-700: #475f2d; --color-lime-800: #3a4c26; --color-lime-900: #2f3e21; --color-lime-950: #1a2512;
-
-  /* danger: brick (kept clearly distinct from oxblood brand) */
-  --color-red-50: #fdf0ec; --color-red-100: #fadbd3; --color-red-200: #f4b9aa; --color-red-300: #ec9180; --color-red-400: #df6a55;
-  --color-red-500: #d04a34; --color-red-600: #bc3a26; --color-red-700: #9c2f1f; --color-red-800: #7d281c; --color-red-900: #66241b; --color-red-950: #38100b;
-  --color-rose-50: #fdf0ec; --color-rose-100: #fadbd3; --color-rose-200: #f4b9aa; --color-rose-300: #ec9180; --color-rose-400: #df6a55;
-  --color-rose-500: #d04a34; --color-rose-600: #bc3a26; --color-rose-700: #9c2f1f; --color-rose-800: #7d281c; --color-rose-900: #66241b; --color-rose-950: #38100b;
-
-  /* warning: brass ochre */
-  --color-amber-50: #fbf5e6; --color-amber-100: #f5e8c6; --color-amber-200: #ecd490; --color-amber-300: #e0bb5f; --color-amber-400: #d1a23f;
-  --color-amber-500: #b88a2c; --color-amber-600: #9a6f1f; --color-amber-700: #7d581b; --color-amber-800: #64461a; --color-amber-900: #523a19; --color-amber-950: #2d1f0a;
-  --color-yellow-50: #fbf5e6; --color-yellow-100: #f5e8c6; --color-yellow-200: #ecd490; --color-yellow-300: #e0bb5f; --color-yellow-400: #d1a23f;
-  --color-yellow-500: #b88a2c; --color-yellow-600: #9a6f1f; --color-yellow-700: #7d581b; --color-yellow-800: #64461a; --color-yellow-900: #523a19; --color-yellow-950: #2d1f0a;
-  --color-orange-50: #fbf0ea; --color-orange-100: #f5dccf; --color-orange-200: #ebbaa1; --color-orange-300: #de9370; --color-orange-400: #cf7048;
-  --color-orange-500: #b8582f; --color-orange-600: #9c4626; --color-orange-700: #7e3a22; --color-orange-800: #66321f; --color-orange-900: #542c1d; --color-orange-950: #2d150d;
-
-  /* brand accent: oxblood (replaces teal) */
-  --color-teal-50: #f8eded; --color-teal-100: #f0dadc; --color-teal-200: #e2b8bd; --color-teal-300: #cf8d96; --color-teal-400: #b4545f;
-  --color-teal-500: #96303d; --color-teal-700: #651822; --color-teal-800: #5a1620; --color-teal-900: #3b0f16; --color-teal-950: #2a0a10;
-  --color-cyan-50: #f8eded; --color-cyan-100: #f0dadc; --color-cyan-200: #e2b8bd; --color-cyan-300: #cf8d96; --color-cyan-400: #b4545f;
-  --color-cyan-500: #96303d; --color-cyan-600: #7a1f2b; --color-cyan-700: #651822; --color-cyan-800: #5a1620; --color-cyan-900: #3b0f16; --color-cyan-950: #2a0a10;
-
-  /* info: ink slate-blue (replaces sky/blue/indigo) */
-  --color-sky-50: #eef2f5; --color-sky-100: #dbe4ea; --color-sky-200: #bccad5; --color-sky-300: #93a9ba; --color-sky-400: #6a859b;
-  --color-sky-500: #4d6a82; --color-sky-600: #3b566d; --color-sky-700: #314758; --color-sky-800: #2b3c4a; --color-sky-900: #26333e; --color-sky-950: #151d24;
-  --color-blue-50: #eef2f5; --color-blue-100: #dbe4ea; --color-blue-200: #bccad5; --color-blue-300: #93a9ba; --color-blue-400: #6a859b;
-  --color-blue-500: #4d6a82; --color-blue-600: #3b566d; --color-blue-700: #314758; --color-blue-800: #2b3c4a; --color-blue-900: #26333e; --color-blue-950: #151d24;
-  --color-indigo-50: #eef2f5; --color-indigo-100: #dbe4ea; --color-indigo-200: #bccad5; --color-indigo-300: #93a9ba; --color-indigo-400: #6a859b;
-  --color-indigo-500: #4d6a82; --color-indigo-600: #3b566d; --color-indigo-700: #314758; --color-indigo-800: #2b3c4a; --color-indigo-900: #26333e; --color-indigo-950: #151d24;
-
-  /* plum (replaces violet/purple/fuchsia/pink) */
-  --color-violet-50: #f6eef2; --color-violet-100: #ecdce5; --color-violet-200: #dbbdcd; --color-violet-300: #c496ae; --color-violet-400: #a76a89;
-  --color-violet-500: #8a4c6b; --color-violet-600: #723d57; --color-violet-700: #5e3347; --color-violet-800: #4e2c3c; --color-violet-900: #42273a; --color-violet-950: #26141f;
-  --color-purple-50: #f6eef2; --color-purple-100: #ecdce5; --color-purple-200: #dbbdcd; --color-purple-300: #c496ae; --color-purple-400: #a76a89;
-  --color-purple-500: #8a4c6b; --color-purple-600: #723d57; --color-purple-700: #5e3347; --color-purple-800: #4e2c3c; --color-purple-900: #42273a; --color-purple-950: #26141f;
-  --color-fuchsia-500: #8a4c6b; --color-fuchsia-600: #723d57; --color-pink-500: #8a4c6b; --color-pink-600: #723d57;
 }
 
 :root {
-  /* Oxblood + brass + bone. Calm operating workspace: bone canvas, white floating surfaces, oxblood actions, brass accents. */
-  --obs: #2a1418;
-  --obs-2: #3b161d;
+  /* Betterway Master Brand Kit: Midnight Banking Navy + Sovereign Gold + Institutional Alabaster */
+  --obs: #021125;
+  --obs-2: #072244;
   --obs-line: rgba(255, 255, 255, 0.10);
-  --obs-text: #f6efe6;
-  --obs-mute: #c2aea5;
+  --obs-text: #f8f9fa;
+  --obs-mute: #94a3b8;
 
-  --bg: #f6f1ea;
-  --bg-2: #ece4d8;
-  --sidebar: #2a1418;
+  --bg: #f8f9fa;
+  --bg-2: #f3efe7;
+  --sidebar: #021125;
   --surface: #ffffff;
   --card: #ffffff;
-  --surface-2: #faf6f0;
-  --hover: #f3ece1;
-  --soft: #efe7da;
+  --surface-2: #f8f9fa;
+  --hover: #f3efe7;
+  --soft: #ece6d9;
 
-  --text: #2a1418;
-  --ink: #2a1418;
-  --text-2: #4d3a3c;
-  --body: #4d3a3c;
-  --text-3: #76665f;
-  --muted: #76665f;
-  --text-4: #a89a90;
+  --text: #021125;
+  --ink: #0a1628;
+  --text-2: #4a5868;
+  --body: #4a5868;
+  --text-3: #64748b;
+  --muted: #64748b;
+  --text-4: #94a3b8;
 
-  --border: #e7dccd;
-  --line: #e7dccd;
-  --border-2: #d3c4ae;
-  --line-strong: #d3c4ae;
+  --border: #e2e6ea;
+  --line: #e2e6ea;
+  --border-2: #cbd5e1;
+  --line-strong: #cbd5e1;
 
-  --ember: #7a1f2b;
-  --ember-dark: #5a1620;
+  --ember: #021125;
+  --ember-dark: #010915;
   --blaze: #bc3a26;
-  --champ: #b08a3e;
-  --champ-deep: #7d5f1f;
-  --champ-soft: #f3e9cf;
-  --oasis: #587536;
+  --champ: #d7b04e;
+  --champ-deep: #8a6518;
+  --champ-soft: #faf3e0;
+  --oasis: #0d8a52;
   --dune: #bc3a26;
-  --navy: #2a1418;
-  --fold: #5a1620;
+  --navy: #021125;
+  --fold: #072244;
 
-  --primary: #7a1f2b;
+  --primary: #021125;
   --primary-fg: #ffffff;
-  --accent: #7a1f2b;
+  --accent: #021125;
   --accent-fg: #ffffff;
 
-  --success: #587536;
-  --warning: #9a6f1f;
+  --success: #0d8a52;
+  --warning: #b45309;
   --danger: #bc3a26;
-  --info: #3b566d;
+  --info: #072244;
 
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
-  --shadow-xs: 0 1px 2px rgba(42, 20, 24, 0.04);
-  --shadow-sm: 0 1px 2px rgba(42, 20, 24, 0.04), 0 4px 16px -6px rgba(90, 22, 32, 0.08);
-  --shadow-md: 0 8px 24px -6px rgba(90, 22, 32, 0.14), 0 2px 6px rgba(42, 20, 24, 0.05);
-  --shadow-lg: 0 24px 60px -18px rgba(90, 22, 32, 0.28);
+  --shadow-xs: 0 1px 2px rgba(2, 17, 37, 0.04);
+  --shadow-sm: 0 1px 2px rgba(2, 17, 37, 0.04), 0 4px 16px -6px rgba(2, 17, 37, 0.08);
+  --shadow-md: 0 8px 24px -6px rgba(2, 17, 37, 0.14), 0 2px 6px rgba(2, 17, 37, 0.05);
+  --shadow-lg: 0 24px 60px -18px rgba(2, 17, 37, 0.28);
 }
 
 :root[data-theme="dark"],
@@ -297,7 +243,7 @@
     background:
       radial-gradient(600px 360px at 100% 0%, rgba(201, 162, 87, 0.16), transparent 60%),
       radial-gradient(500px 320px at 0% 100%, rgba(143, 42, 55, 0.5), transparent 60%),
-      linear-gradient(165deg, #5a1620 0%, #2f1015 65%, #1f0d10 100%);
+      linear-gradient(165deg, #021125 0%, #2f1015 65%, #010915 100%);
     border-right: 1px solid rgba(255, 255, 255, 0.08);
   }
 
@@ -385,7 +331,7 @@
     margin: 0;
     font: 700 clamp(28px, 3vw, 36px) / 1.12 var(--font-display);
     letter-spacing: -0.025em;
-    color: #2a1418;
+    color: #021125;
   }
 
   .swk-login2-sub {
@@ -408,7 +354,7 @@
   }
 
   .swk-login2-field:focus-within {
-    border-color: #7a1f2b;
+    border-color: #021125;
     box-shadow: 0 0 0 3px rgba(122, 31, 43, 0.18);
   }
 
@@ -418,7 +364,7 @@
     border: 0;
     outline: 0;
     background: transparent;
-    color: #2a1418;
+    color: #021125;
     font-size: 13.5px;
     height: 100%;
   }
@@ -432,7 +378,7 @@
     gap: 8px;
     border: 0;
     border-radius: 999px;
-    background: linear-gradient(135deg, #8f2a37 0%, #651822 100%);
+    background: linear-gradient(135deg, #072244 0%, #072244 100%);
     color: #ffffff;
     font-size: 14px;
     font-weight: 650;
@@ -460,7 +406,7 @@
 
   .dark .bw-card,
   .dark .swk-card {
-    background: #2a1418;
+    background: #021125;
     border-color: var(--line);
   }
 

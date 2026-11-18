@@ -2,7 +2,12 @@ import Link from 'next/link';
 import { getDb } from '@/server/db';
 import { requireStaffUser } from '@/server/auth/request';
 import { OsBanner } from '@/components/os-banner';
-import { canPrintReceptionQr } from '@/server/engines/swk-enterprise-engine';
+import { StaffAvatar } from '@/components/staff-avatar';
+import { PrintQrStandButton, ReceptionQrScanWidget } from '@/components/reception-qr-client';
+import {
+  canPrintReceptionQr,
+  generateReceptionStandQrSvg,
+} from '@/server/engines/swk-enterprise-engine';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,12 +16,16 @@ const OFFICE_RECEPTION_QR_TOKEN = 'BW-RECEPTION-STAND-DXB-1';
 export default async function ReceptionQrPage({
   searchParams,
 }: {
-  searchParams: Promise<{ print?: string; notice?: string; error?: string }>;
+  searchParams: Promise<{ print?: string; scan?: string; stand?: string; notice?: string; error?: string }>;
 }) {
   const user = await requireStaffUser();
   const sp = await searchParams;
   const wantsPoster = sp.print === '1';
   const allowedToPrint = canPrintReceptionQr(user);
+
+  const scanUrl = `https://os.betterwaymortgages.com/os/reception-qr?scan=1&stand=${OFFICE_RECEPTION_QR_TOKEN}`;
+  const qrSvg = generateReceptionStandQrSvg(scanUrl, '#021125', '#ffffff');
+  const qrDataUri = `data:image/svg+xml;utf8,${encodeURIComponent(qrSvg)}`;
 
   const db = getDb();
   const attendanceLogs = db
@@ -32,111 +41,125 @@ export default async function ReceptionQrPage({
       <OsBanner notice={sp.notice} error={sp.error} />
 
       {/* Header Banner */}
-      <div className="rounded-2xl bg-white text-gray-900 p-6 border border-gray-200 shadow-xs flex flex-wrap items-center justify-between gap-4">
+      <div className="rounded-2xl bg-white text-gray-900 p-6 border border-gray-200 shadow-xs flex flex-wrap items-center justify-between gap-4 print:hidden">
         <div>
-          <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-700">
-            Step 10 · Office Attendance &amp; Punctuality Enforcement
+          <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#8a6518]">
+            Step 10 · SWK-Grade Office Attendance &amp; Anti-Loophole QR Verification
           </div>
-          <h1 className="font-display text-2xl md:text-3xl font-bold mt-1">
+          <h1 className="font-display text-2xl md:text-3xl font-bold mt-1 text-[#021125]">
             Office Reception QR Attendance &amp; Working Hours
           </h1>
-          <p className="text-xs text-gray-500 mt-1 max-w-2xl">
+          <p className="text-xs text-gray-600 mt-1 max-w-2xl">
             Mon–Fri <code>10:00 AM – 7:00 PM</code> · Sat <code>10:00 AM – 4:00 PM</code> · Sun Holiday. Grace window
-            until <code>10:05 AM</code>. Three or more late arrivals in 7 days automatically alert Supreme Owner{' '}
-            <strong>Shabib Siraj</strong> and Operations Manager <strong>Mohammad Haseeb</strong>.
+            until <code>10:05 AM GST</code>. Three or more late arrivals in 7 days automatically alert Supreme Owner{' '}
+            <strong>Shabib Siraj</strong>, Executive Director <strong>Warda</strong>, and Team Manager{' '}
+            <strong>Daniel Xavier</strong>.
           </p>
         </div>
 
-        {/* HARD RULE: Only Owner Shabib Siraj, Admin, or Operations Manager Mohammad Haseeb can open Print QR Poster */}
+        {/* HARD RULE: Only Owner Shabib Siraj, Warda, Admin, or Team Manager Daniel Xavier can open Print QR Poster */}
         {allowedToPrint ? (
           <Link
             href={wantsPoster ? '/os/reception-qr' : '/os/reception-qr?print=1'}
-            className="px-4 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition"
+            className="px-4 py-2.5 rounded-xl bg-[#021125] hover:bg-[#072244] text-[#d7b04e] border border-[#d7b04e]/40 text-xs font-bold transition"
           >
-            {wantsPoster ? 'Close Printable QR Poster' : 'Print Reception QR Poster (Owner / Ops Only)'}
+            {wantsPoster ? 'Close Printable QR Stand' : 'Print Reception QR Stand (Owner / Manager Only)'}
           </Link>
         ) : (
-          <span className="px-3 py-1.5 rounded-lg bg-white/10 border border-white/15 text-[11px] text-gray-500">
-            Poster Printing Restricted to Owner &amp; Operations Manager
+          <span className="px-3 py-1.5 rounded-lg bg-slate-100 border border-slate-200 text-[11px] text-gray-600">
+            QR Stand Printing Restricted to Owner (Shabib Siraj / Warda) &amp; Team Manager (Daniel Xavier)
           </span>
         )}
       </div>
 
-      {/* Printable Reception Stand QR Poster (Restricted by HARD RULE `canPrintReceptionQr`) */}
+      {/* Printable Reception Stand QR Poster (Matches SWK ReceptionQrPage ?print=1) */}
       {wantsPoster && allowedToPrint && (
-        <div className="bg-white rounded-2xl border-2 border-slate-900 p-8 shadow-xl max-w-2xl mx-auto text-center space-y-4">
-          <div className="text-xs font-bold uppercase tracking-[0.25em] text-slate-700">
-            Betterway Mortgages LLC · Dubai Reception Stand Poster
-          </div>
-          <h2 className="font-display text-3xl font-bold text-slate-900">Scan on Arrival Before 10:05 AM</h2>
-          <p className="text-xs text-slate-600 max-w-md mx-auto">
-            Authorized for display at the Betterway Mortgages Reception Desk by <strong>Shabib Siraj</strong> (Owner)
-            &amp; <strong>Mohammad Haseeb</strong> (Operations Manager).
-          </p>
-          <div className="w-56 h-56 mx-auto rounded-2xl bg-slate-900 text-white border-4 border-slate-900 flex flex-col items-center justify-center p-4 shadow-inner">
-            <div className="grid grid-cols-5 gap-1.5 w-32 h-32">
-              {Array.from({ length: 25 }).map((_, idx) => (
-                <div
-                  key={idx}
-                  className={`rounded-sm ${idx % 2 === 0 || idx % 7 === 0 ? 'bg-[#f3e9cf]' : 'bg-gray-900'}`}
-                />
-              ))}
-            </div>
-            <div className="font-num text-[10px] font-bold tracking-widest mt-3 text-slate-700">
-              {OFFICE_RECEPTION_QR_TOKEN}
+        <div className="w-full max-w-md bg-white text-[#021125] rounded-3xl p-8 shadow-2xl border-4 border-[#d7b04e] text-center space-y-5 mx-auto">
+          <div
+            className="flex flex-col items-center justify-center gap-2 rounded-2xl px-5 py-4 mx-auto"
+            style={{
+              background: 'linear-gradient(135deg, #021125 0%, #072244 100%)',
+              border: '1px solid rgba(215, 176, 78, 0.55)',
+            }}
+          >
+            <img src="/brand/logo-white.svg" alt="Betterway Mortgages LLC" className="h-11 w-auto object-contain" />
+            <div className="text-[10px] uppercase tracking-[0.2em] text-[#d7b04e] font-bold">
+              Betterway Mortgages LLC · Office Attendance QR
             </div>
           </div>
-          <div className="text-xs text-slate-700 font-semibold">
-            Mon–Fri: 10:00 AM – 7:00 PM · Sat: 10:00 AM – 4:00 PM · Sun: Official Holiday
+
+          <div className="p-4 bg-white rounded-2xl border-2 border-[#e2e6ea] inline-block mx-auto">
+            <img
+              src={qrDataUri}
+              alt="Betterway Mortgages LLC Office Attendance QR Code"
+              className="w-64 h-64 mx-auto block"
+            />
           </div>
+
+          <div className="space-y-1.5">
+            <h2 className="font-display font-bold text-xl text-[#021125]">Scan to Sign In &amp; Check In</h2>
+            <p className="text-xs text-[#4a5868] leading-relaxed">
+              1. Connect your phone to <b>Betterway-Office-5G</b> Office Wi-Fi.
+              <br />
+              2. Scan this QR code with your phone camera before <b>10:05 AM GST</b>.
+              <br />
+              3. Sign in with your Betterway email &amp; password.
+            </p>
+            <div className="pt-1 text-[11px] font-bold text-[#021125]">
+              Betterway Mortgages LLC · Al Nasr Plaza, Oud Metha, Dubai
+            </div>
+            <div className="text-[10px] font-semibold text-[#8a6518]">
+              Authorized by Shabib Siraj, Warda &amp; Daniel Xavier
+            </div>
+          </div>
+
+          <div className="pt-2 flex items-center justify-center gap-3 print:hidden">
+            <PrintQrStandButton />
+            <Link
+              href="/os/reception-qr"
+              className="px-4 py-2.5 rounded-xl bg-slate-100 text-[#021125] font-semibold text-xs border border-slate-300"
+            >
+              Scan &amp; Check-In View
+            </Link>
+          </div>
+          <div className="text-[10px] font-mono text-slate-400 break-all">{scanUrl}</div>
         </div>
       )}
 
-      {/* Working Hours & Scan Form */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="bw-card p-5 space-y-4">
-          <div>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-700">
-              Reception Stand Check-In
-            </span>
-            <h2 className="font-display text-lg font-bold text-slate-900 mt-0.5">Scan Office Reception QR</h2>
-            <p className="text-xs text-slate-600 mt-1">
-              Logged in as <strong>{user.full_name_en}</strong> ({user.email}). Scanning after <code>10:05 AM</code> is
-              recorded as <strong>LATE</strong>.
-            </p>
-          </div>
+      {/* Working Hours, Live Camera Scan Check-In & Attendance Roll Call */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 print:hidden">
+        <div className="space-y-4">
+          <ReceptionQrScanWidget
+            defaultEmail={user.email}
+            defaultName={user.full_name_en}
+            standCode={sp.stand || OFFICE_RECEPTION_QR_TOKEN}
+          />
 
-          <form method="POST" action="/api/v1/actions" className="space-y-3 text-xs">
-            <input type="hidden" name="action" value="reception_qr_checkin" />
-            <input type="hidden" name="returnTo" value="/os/reception-qr" />
-            <label className="block">
-              <span className="font-semibold text-slate-700">Reception Stand QR Token</span>
-              <input
-                type="text"
-                name="qrStandCode"
-                defaultValue={OFFICE_RECEPTION_QR_TOKEN}
-                required
-                className="bw-input mt-1 w-full font-num"
-              />
-            </label>
-            <label className="block">
-              <span className="font-semibold text-slate-700">Arrival Time (GST HH:MM)</span>
-              <input
-                type="text"
-                name="checkInTimeGst"
-                defaultValue="09:58"
-                required
-                className="bw-input mt-1 w-full font-num"
-              />
-            </label>
-            <label className="block">
-              <span className="font-semibold text-slate-700">Office Wi-Fi SSID</span>
-              <input type="text" name="networkSsid" defaultValue="Betterway-Office-5G" className="bw-input mt-1 w-full" />
-            </label>
-            <button type="submit" className="bw-btn-gold w-full justify-center">
-              Complete Reception QR Check-In
-            </button>
-          </form>
+          {/* Server Form Fallback */}
+          <div className="bw-card p-4 space-y-3">
+            <div className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
+              Manual / Back-Office Time Override (Admin / HR)
+            </div>
+            <form method="POST" action="/api/v1/actions" className="space-y-2.5 text-xs">
+              <input type="hidden" name="action" value="reception_qr_checkin" />
+              <input type="hidden" name="returnTo" value="/os/reception-qr" />
+              <input type="hidden" name="qrStandCode" value={OFFICE_RECEPTION_QR_TOKEN} />
+              <input type="hidden" name="networkSsid" value="Betterway-Office-5G" />
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  name="checkInTimeGst"
+                  defaultValue="09:58"
+                  required
+                  className="bw-input font-num flex-1"
+                  placeholder="HH:MM GST"
+                />
+                <button type="submit" className="bw-btn-navy shrink-0">
+                  Log GST Arrival
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
 
         {/* Continuous Contemptor Alerts + Today's Roll Call */}
@@ -145,9 +168,9 @@ export default async function ReceptionQrPage({
             <div className="flex items-center justify-between mb-3">
               <div>
                 <span className="text-[10px] font-bold uppercase tracking-wider text-rose-700">
-                  10:30 AM Owner &amp; Operations Escalation
+                  10:30 AM Owner &amp; Manager Escalation
                 </span>
-                <h2 className="font-display text-lg font-bold text-slate-900">
+                <h2 className="font-display text-lg font-bold text-[#021125]">
                   Continuous Contemptor Alerts (3+ Late Arrivals in 7 Days)
                 </h2>
               </div>
@@ -157,8 +180,7 @@ export default async function ReceptionQrPage({
             </div>
             {contemptorAlerts.length === 0 ? (
               <p className="text-xs text-slate-600">
-                Zero continuous contemptors in the current 7-day rolling window. All staff within punctuality
-                threshold.
+                Zero continuous contemptors in the current 7-day rolling window. All staff within the 10:05 AM GST punctuality threshold.
               </p>
             ) : (
               <div className="space-y-2">
@@ -167,12 +189,15 @@ export default async function ReceptionQrPage({
                     key={String(c.id)}
                     className="p-3 rounded-xl bg-rose-50/70 border border-rose-200 flex flex-wrap items-center justify-between gap-2 text-xs"
                   >
-                    <div>
-                      <span className="font-bold text-slate-900">{String(c.employee_name)}</span> ({String(c.email)}) —{' '}
-                      <strong className="text-rose-700">{Number(c.late_count_7d)} late arrivals in 7 days</strong>
+                    <div className="flex items-center gap-2.5">
+                      <StaffAvatar name={String(c.employee_name)} email={String(c.email)} size={30} />
+                      <div>
+                        <span className="font-bold text-[#021125]">{String(c.employee_name)}</span> ({String(c.email)}) —{' '}
+                        <strong className="text-rose-700">{Number(c.late_count_7d)} late arrivals in 7 days</strong>
+                      </div>
                     </div>
                     <span className="font-num text-[11px] font-bold text-rose-800">
-                      Notified: Shabib Siraj &amp; Mohammad Haseeb
+                      Notified: Shabib Siraj, Warda &amp; Daniel Xavier
                     </span>
                   </div>
                 ))}
@@ -181,7 +206,7 @@ export default async function ReceptionQrPage({
           </div>
 
           <div className="bw-card p-5">
-            <h2 className="font-display text-lg font-bold text-slate-900 mb-3">
+            <h2 className="font-display text-lg font-bold text-[#021125] mb-3">
               Office Reception Attendance Log ({attendanceLogs.length})
             </h2>
             <div className="overflow-x-auto">
@@ -200,7 +225,12 @@ export default async function ReceptionQrPage({
                   {attendanceLogs.map((a) => (
                     <tr key={String(a.id)}>
                       <td className="py-2.5 px-3 font-num">{String(a.check_in_date)}</td>
-                      <td className="py-2.5 px-3 font-bold text-slate-900">{String(a.employee_name)}</td>
+                      <td className="py-2.5 px-3">
+                        <div className="flex items-center gap-2.5">
+                          <StaffAvatar name={String(a.employee_name)} email={String(a.email)} size={28} />
+                          <span className="font-bold text-[#021125]">{String(a.employee_name)}</span>
+                        </div>
+                      </td>
                       <td className="py-2.5 px-3">{String(a.shift_name)}</td>
                       <td className="py-2.5 px-3 font-num font-bold">{String(a.check_in_time_gst)}</td>
                       <td className="py-2.5 px-3">

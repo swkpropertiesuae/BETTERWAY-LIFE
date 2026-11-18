@@ -402,7 +402,7 @@ export function FintechDashboardClient({
          ===================================================================== */}
       <section
         className="relative overflow-hidden rounded-[26px] text-white"
-        style={{ background: 'linear-gradient(120deg, #111 0%, #2a1418 60%, #3a1d10 125%)' }}
+        style={{ background: 'linear-gradient(120deg, #111 0%, #021125 60%, #3a1d10 125%)' }}
       >
         <div
           className="absolute inset-0 opacity-[.28] bg-cover bg-center mix-blend-luminosity"
@@ -524,7 +524,7 @@ export function FintechDashboardClient({
             title: '3. Commercial, Equity Release & Non-Resident',
             sub: 'Corporate Trade Licence & 2Yr Audit → DSCR & Rental NOI Stress → Non-Resident 60% LTV Matrix → Cross-Sell Takaful, DIFC Wills & Golden Visa',
             to: '/os/los',
-            accent: '#2a1418',
+            accent: '#021125',
           },
         ].map((dept) => (
           <Link
@@ -587,7 +587,7 @@ export function FintechDashboardClient({
             >
               <div>
                 <div className="flex items-center justify-between">
-                  <span className="font-mono text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-[#2a1418] text-[#f4dfd3]">
+                  <span className="font-mono text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-[#021125] text-[#f4dfd3]">
                     {st.step}
                   </span>
                   <ArrowUpRight className="size-3.5 text-[var(--muted)] group-hover:text-[var(--ink)]" />
@@ -611,7 +611,7 @@ export function FintechDashboardClient({
               Betterway Leadership Governance, Office Hours (Mon–Fri 10am–7pm · Sat 10am–4pm · 10:05 AM Grace) &amp; Briefings
             </div>
             <div className="text-[12.5px] text-[var(--muted)]">
-              <strong>Owner:</strong> Shabib Siraj (Full Control &amp; Final Approver) · <strong>Manager:</strong> Mohammad Haseeb (Operations) · <strong>Advisors:</strong> 50–50% Net Commission Split
+              <strong>Leadership:</strong> Shabib Siraj &amp; Warda (Full Control &amp; Final Approver) · <strong>Team Manager:</strong> Daniel Xavier · <strong>Advisors:</strong> 50–50% Net Commission Split
             </div>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
@@ -689,7 +689,7 @@ export function FintechDashboardClient({
                   onClick={() => setActiveTab(t.id as CommandSectionTab)}
                   className={`inline-flex items-center gap-1.5 rounded-[9px] px-3 py-1.5 text-[12.5px] font-semibold whitespace-nowrap transition cursor-pointer ${
                     isAct
-                      ? 'bg-[#2a1418] text-white'
+                      ? 'bg-[#021125] text-white'
                       : 'text-[var(--muted)] hover:bg-[var(--hover)] hover:text-[var(--ink)]'
                   }`}
                 >
@@ -751,7 +751,7 @@ export function FintechDashboardClient({
                 sub: `Subvention Rec: AED ${Math.round(metrics.subventionReceivableFils / 100).toLocaleString('en-US')}`,
                 badge: metrics.isBalanced !== false ? '✓ Balanced' : 'Check',
                 badgeStyle: 'bg-[#f8ecec] text-[#4d6b3a] border-[#4d6b3a]/30',
-                sparkColor: '#2a1418',
+                sparkColor: '#021125',
                 sparkPoints: '0,22 20,18 40,20 60,12 80,9 100,4',
                 onClick: () => setActiveTab('closing'),
               },
@@ -783,7 +783,7 @@ export function FintechDashboardClient({
 
                 <div className="flex items-end justify-between gap-2 w-full">
                   <div>
-                    <div className="font-mono text-2xl font-bold tracking-tight text-[#2a1418] dark:text-[#faf6f0]">
+                    <div className="font-mono text-2xl font-bold tracking-tight text-[#021125] dark:text-[#faf6f0]">
                       {kpi.value}
                     </div>
                     <div className="font-mono text-[11px] text-[#766661] mt-0.5">{kpi.sub}</div>
@@ -808,14 +808,14 @@ export function FintechDashboardClient({
             <div className="col-span-12 lg:col-span-8 bw-card p-5 space-y-4">
               <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#e7dccd] dark:border-[#3a2326] pb-3">
                 <div>
-                  <h2 className="text-sm font-bold text-[#2a1418] dark:text-[#faf6f0]">
+                  <h2 className="text-sm font-bold text-[#021125] dark:text-[#faf6f0]">
                     Pipeline Funnel &amp; Stage Bottleneck Bar
                   </h2>
                   <p className="text-[11px] text-[#766661]">
                     Conversion drop-off and average turnaround days across UAE mortgage origination stages
                   </p>
                 </div>
-                <span className="font-mono text-xs font-semibold text-[#7a1f2b]">
+                <span className="font-mono text-xs font-semibold text-[#021125]">
                   Avg End-to-End Cycle: 21.8 Days
                 </span>
               </div>
@@ -823,7 +823,7 @@ export function FintechDashboardClient({
               <div className="space-y-2.5">
                 {PIPELINE_FUNNEL_STAGES.map((s) => (
                   <div key={s.stage} className="grid grid-cols-12 items-center gap-3 text-xs">
-                    <div className="col-span-5 sm:col-span-4 font-semibold text-[#2a1418] dark:text-[#faf6f0] truncate">
+                    <div className="col-span-5 sm:col-span-4 font-semibold text-[#021125] dark:text-[#faf6f0] truncate">
                       {s.stage}
                     </div>
                     <div className="col-span-4 sm:col-span-5">
@@ -832,21 +832,21 @@ export function FintechDashboardClient({
                           className={`h-full rounded-[3px] ${
                             s.status === 'warning'
                               ? 'bg-[#a8741a]'
-                              : 'bg-[#2a1418] dark:bg-[#c9a257]'
+                              : 'bg-[#021125] dark:bg-[#c9a257]'
                           }`}
                           style={{ width: `${s.pct}%` }}
                         />
                       </div>
                     </div>
                     <div className="col-span-3 flex items-center justify-end gap-2 font-mono text-[11px]">
-                      <span className="font-bold text-[#2a1418] dark:text-[#faf6f0]">
+                      <span className="font-bold text-[#021125] dark:text-[#faf6f0]">
                         {s.files} ({s.volumeM})
                       </span>
                       <span
                         className={`px-1.5 py-0.5 rounded font-semibold ${
                           s.status === 'warning'
                             ? 'bg-[#f9f3e3] text-[#a8741a]'
-                            : 'bg-[#f8ecec] text-[#7a1f2b]'
+                            : 'bg-[#f8ecec] text-[#021125]'
                         }`}
                       >
                         {s.avgDays}d
@@ -860,45 +860,45 @@ export function FintechDashboardClient({
               <div className="pt-3 border-t border-[#e7dccd] dark:border-[#3a2326] grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
                 <Link
                   href="/os/accounts-expenses"
-                  className="rounded-[6px] border border-[#e7dccd] dark:border-[#3a2326] bg-[#faf6f0] dark:bg-[#231115] p-2.5 hover:border-[#7a1f2b]"
+                  className="rounded-[6px] border border-[#e7dccd] dark:border-[#3a2326] bg-[#faf6f0] dark:bg-[#231115] p-2.5 hover:border-[#021125]"
                 >
                   <span className="text-[10px] font-bold uppercase text-[#766661] block">
                     Treasury Cash (GL 1100)
                   </span>
-                  <strong className="font-mono text-sm text-[#2a1418] dark:text-[#faf6f0]">
+                  <strong className="font-mono text-sm text-[#021125] dark:text-[#faf6f0]">
                     AED {Math.round(metrics.bankCashFils / 100).toLocaleString('en-US')}
                   </strong>
                 </Link>
                 <Link
                   href="/os/erp"
-                  className="rounded-[6px] border border-[#e7dccd] dark:border-[#3a2326] bg-[#faf6f0] dark:bg-[#231115] p-2.5 hover:border-[#7a1f2b]"
+                  className="rounded-[6px] border border-[#e7dccd] dark:border-[#3a2326] bg-[#faf6f0] dark:bg-[#231115] p-2.5 hover:border-[#021125]"
                 >
                   <span className="text-[10px] font-bold uppercase text-[#766661] block">
                     Subvention Rec. (GL 1200)
                   </span>
-                  <strong className="font-mono text-sm text-[#7a1f2b]">
+                  <strong className="font-mono text-sm text-[#021125]">
                     AED {Math.round(metrics.subventionReceivableFils / 100).toLocaleString('en-US')}
                   </strong>
                 </Link>
                 <Link
                   href="/os/loan-risk-pdc"
-                  className="rounded-[6px] border border-[#e7dccd] dark:border-[#3a2326] bg-[#faf6f0] dark:bg-[#231115] p-2.5 hover:border-[#7a1f2b]"
+                  className="rounded-[6px] border border-[#e7dccd] dark:border-[#3a2326] bg-[#faf6f0] dark:bg-[#231115] p-2.5 hover:border-[#021125]"
                 >
                   <span className="text-[10px] font-bold uppercase text-[#766661] block">
                     PDC Safe Vault ({metrics.pdcVaultCount})
                   </span>
-                  <strong className="font-mono text-sm text-[#2a1418] dark:text-[#faf6f0]">
+                  <strong className="font-mono text-sm text-[#021125] dark:text-[#faf6f0]">
                     AED {Math.round(metrics.pdcVaultFils / 100).toLocaleString('en-US')}
                   </strong>
                 </Link>
                 <Link
                   href="/os/accounts-expenses"
-                  className="rounded-[6px] border border-[#e7dccd] dark:border-[#3a2326] bg-[#faf6f0] dark:bg-[#231115] p-2.5 hover:border-[#7a1f2b]"
+                  className="rounded-[6px] border border-[#e7dccd] dark:border-[#3a2326] bg-[#faf6f0] dark:bg-[#231115] p-2.5 hover:border-[#021125]"
                 >
                   <span className="text-[10px] font-bold uppercase text-[#766661] block">
                     Net Profit After Tax
                   </span>
-                  <strong className="font-mono text-sm text-[#7a1f2b]">
+                  <strong className="font-mono text-sm text-[#021125]">
                     AED {Math.round(metrics.netProfitFils / 100).toLocaleString('en-US')}
                   </strong>
                 </Link>
@@ -965,7 +965,7 @@ export function FintechDashboardClient({
                           <button
                             type="button"
                             onClick={() => setNudgedIds((prev) => ({ ...prev, [deal.id]: true }))}
-                            className="px-2.5 py-1 rounded-md bg-[#2a1418] text-white font-semibold text-[11px] cursor-pointer"
+                            className="px-2.5 py-1 rounded-md bg-[#021125] text-white font-semibold text-[11px] cursor-pointer"
                           >
                             {isNudged ? '✓ Nudge Dispatched' : 'Nudge Client'}
                           </button>
@@ -988,7 +988,7 @@ export function FintechDashboardClient({
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#e7dccd] dark:border-[#3a2326] pb-3">
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-base font-bold text-[#2a1418] dark:text-[#faf6f0]">
+                <h2 className="text-base font-bold text-[#021125] dark:text-[#faf6f0]">
                   Mortgage Pipeline (Click Any Client to Open Slide-Over Deal Drawer)
                 </h2>
                 <span className="bw-badge font-mono">{mergedDeals.length} Active Files</span>
@@ -1005,7 +1005,7 @@ export function FintechDashboardClient({
                   onClick={() => setPipelineView('table')}
                   className={`inline-flex items-center gap-1.5 rounded-[4px] px-3 py-1 font-semibold cursor-pointer ${
                     pipelineView === 'table'
-                      ? 'bg-[#2a1418] text-white dark:bg-[#faf6f0] dark:text-[#231115]'
+                      ? 'bg-[#021125] text-white dark:bg-[#faf6f0] dark:text-[#231115]'
                       : 'text-[#766661]'
                   }`}
                 >
@@ -1017,7 +1017,7 @@ export function FintechDashboardClient({
                   onClick={() => setPipelineView('kanban')}
                   className={`inline-flex items-center gap-1.5 rounded-[4px] px-3 py-1 font-semibold cursor-pointer ${
                     pipelineView === 'kanban'
-                      ? 'bg-[#2a1418] text-white dark:bg-[#faf6f0] dark:text-[#231115]'
+                      ? 'bg-[#021125] text-white dark:bg-[#faf6f0] dark:text-[#231115]'
                       : 'text-[#766661]'
                   }`}
                 >
@@ -1059,7 +1059,7 @@ export function FintechDashboardClient({
                       >
                         <td className="py-3 pr-3">
                           <div className="flex items-center gap-2">
-                            <span className="font-bold text-[#2a1418] dark:text-[#faf6f0]">
+                            <span className="font-bold text-[#021125] dark:text-[#faf6f0]">
                               {deal.borrowerName}
                             </span>
                             <span className="rounded-[4px] border border-[#e7dccd] dark:border-[#3a2326] bg-[#faf6f0] dark:bg-[#231115] px-1.5 py-0.5 text-[10px] font-semibold text-[#766661]">
@@ -1072,19 +1072,19 @@ export function FintechDashboardClient({
                         </td>
 
                         <td className="py-3 px-3">
-                          <div className="font-semibold text-[#2a1418] dark:text-[#faf6f0]">
+                          <div className="font-semibold text-[#021125] dark:text-[#faf6f0]">
                             {deal.propertyTitle}
                           </div>
-                          <div className="font-mono text-[11px] text-[#7a1f2b] font-semibold">
+                          <div className="font-mono text-[11px] text-[#021125] font-semibold">
                             AED {(deal.loanAmountAed / 1000000).toFixed(2)}M • {deal.ltvPct}% LTV
                           </div>
                         </td>
 
                         <td className="py-3 px-3">
-                          <span className="inline-flex items-center gap-1.5 rounded-[4px] bg-[#2a1418] text-white dark:bg-[#faf6f0] dark:text-[#231115] px-2 py-0.5 font-mono text-[11px] font-bold">
+                          <span className="inline-flex items-center gap-1.5 rounded-[4px] bg-[#021125] text-white dark:bg-[#faf6f0] dark:text-[#231115] px-2 py-0.5 font-mono text-[11px] font-bold">
                             {deal.selectedBank}
                           </span>
-                          <span className="ml-2 font-mono text-xs font-semibold text-[#2a1418] dark:text-[#faf6f0]">
+                          <span className="ml-2 font-mono text-xs font-semibold text-[#021125] dark:text-[#faf6f0]">
                             {deal.rateLabel}
                           </span>
                         </td>
@@ -1093,7 +1093,7 @@ export function FintechDashboardClient({
                           <span
                             className={`inline-flex items-center rounded-[4px] px-2 py-0.5 font-mono text-xs font-bold border ${
                               deal.dbrPct <= 45
-                                ? 'bg-[#f8ecec] text-[#7a1f2b] border-[#7a1f2b]/30'
+                                ? 'bg-[#f8ecec] text-[#021125] border-[#021125]/30'
                                 : deal.dbrPct <= 50
                                   ? 'bg-[#f9f3e3] text-[#a8741a] border-[#a8741a]/30'
                                   : 'bg-[#fbebe7] text-[#c8321f] border-[#c8321f]/30'
@@ -1120,7 +1120,7 @@ export function FintechDashboardClient({
                                 cy="14"
                                 r={r}
                                 fill="none"
-                                stroke="#7a1f2b"
+                                stroke="#021125"
                                 strokeWidth="3"
                                 strokeDasharray={`${dash} ${circ}`}
                                 strokeLinecap="round"
@@ -1145,7 +1145,7 @@ export function FintechDashboardClient({
                             className="bw-btn-ghost text-[11px]"
                           >
                             <span>{deal.stage}</span>
-                            <PanelRightOpen className="size-3.5 text-[#7a1f2b]" />
+                            <PanelRightOpen className="size-3.5 text-[#021125]" />
                           </button>
                         </td>
                       </tr>
@@ -1160,10 +1160,10 @@ export function FintechDashboardClient({
                 <div
                   key={`${deal.id}-${deal.dealRef}`}
                   onClick={() => openDealDrawer(deal)}
-                  className="rounded-[6px] border border-[#e7dccd] dark:border-[#3a2326] bg-[#faf6f0] dark:bg-[#231115] p-3.5 space-y-2.5 hover:border-[#7a1f2b] transition cursor-pointer"
+                  className="rounded-[6px] border border-[#e7dccd] dark:border-[#3a2326] bg-[#faf6f0] dark:bg-[#231115] p-3.5 space-y-2.5 hover:border-[#021125] transition cursor-pointer"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded bg-[#2a1418] text-white">
+                    <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded bg-[#021125] text-white">
                       {deal.stage}
                     </span>
                     <span className="font-mono text-[10px] text-[#766661]">
@@ -1171,13 +1171,13 @@ export function FintechDashboardClient({
                     </span>
                   </div>
                   <div>
-                    <p className="font-bold text-sm text-[#2a1418] dark:text-[#faf6f0]">
+                    <p className="font-bold text-sm text-[#021125] dark:text-[#faf6f0]">
                       {deal.borrowerName}
                     </p>
                     <p className="text-[11px] text-[#766661] truncate">{deal.propertyTitle}</p>
                   </div>
                   <div className="flex items-center justify-between font-mono text-xs">
-                    <span className="font-bold text-[#7a1f2b]">
+                    <span className="font-bold text-[#021125]">
                       AED {(deal.loanAmountAed / 1000000).toFixed(2)}M ({deal.ltvPct}% LTV)
                     </span>
                     <span className="font-semibold">
@@ -1188,7 +1188,7 @@ export function FintechDashboardClient({
                     <span
                       className={`px-1.5 py-0.5 rounded font-bold ${
                         deal.dbrPct <= 45
-                          ? 'bg-[#f8ecec] text-[#7a1f2b]'
+                          ? 'bg-[#f8ecec] text-[#021125]'
                           : deal.dbrPct <= 50
                             ? 'bg-[#f9f3e3] text-[#a8741a]'
                             : 'bg-[#fbebe7] text-[#c8321f]'
@@ -1215,10 +1215,10 @@ export function FintechDashboardClient({
           {/* Left Panel (5 cols): Interactive Input Controls & Live CBUAE Gauges */}
           <div className="col-span-12 lg:col-span-5 bw-card p-5 space-y-4">
             <div className="border-b border-[#e7dccd] dark:border-[#3a2326] pb-3">
-              <span className="font-mono text-[10px] font-bold uppercase text-[#7a1f2b]">
+              <span className="font-mono text-[10px] font-bold uppercase text-[#021125]">
                 Live CBUAE Underwriting Engine
               </span>
-              <h2 className="text-base font-bold text-[#2a1418] dark:text-[#faf6f0]">
+              <h2 className="text-base font-bold text-[#021125] dark:text-[#faf6f0]">
                 Eligibility &amp; 50.0% DBR Stress Calculator
               </h2>
             </div>
@@ -1229,7 +1229,7 @@ export function FintechDashboardClient({
                 <span className="text-[10px] font-bold uppercase text-[#766661]">
                   Max Loan Eligible
                 </span>
-                <p className="font-mono text-sm sm:text-base font-bold text-[#7a1f2b] mt-0.5">
+                <p className="font-mono text-sm sm:text-base font-bold text-[#021125] mt-0.5">
                   AED {(maxLoanEligibleAed / 1000000).toFixed(2)}M
                 </p>
               </div>
@@ -1241,7 +1241,7 @@ export function FintechDashboardClient({
                 <p
                   className={`font-mono text-sm sm:text-base font-bold mt-0.5 ${
                     calculatedDbrPct <= 45
-                      ? 'text-[#7a1f2b]'
+                      ? 'text-[#021125]'
                       : calculatedDbrPct <= 50
                         ? 'text-[#a8741a]'
                         : 'text-[#c8321f]'
@@ -1256,7 +1256,7 @@ export function FintechDashboardClient({
                 <span className="text-[10px] font-bold uppercase text-[#766661]">
                   Upfront Cash Req.
                 </span>
-                <p className="font-mono text-sm sm:text-base font-bold text-[#2a1418] dark:text-[#faf6f0] mt-0.5">
+                <p className="font-mono text-sm sm:text-base font-bold text-[#021125] dark:text-[#faf6f0] mt-0.5">
                   AED {Math.round(totalUpfrontCashAed / 1000).toLocaleString('en-US')}k
                 </p>
               </div>
@@ -1272,7 +1272,7 @@ export function FintechDashboardClient({
                 <div
                   className={`h-full transition-all ${
                     calculatedDbrPct <= 45
-                      ? 'bg-[#7a1f2b]'
+                      ? 'bg-[#021125]'
                       : calculatedDbrPct <= 50
                         ? 'bg-[#a8741a]'
                         : 'bg-[#c8321f]'
@@ -1302,7 +1302,7 @@ export function FintechDashboardClient({
                   step={100000}
                   value={propValueAed}
                   onChange={(e) => setPropValueAed(Number(e.target.value))}
-                  className="w-full accent-[#2a1418]"
+                  className="w-full accent-[#021125]"
                 />
               </div>
 
@@ -1367,10 +1367,10 @@ export function FintechDashboardClient({
           <div className="col-span-12 lg:col-span-7 bw-card p-5 flex flex-col justify-between space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#e7dccd] dark:border-[#3a2326] pb-3">
               <div>
-                <span className="font-mono text-[10px] font-bold uppercase text-[#7a1f2b]">
+                <span className="font-mono text-[10px] font-bold uppercase text-[#021125]">
                   Multi-Bank Comparison Matrix ({selectedBanks.length}/3 Selected)
                 </span>
-                <h2 className="text-base font-bold text-[#2a1418] dark:text-[#faf6f0]">
+                <h2 className="text-base font-bold text-[#021125] dark:text-[#faf6f0]">
                   Ranked UAE Bank Offers for AED {loanAmountAed.toLocaleString('en-US')} Loan
                 </h2>
               </div>
@@ -1409,8 +1409,8 @@ export function FintechDashboardClient({
                     onClick={() => toggleBankSelection(bank.code)}
                     className={`rounded-[6px] border p-3.5 text-xs space-y-2 transition cursor-pointer ${
                       isSelected
-                        ? 'border-[#7a1f2b] bg-[#f8ecec]/50 dark:bg-[#7a1f2b]/10'
-                        : 'border-[#e7dccd] dark:border-[#3a2326] bg-white dark:bg-[#2a1418]'
+                        ? 'border-[#021125] bg-[#f8ecec]/50 dark:bg-[#021125]/10'
+                        : 'border-[#e7dccd] dark:border-[#3a2326] bg-white dark:bg-[#021125]'
                     }`}
                   >
                     <div className="flex items-center justify-between">
@@ -1419,19 +1419,19 @@ export function FintechDashboardClient({
                           type="checkbox"
                           checked={isSelected}
                           onChange={() => {}}
-                          className="accent-[#7a1f2b]"
+                          className="accent-[#021125]"
                         />
-                        <span className="font-mono font-bold px-1.5 py-0.5 rounded bg-[#2a1418] text-white text-[10px]">
+                        <span className="font-mono font-bold px-1.5 py-0.5 rounded bg-[#021125] text-white text-[10px]">
                           {bank.code}
                         </span>
-                        <span className="font-bold text-[#2a1418] dark:text-[#faf6f0]">
+                        <span className="font-bold text-[#021125] dark:text-[#faf6f0]">
                           {bank.name}
                         </span>
                       </div>
                       <span
                         className={`font-mono text-[10px] font-bold px-1.5 py-0.5 rounded ${
                           isEligible
-                            ? 'bg-[#f8ecec] text-[#7a1f2b]'
+                            ? 'bg-[#f8ecec] text-[#021125]'
                             : 'bg-[#fbebe7] text-[#c8321f]'
                         }`}
                       >
@@ -1442,14 +1442,14 @@ export function FintechDashboardClient({
                     <div className="grid grid-cols-3 gap-2 pt-1 font-mono">
                       <div>
                         <span className="text-[10px] text-[#766661] block">Fixed Rate</span>
-                        <strong className="text-sm text-[#2a1418] dark:text-[#faf6f0]">
+                        <strong className="text-sm text-[#021125] dark:text-[#faf6f0]">
                           {bank.fixedRatePct.toFixed(2)}%
                         </strong>
                         <span className="block text-[10px] text-[#766661]">{bank.fixedTerm}</span>
                       </div>
                       <div>
                         <span className="text-[10px] text-[#766661] block">Monthly EMI</span>
-                        <strong className="text-sm text-[#7a1f2b]">
+                        <strong className="text-sm text-[#021125]">
                           AED {emi.toLocaleString('en-US')}
                         </strong>
                         <span className="block text-[10px] text-[#766661]">
@@ -1458,7 +1458,7 @@ export function FintechDashboardClient({
                       </div>
                       <div>
                         <span className="text-[10px] text-[#766661] block">Reversion</span>
-                        <strong className="text-[11px] text-[#2a1418] dark:text-[#faf6f0]">
+                        <strong className="text-[11px] text-[#021125] dark:text-[#faf6f0]">
                           {bank.reversionLabel}
                         </strong>
                         <span className="block text-[10px] text-[#766661]">
@@ -1481,15 +1481,15 @@ export function FintechDashboardClient({
         <section className="bw-card p-5 space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#e7dccd] dark:border-[#3a2326] pb-3">
             <div>
-              <span className="font-mono text-[10px] font-bold uppercase text-[#7a1f2b]">
+              <span className="font-mono text-[10px] font-bold uppercase text-[#021125]">
                 AES-256-GCM Encrypted Vault &amp; Local Stirling-PDF Worker
               </span>
-              <h2 className="text-base font-bold text-[#2a1418] dark:text-[#faf6f0]">
+              <h2 className="text-base font-bold text-[#021125] dark:text-[#faf6f0]">
                 Intelligent Document Vault &amp; In-App OCR Split-Viewer
               </h2>
             </div>
             {vaultBanner && (
-              <span className="font-mono text-xs font-semibold px-3 py-1 rounded bg-[#f8ecec] text-[#7a1f2b] border border-[#7a1f2b]/30">
+              <span className="font-mono text-xs font-semibold px-3 py-1 rounded bg-[#f8ecec] text-[#021125] border border-[#021125]/30">
                 {vaultBanner}
               </span>
             )}
@@ -1508,7 +1508,7 @@ export function FintechDashboardClient({
                     onClick={() => setActiveDocId(item.id)}
                     className={`w-full text-left rounded-[6px] border p-3 text-xs transition cursor-pointer ${
                       isAct
-                        ? 'border-[#2a1418] dark:border-[#c9a257] bg-[#faf6f0] dark:bg-[#231115]'
+                        ? 'border-[#021125] dark:border-[#c9a257] bg-[#faf6f0] dark:bg-[#231115]'
                         : 'border-[#e7dccd] dark:border-[#3a2326]'
                     }`}
                   >
@@ -1519,7 +1519,7 @@ export function FintechDashboardClient({
                       <span
                         className={`font-mono text-[10px] font-bold px-1.5 py-0.5 rounded ${
                           st === 'VERIFIED'
-                            ? 'bg-[#f8ecec] text-[#7a1f2b]'
+                            ? 'bg-[#f8ecec] text-[#021125]'
                             : st === 'REJECTED_WA'
                               ? 'bg-[#fbebe7] text-[#c8321f]'
                               : 'bg-[#f9f3e3] text-[#a8741a]'
@@ -1528,7 +1528,7 @@ export function FintechDashboardClient({
                         {st}
                       </span>
                     </div>
-                    <p className="font-semibold text-[#2a1418] dark:text-[#faf6f0] mt-1">
+                    <p className="font-semibold text-[#021125] dark:text-[#faf6f0] mt-1">
                       {item.title}
                     </p>
                   </button>
@@ -1540,14 +1540,14 @@ export function FintechDashboardClient({
             <div className="col-span-12 lg:col-span-5 rounded-[6px] border border-[#e7dccd] dark:border-[#3a2326] bg-[#faf6f0] dark:bg-[#231115] p-4 space-y-3">
               <div className="flex items-center justify-between border-b border-[#e7dccd] dark:border-[#3a2326] pb-2.5">
                 <div>
-                  <span className="font-mono text-[10px] font-bold text-[#7a1f2b] uppercase">
+                  <span className="font-mono text-[10px] font-bold text-[#021125] uppercase">
                     In-App OCR Key-Value Overlay
                   </span>
-                  <h3 className="text-xs font-bold text-[#2a1418] dark:text-[#faf6f0]">
+                  <h3 className="text-xs font-bold text-[#021125] dark:text-[#faf6f0]">
                     {activeDoc.title}
                   </h3>
                 </div>
-                <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-white dark:bg-[#2a1418] border border-[#e7dccd] dark:border-[#3a2326]">
+                <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-white dark:bg-[#021125] border border-[#e7dccd] dark:border-[#3a2326]">
                   Confidence: 99.4%
                 </span>
               </div>
@@ -1556,10 +1556,10 @@ export function FintechDashboardClient({
                 {activeDoc.ocrFields.map((f) => (
                   <div
                     key={f.key}
-                    className="flex items-center justify-between rounded-[4px] bg-white dark:bg-[#2a1418] border border-[#e7dccd] dark:border-[#3a2326] px-3 py-2 text-xs"
+                    className="flex items-center justify-between rounded-[4px] bg-white dark:bg-[#021125] border border-[#e7dccd] dark:border-[#3a2326] px-3 py-2 text-xs"
                   >
                     <span className="text-[#766661]">{f.key}</span>
-                    <span className="font-mono font-bold text-[#2a1418] dark:text-[#faf6f0]">
+                    <span className="font-mono font-bold text-[#021125] dark:text-[#faf6f0]">
                       {f.val}
                     </span>
                   </div>
@@ -1615,7 +1615,7 @@ export function FintechDashboardClient({
 
               <Link
                 href="/os/compliance"
-                className="text-center text-xs font-semibold text-[#7a1f2b] hover:underline"
+                className="text-center text-xs font-semibold text-[#021125] hover:underline"
               >
                 Open Full KFS &amp; goAML Vault →
               </Link>
@@ -1631,10 +1631,10 @@ export function FintechDashboardClient({
         <section className="bw-card p-5 space-y-4">
           <div className="flex items-center justify-between border-b border-[#e7dccd] dark:border-[#3a2326] pb-3">
             <div>
-              <span className="font-mono text-[10px] font-bold uppercase text-[#7a1f2b]">
+              <span className="font-mono text-[10px] font-bold uppercase text-[#021125]">
                 Al Manara DLD Registration Trustee
               </span>
-              <h2 className="text-base font-bold text-[#2a1418] dark:text-[#faf6f0]">
+              <h2 className="text-base font-bold text-[#021125] dark:text-[#faf6f0]">
                 DLD Transfer &amp; Manager&apos;s Cheque Day-of-Closing Sheet
               </h2>
             </div>
@@ -1656,7 +1656,7 @@ export function FintechDashboardClient({
                 key={st.label}
                 className={`rounded-[6px] border p-2.5 text-[11px] ${
                   st.done
-                    ? 'border-[#7a1f2b]/40 bg-[#f8ecec] text-[#7a1f2b]'
+                    ? 'border-[#021125]/40 bg-[#f8ecec] text-[#021125]'
                     : st.active
                       ? 'border-[#a8741a] bg-[#f9f3e3] text-[#a8741a]'
                       : 'border-[#e7dccd] text-[#766661]'
@@ -1665,7 +1665,7 @@ export function FintechDashboardClient({
                 <div className="font-mono text-[10px] font-bold">
                   0{idx + 1} • {st.date}
                 </div>
-                <div className="font-semibold text-[#2a1418] dark:text-[#faf6f0] mt-0.5 leading-tight">
+                <div className="font-semibold text-[#021125] dark:text-[#faf6f0] mt-0.5 leading-tight">
                   {st.label}
                 </div>
               </div>
@@ -1692,12 +1692,12 @@ export function FintechDashboardClient({
                   ['5. RERA Brokerage Commission (2% + 5% VAT)', 'Buyer Manager Chq', 'Held in Safe Vault Custody', '88,200.00'],
                 ].map(([payee, src, ver, amt]) => (
                   <tr key={payee}>
-                    <td className="py-2.5 font-sans font-semibold text-[#2a1418] dark:text-[#faf6f0]">
+                    <td className="py-2.5 font-sans font-semibold text-[#021125] dark:text-[#faf6f0]">
                       {payee}
                     </td>
                     <td className="py-2.5 text-[#766661] text-[11px]">{src}</td>
-                    <td className="py-2.5 font-sans text-[11px] text-[#7a1f2b] font-medium">{ver}</td>
-                    <td className="py-2.5 text-right font-bold text-[#2a1418] dark:text-[#faf6f0]">
+                    <td className="py-2.5 font-sans text-[11px] text-[#021125] font-medium">{ver}</td>
+                    <td className="py-2.5 text-right font-bold text-[#021125] dark:text-[#faf6f0]">
                       AED {amt}
                     </td>
                   </tr>
@@ -1715,10 +1715,10 @@ export function FintechDashboardClient({
         <section className="bw-card p-5 space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#e7dccd] dark:border-[#3a2326] pb-3">
             <div>
-              <span className="font-mono text-[10px] font-bold uppercase text-[#7a1f2b]">
+              <span className="font-mono text-[10px] font-bold uppercase text-[#021125]">
                 Pay-When-Paid Waterfall &amp; 5% FTA VAT 201
               </span>
-              <h2 className="text-base font-bold text-[#2a1418] dark:text-[#faf6f0]">
+              <h2 className="text-base font-bold text-[#021125] dark:text-[#faf6f0]">
                 Commission, Clawback &amp; UAE VAT Ledger
               </h2>
             </div>
@@ -1750,7 +1750,7 @@ export function FintechDashboardClient({
                 {mergedCommissions.map((row, idx) => (
                   <tr key={`${row.dealId}-${idx}`}>
                     <td className="py-2.5">
-                      <div className="font-bold text-[#2a1418] dark:text-[#faf6f0]">
+                      <div className="font-bold text-[#021125] dark:text-[#faf6f0]">
                         {row.dealId}
                       </div>
                       <div className="font-sans text-[11px] text-[#766661]">{row.client}</div>
@@ -1767,17 +1767,17 @@ export function FintechDashboardClient({
                     <td className="py-2.5 text-right text-[#766661]">
                       -AED {row.partnerCutAed.toLocaleString('en-US')}
                     </td>
-                    <td className="py-2.5 text-right font-bold text-[#7a1f2b]">
+                    <td className="py-2.5 text-right font-bold text-[#021125]">
                       AED {row.advisorSplitAed.toLocaleString('en-US')}
                     </td>
-                    <td className="py-2.5 text-right text-[#2a1418] dark:text-[#faf6f0]">
+                    <td className="py-2.5 text-right text-[#021125] dark:text-[#faf6f0]">
                       AED {row.vat5PctAed.toLocaleString('en-US')}
                     </td>
                     <td className="py-2.5 text-right">
                       <span
                         className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-bold ${
                           row.status === 'Paid'
-                            ? 'bg-[#f8ecec] text-[#7a1f2b]'
+                            ? 'bg-[#f8ecec] text-[#021125]'
                             : row.status === 'Sent to Bank'
                               ? 'bg-[#f9f3e3] text-[#a8741a]'
                               : 'bg-[#f1ebe1] text-[#766661]'

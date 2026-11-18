@@ -17,6 +17,7 @@ import {
   Sparkles,
   UserCheck,
 } from 'lucide-react';
+import { StaffAvatar } from '@/components/staff-avatar';
 
 export interface InboxLeadItem {
   id: number;
@@ -157,7 +158,7 @@ export function InboxClient({
                 onClick={() => setFilter(tab.id)}
                 className={`px-2.5 py-1 rounded-full text-[11px] font-semibold transition-colors ${
                   filter === tab.id
-                    ? 'bg-[#2a1418] text-white'
+                    ? 'bg-[#021125] text-white'
                     : 'bg-white text-[var(--text-2)] border border-[var(--border)] hover:text-[var(--text)]'
                 }`}
               >
@@ -177,7 +178,7 @@ export function InboxClient({
                 type="button"
                 onClick={() => setSelectedLeadId(lead.id)}
                 className={`w-full text-left p-3.5 transition-colors hover:bg-white ${
-                  active ? 'bg-white border-l-[3px] border-l-[#7a1f2b]' : ''
+                  active ? 'bg-white border-l-[3px] border-l-[#021125]' : ''
                 }`}
               >
                 <div className="flex items-center justify-between gap-2">
@@ -202,12 +203,13 @@ export function InboxClient({
                     {lead.sourceChannel}
                   </span>
                   {aiOn ? (
-                    <span className="inline-flex items-center gap-1 text-[10.5px] font-semibold text-[#7a1f2b]">
+                    <span className="inline-flex items-center gap-1 text-[10.5px] font-semibold text-[#021125]">
                       <Bot className="w-3 h-3" /> AI Active
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1 text-[10.5px] font-medium text-emerald-700">
-                      <UserCheck className="w-3 h-3" /> {lead.advisorName.split(' ')[0]}
+                    <span className="inline-flex items-center gap-1.5 text-[10.5px] font-medium text-emerald-700">
+                      <StaffAvatar name={lead.advisorName} size={18} />
+                      <span>{lead.advisorName.split(' ')[0]}</span>
                     </span>
                   )}
                 </div>
@@ -228,7 +230,7 @@ export function InboxClient({
                   <h3 className="font-bold text-[15px] text-[var(--text)]">{activeLead.contactName}</h3>
                   <span className="bw-badge bg-[var(--bg-2)] text-[var(--text-2)]">{activeLead.stage}</span>
                   {isAiActive && (
-                    <span className="bw-badge bg-[#7a1f2b]/12 text-[#7a1f2b] border-[#7a1f2b]/25">
+                    <span className="bw-badge bg-[#021125]/12 text-[#021125] border-[#021125]/25">
                       <Bot className="w-3 h-3" /> AI Concierge Responding
                     </span>
                   )}
@@ -271,16 +273,16 @@ export function InboxClient({
                         isInternal
                           ? 'bg-amber-50/90 border-amber-300 text-amber-950'
                           : isAi
-                            ? 'bg-[#f6e6e6] border-[#7a1f2b]/30 text-[#2a1418]'
+                            ? 'bg-[#faf3e0] border-[#021125]/30 text-[#021125]'
                             : isClient
                               ? 'bg-white border-[var(--border)] text-[var(--text)]'
-                              : 'bg-[#2a1418] border-[#2a1418] text-white'
+                              : 'bg-[#021125] border-[#021125] text-white'
                       }`}
                     >
                       <div className="flex items-center justify-between gap-4 mb-1.5 text-[10.5px] opacity-75 font-medium">
                         <span className="inline-flex items-center gap-1 font-semibold">
                           {isInternal && <Lock className="w-3 h-3 text-amber-700" />}
-                          {isAi && <Sparkles className="w-3 h-3 text-[#7a1f2b]" />}
+                          {isAi && <Sparkles className="w-3 h-3 text-[#021125]" />}
                           {m.channel} · {m.senderName}
                         </span>
                         <span className="font-num">{m.createdAt}</span>
@@ -319,7 +321,7 @@ export function InboxClient({
                           channel === ch.id
                             ? ch.id === 'INTERNAL_NOTE'
                               ? 'bg-amber-600 text-white'
-                              : 'bg-[#2a1418] text-white'
+                              : 'bg-[#021125] text-white'
                             : 'bg-[var(--bg-2)] text-[var(--text-2)] hover:text-[var(--text)]'
                         }`}
                       >
@@ -333,7 +335,7 @@ export function InboxClient({
                 <button
                   type="button"
                   onClick={generateAiSuggestion}
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-[#7a1f2b]/12 text-[#7a1f2b] hover:bg-[#7a1f2b]/20 transition-colors"
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-[#021125]/12 text-[#021125] hover:bg-[#021125]/20 transition-colors"
                 >
                   <Sparkles className="w-3 h-3" />
                   AI Draft Reply
@@ -412,10 +414,10 @@ export function InboxClient({
                 Matched UAE Bank Offers (Click to Insert)
               </div>
               {RECOMMENDED_BANK_OFFERS.map((offer) => (
-                <div key={offer.code} className="bw-card p-3 space-y-1.5 hover:border-[#7a1f2b]/40 transition-colors">
+                <div key={offer.code} className="bw-card p-3 space-y-1.5 hover:border-[#021125]/40 transition-colors">
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-xs text-[var(--text)]">{offer.bank}</span>
-                    <span className="font-num font-bold text-xs text-[#7a1f2b]">{offer.rate}</span>
+                    <span className="font-num font-bold text-xs text-[#021125]">{offer.rate}</span>
                   </div>
                   <div className="text-[11px] text-[var(--text-3)]">
                     {offer.ltv} · Reversion: <span className="font-num">{offer.reversion}</span>
@@ -428,7 +430,7 @@ export function InboxClient({
                         `Hi ${activeLead.contactName.split(' ')[0]}, we have matched your AED ${activeLead.targetPropertyAed.toLocaleString('en-US')} purchase with ${offer.bank} at ${offer.rate} (${offer.ltv}, ${offer.note}). Shall I send your Key Facts Statement (KFS)?`,
                       )
                     }
-                    className="w-full mt-1 py-1 px-2 rounded bg-[var(--bg-2)] hover:bg-[#2a1418] hover:text-white text-[11px] font-semibold text-[var(--text-2)] transition-colors"
+                    className="w-full mt-1 py-1 px-2 rounded bg-[var(--bg-2)] hover:bg-[#021125] hover:text-white text-[11px] font-semibold text-[var(--text-2)] transition-colors"
                   >
                     + Insert {offer.code} Quote into Reply
                   </button>

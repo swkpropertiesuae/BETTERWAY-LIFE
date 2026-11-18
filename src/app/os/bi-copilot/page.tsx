@@ -58,12 +58,12 @@ export default async function BiAndCopilotPage({
       <div className="grid md:grid-cols-3 gap-4">
         <div className="bw-card p-5">
           <div className="text-xs text-slate-500">Gross Active Loan Pipeline</div>
-          <div className="font-num text-xl font-bold text-[#2a1418] mt-1">{formatAed(bi.grossPipelineLoanFils)}</div>
+          <div className="font-num text-xl font-bold text-[#021125] mt-1">{formatAed(bi.grossPipelineLoanFils)}</div>
           <div className="text-xs text-slate-500 mt-1">{bi.activeDealsCount} active live deals</div>
         </div>
         <div className="bw-card p-5">
           <div className="text-xs text-slate-500">Stage-Weighted Gross Subvention + Fees</div>
-          <div className="font-num text-xl font-bold text-[#2a1418] mt-1">{formatAed(bi.weightedGrossRevenueFils)}</div>
+          <div className="font-num text-xl font-bold text-[#021125] mt-1">{formatAed(bi.weightedGrossRevenueFils)}</div>
           <div className="text-xs text-slate-500 mt-1">Weighted from Fact-Find (10%) to Cheques Ready (98%)</div>
         </div>
         <div className="bw-card p-5">
@@ -78,7 +78,7 @@ export default async function BiAndCopilotPage({
       <div className="grid lg:grid-cols-12 gap-6">
         {/* Deterministic UAE Bank Statement Analyzer */}
         <div className="lg:col-span-6 bw-card p-5 space-y-3 text-xs">
-          <h2 className="font-display font-bold text-base text-[#2a1418]">
+          <h2 className="font-display font-bold text-base text-[#021125]">
             6-Month UAE Bank Statement Pre-Underwriting Analyzer
           </h2>
           <p className="text-slate-600">
@@ -93,11 +93,11 @@ export default async function BiAndCopilotPage({
           <div className="rounded-lg bg-slate-50 border border-slate-200 p-3.5 grid grid-cols-2 gap-3">
             <div>
               <div className="text-slate-500">Avg Monthly WPS Salary</div>
-              <div className="font-num font-bold text-[#2a1418]">{formatAed(stmtAnalysis.avgMonthlySalaryFils)}</div>
+              <div className="font-num font-bold text-[#021125]">{formatAed(stmtAnalysis.avgMonthlySalaryFils)}</div>
             </div>
             <div>
               <div className="text-slate-500">Detected Recurring EMI</div>
-              <div className="font-num font-bold text-[#2a1418]">{formatAed(stmtAnalysis.detectedRecurringEmiFils)}</div>
+              <div className="font-num font-bold text-[#021125]">{formatAed(stmtAnalysis.detectedRecurringEmiFils)}</div>
             </div>
             <div>
               <div className="text-slate-500">Detected Tabby/Tamara BNPL</div>
@@ -114,7 +114,7 @@ export default async function BiAndCopilotPage({
 
         {/* Citation-Backed Bank Policy Co-Pilot */}
         <div className="lg:col-span-6 bw-card p-5 space-y-3 text-xs">
-          <h2 className="font-display font-bold text-base text-[#2a1418]">
+          <h2 className="font-display font-bold text-base text-[#021125]">
             Citation-Backed Bank Credit Policy Co-Pilot
           </h2>
           <p className="text-slate-600">
@@ -126,7 +126,7 @@ export default async function BiAndCopilotPage({
             <button type="submit" className="bw-btn-gold shrink-0">Ask Policy</button>
           </form>
 
-          <div className="rounded-lg bg-[#2a1418] text-slate-100 p-4 space-y-3">
+          <div className="rounded-lg bg-[#021125] text-slate-100 p-4 space-y-3">
             <div className="whitespace-pre-wrap leading-relaxed">{copilot.deterministicSummary}</div>
             <div className="pt-2 border-t border-white/15 flex flex-wrap gap-2">
               {copilot.citations.map((c) => (

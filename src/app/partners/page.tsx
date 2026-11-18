@@ -21,7 +21,7 @@ export default async function ReraPartnerHubPage({
 
   return (
     <div className="min-h-screen bg-[#faf6f0]">
-      <header className="bg-[#2a1418] text-white px-6 py-4 flex flex-wrap items-center justify-between gap-4">
+      <header className="bg-[#021125] text-white px-6 py-4 flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <img src="/brand/mark.svg" alt="Betterway" className="h-9 w-9 rounded-md" />
           <div>
@@ -63,7 +63,7 @@ export default async function ReraPartnerHubPage({
         <div className="grid lg:grid-cols-12 gap-6">
           {/* 30-Second Buyer Lead Drop */}
           <div className="lg:col-span-5 bw-card p-6 space-y-3 text-xs">
-            <h2 className="font-display font-bold text-base text-[#2a1418]">
+            <h2 className="font-display font-bold text-base text-[#021125]">
               30-Second Buyer Mortgage Lead Drop
             </h2>
             <p className="text-slate-600">
@@ -105,7 +105,7 @@ export default async function ReraPartnerHubPage({
           <div className="lg:col-span-7 bw-card p-6 space-y-4 text-xs">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="font-display font-bold text-base text-[#2a1418]">
+                <h2 className="font-display font-bold text-base text-[#021125]">
                   Privacy-Masked Referral Pipeline ({deals.length} Deal{deals.length === 1 ? '' : 's'})
                 </h2>
                 <p className="text-slate-500">
@@ -122,7 +122,7 @@ export default async function ReraPartnerHubPage({
                   <div key={d.deal_id} className="rounded-lg border border-slate-200 p-4 space-y-2">
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <div>
-                        <span className="font-num font-bold text-[#2a1418]">{d.deal_ref}</span> ·{' '}
+                        <span className="font-num font-bold text-[#021125]">{d.deal_ref}</span> ·{' '}
                         <span className="font-semibold text-slate-900">{d.client_display_name}</span>
                       </div>
                       <span className="bw-badge bg-amber-100 text-[#7d5f1f]">
@@ -133,7 +133,7 @@ export default async function ReraPartnerHubPage({
                       <span>
                         {d.community_name} · {d.transaction_type} · Agent: <strong>{d.agent_name}</strong> ({d.agent_brn})
                       </span>
-                      <span className="font-num font-bold text-[#2a1418]">Facility: {formatAed(d.target_loan_fils)}</span>
+                      <span className="font-num font-bold text-[#021125]">Facility: {formatAed(d.target_loan_fils)}</span>
                     </div>
                     {d.pre_qual_cert_enabled === 1 && (
                       <div className="rounded bg-emerald-50 border border-emerald-200 px-3 py-2 text-emerald-950 flex items-center justify-between">
@@ -157,7 +157,7 @@ export default async function ReraPartnerHubPage({
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
                 B2B Partner Non-Circumvention &amp; Inventory Matcher
               </span>
-              <h2 className="font-display font-bold text-base text-[#2a1418]">
+              <h2 className="font-display font-bold text-base text-[#021125]">
                 Pre-Approved Buyers Seeking Property Matches (&ldquo;You Keep the Client, We Handle the Mortgage&rdquo;)
               </h2>
             </div>
@@ -170,7 +170,7 @@ export default async function ReraPartnerHubPage({
             {matcherPool.map((m) => (
               <div key={m.dealId} className="rounded-lg border border-slate-200 bg-slate-50/70 p-4 space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="font-num font-bold text-[#2a1418]">{m.dealRef} · {m.buyerMaskedCode}</span>
+                  <span className="font-num font-bold text-[#021125]">{m.dealRef} · {m.buyerMaskedCode}</span>
                   <span className="px-2 py-0.5 rounded bg-slate-900 text-[#c9a257] text-[10px] font-bold font-num">
                     {m.nonCircumventionCertId}
                   </span>
@@ -190,7 +190,7 @@ export default async function ReraPartnerHubPage({
                 </div>
                 <div className="text-[10px] text-slate-500 font-num flex items-center justify-between pt-1">
                   <span>Protected Agent: <strong>{m.protectedAgentBrn}</strong></span>
-                  <a href={`/os/print/aip/${m.dealId}`} className="font-semibold text-[#2a1418] underline">
+                  <a href={`/os/print/aip/${m.dealId}`} className="font-semibold text-[#021125] underline">
                     Download 60d AIP Cert →
                   </a>
                 </div>
@@ -203,10 +203,10 @@ export default async function ReraPartnerHubPage({
           <div className="grid lg:grid-cols-12 gap-6 text-xs">
             <div className="lg:col-span-6 bw-card p-6 space-y-3">
               <div className="flex items-center justify-between">
-                <h2 className="font-display font-bold text-base text-[#2a1418]">
+                <h2 className="font-display font-bold text-base text-[#021125]">
                   Brokerage Owner Corporate Banking & Referral Agreement (`PARTNER_AGENCY_ADMIN` Only)
                 </h2>
-                <span className="bw-badge bg-[#2a1418] text-[#c9a257]">
+                <span className="bw-badge bg-[#021125] text-[#c9a257]">
                   Tier: {agencyFinancials.tier} ({formatBps(agencyFinancials.default_split_bps)} of Bank Subvention)
                 </span>
               </div>
@@ -241,7 +241,7 @@ export default async function ReraPartnerHubPage({
             </div>
 
             <div className="lg:col-span-6 bw-card p-6 space-y-3">
-              <h2 className="font-display font-bold text-base text-[#2a1418]">
+              <h2 className="font-display font-bold text-base text-[#021125]">
                 Self-Billed Peppol `PINT-AE` Commission Tax Invoices
               </h2>
               {(agencyFinancials.invoices as Record<string, unknown>[]).length === 0 ? (
@@ -253,7 +253,7 @@ export default async function ReraPartnerHubPage({
                   {(agencyFinancials.invoices as Record<string, unknown>[]).map((inv) => (
                     <div key={String(inv.id)} className="rounded border border-slate-200 p-3 flex items-center justify-between">
                       <div>
-                        <div className="font-num font-bold text-[#2a1418]">{String(inv.invoice_number)}</div>
+                        <div className="font-num font-bold text-[#021125]">{String(inv.invoice_number)}</div>
                         <div className="font-num text-slate-500">Total incl. 5% VAT: {formatAed(Number(inv.total_fils))}</div>
                       </div>
                       <a href={`/api/v1/exports/pint-ae/${String(inv.id)}`} className="bw-btn-gold">

@@ -100,7 +100,7 @@ export default function FintechXShowcasePage() {
   const minRequiredSalaryAed = Math.round(monthlyEmiAed * 2); // CBUAE 50% DBR rule
 
   return (
-    <div className="min-h-screen bg-[#f6f1ea] text-[#2a1418]">
+    <div className="min-h-screen bg-[#f6f1ea] text-[#021125]">
       {/* FintechX Sticky Top Navigation Bar */}
       <header className="sticky top-0 z-50 border-b border-[#e7dccd] bg-[#f6f1ea]/90 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-18 flex items-center justify-between gap-4">
@@ -135,16 +135,16 @@ export default function FintechXShowcasePage() {
           <div className="flex items-center gap-2.5">
             <Link
               href="/partners"
-              className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-[#e7dccd] bg-white hover:bg-[#e7dccd] px-4 py-2 text-xs font-semibold text-[#2a1418] transition"
+              className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-[#e7dccd] bg-white hover:bg-[#e7dccd] px-4 py-2 text-xs font-semibold text-[#021125] transition"
             >
               Partner Hub
             </Link>
             <Link
               href="/os"
-              className="inline-flex items-center gap-2 rounded-full bg-[#2a1418] hover:bg-[#3b161d] pl-4 pr-2 py-1.5 text-xs font-semibold text-white transition shadow-sm"
+              className="inline-flex items-center gap-2 rounded-full bg-[#021125] hover:bg-[#072244] pl-4 pr-2 py-1.5 text-xs font-semibold text-white transition shadow-sm"
             >
               <span>Enter Corporate OS</span>
-              <span className="size-6 rounded-full bg-[#c9a257] text-[#2a1418] flex items-center justify-center">
+              <span className="size-6 rounded-full bg-[#c9a257] text-[#021125] flex items-center justify-center">
                 <ArrowUpRight className="size-3.5" />
               </span>
             </Link>
@@ -155,12 +155,12 @@ export default function FintechXShowcasePage() {
       {/* FintechX Hero Section with Trust Pill, Value Prop & Live Interactive Mortgage Intelligence Preview */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 pt-12 pb-16 space-y-12">
         <div className="max-w-3xl mx-auto text-center space-y-5">
-          <div className="inline-flex items-center gap-2 rounded-full bg-white border border-[#e7dccd] px-3.5 py-1.5 text-xs font-semibold text-[#2a1418] shadow-2xs">
+          <div className="inline-flex items-center gap-2 rounded-full bg-white border border-[#e7dccd] px-3.5 py-1.5 text-xs font-semibold text-[#021125] shadow-2xs">
             <span className="size-2 rounded-full bg-emerald-600" />
             <span>CBUAE Licensed Mortgage Brokerage · RERA ORN 31048 · 24 UAE Banks</span>
           </div>
 
-          <h1 className="font-display text-3xl sm:text-5xl font-bold tracking-tight text-[#2a1418] leading-[1.12]">
+          <h1 className="font-display text-3xl sm:text-5xl font-bold tracking-tight text-[#021125] leading-[1.12]">
             Institutional Mortgage Intelligence &amp; DLD Settlement for the UAE.
           </h1>
 
@@ -171,22 +171,22 @@ export default function FintechXShowcasePage() {
           <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
             <Link
               href="/os"
-              className="inline-flex items-center gap-2.5 rounded-full bg-[#2a1418] hover:bg-[#3b161d] pl-5 pr-2.5 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-md transition"
+              className="inline-flex items-center gap-2.5 rounded-full bg-[#021125] hover:bg-[#072244] pl-5 pr-2.5 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-md transition"
             >
               <span>Open Live Corporate Dashboard</span>
-              <span className="size-7 rounded-full bg-[#c9a257] text-[#2a1418] flex items-center justify-center">
+              <span className="size-7 rounded-full bg-[#c9a257] text-[#021125] flex items-center justify-center">
                 <ArrowRight className="size-4" />
               </span>
             </Link>
             <Link
               href="/os/los"
-              className="inline-flex items-center gap-2 rounded-full border border-[#e7dccd] bg-white hover:bg-[#e7dccd] px-5 py-2.5 text-xs sm:text-sm font-semibold text-[#2a1418] transition"
+              className="inline-flex items-center gap-2 rounded-full border border-[#e7dccd] bg-white hover:bg-[#e7dccd] px-5 py-2.5 text-xs sm:text-sm font-semibold text-[#021125] transition"
             >
               <span>24-Bank Underwriting Desk</span>
             </Link>
             <Link
               href="/os/print/proposal/1"
-              className="inline-flex items-center gap-2 rounded-full border border-[#e7dccd] bg-white hover:bg-[#e7dccd] px-5 py-2.5 text-xs sm:text-sm font-semibold text-[#2a1418] transition"
+              className="inline-flex items-center gap-2 rounded-full border border-[#e7dccd] bg-white hover:bg-[#e7dccd] px-5 py-2.5 text-xs sm:text-sm font-semibold text-[#021125] transition"
             >
               <span>View Official 3-Bank Proposal PDF</span>
             </Link>
@@ -202,7 +202,7 @@ export default function FintechXShowcasePage() {
             { value: '100% Integer Fils', label: 'Double-Entry GL, FTA VAT 201 & 9% Corporate Tax' },
           ].map((stat, idx) => (
             <div key={idx} className="rounded-2xl bg-white border border-[#e7dccd] p-5 text-center shadow-2xs">
-              <div className="font-display text-2xl font-bold text-[#2a1418] font-num">{stat.value}</div>
+              <div className="font-display text-2xl font-bold text-[#021125] font-num">{stat.value}</div>
               <div className="text-xs text-[#766661] mt-1">{stat.label}</div>
             </div>
           ))}
@@ -217,7 +217,7 @@ export default function FintechXShowcasePage() {
                   <Sparkles className="size-3.5" />
                   Live CBUAE Affordability &amp; DLD Fee Engine
                 </span>
-                <h2 className="text-xl font-bold text-[#2a1418] mt-2">
+                <h2 className="text-xl font-bold text-[#021125] mt-2">
                   Interactive UAE Mortgage &amp; Upfront Cash-to-Close Calculator
                 </h2>
               </div>
@@ -227,7 +227,7 @@ export default function FintechXShowcasePage() {
               <div className="p-4 rounded-2xl bg-[#f6f1ea] border border-[#e7dccd] space-y-2">
                 <div className="flex justify-between font-semibold">
                   <span>Property Purchase Price</span>
-                  <span className="font-num text-[#2a1418]">AED {propertyPriceAed.toLocaleString('en-US')}</span>
+                  <span className="font-num text-[#021125]">AED {propertyPriceAed.toLocaleString('en-US')}</span>
                 </div>
                 <input
                   type="range"
@@ -236,7 +236,7 @@ export default function FintechXShowcasePage() {
                   step={50000}
                   value={propertyPriceAed}
                   onChange={(e) => setPropertyPriceAed(Number(e.target.value))}
-                  className="w-full accent-[#2a1418]"
+                  className="w-full accent-[#021125]"
                 />
                 <div className="flex justify-between text-[10px] text-[#766661] font-num">
                   <span>AED 800k</span>
@@ -247,7 +247,7 @@ export default function FintechXShowcasePage() {
               <div className="p-4 rounded-2xl bg-[#f6f1ea] border border-[#e7dccd] space-y-2">
                 <div className="flex justify-between font-semibold">
                   <span>Buyer Down Payment ({downPaymentPct}%)</span>
-                  <span className="font-num text-[#2a1418]">
+                  <span className="font-num text-[#021125]">
                     AED {Math.round((propertyPriceAed * downPaymentPct) / 100).toLocaleString('en-US')}
                   </span>
                 </div>
@@ -258,7 +258,7 @@ export default function FintechXShowcasePage() {
                   step={5}
                   value={downPaymentPct}
                   onChange={(e) => setDownPaymentPct(Number(e.target.value))}
-                  className="w-full accent-[#2a1418]"
+                  className="w-full accent-[#021125]"
                 />
                 <div className="flex justify-between text-[10px] text-[#766661]">
                   <span>15% (UAE National)</span>
@@ -270,7 +270,7 @@ export default function FintechXShowcasePage() {
               <div className="p-4 rounded-2xl bg-[#f6f1ea] border border-[#e7dccd] space-y-2">
                 <div className="flex justify-between font-semibold">
                   <span>Loan Tenure (Max 25 Years)</span>
-                  <span className="font-num text-[#2a1418]">{tenureYears} Years ({months} mos)</span>
+                  <span className="font-num text-[#021125]">{tenureYears} Years ({months} mos)</span>
                 </div>
                 <input
                   type="range"
@@ -279,14 +279,14 @@ export default function FintechXShowcasePage() {
                   step={1}
                   value={tenureYears}
                   onChange={(e) => setTenureYears(Number(e.target.value))}
-                  className="w-full accent-[#2a1418]"
+                  className="w-full accent-[#021125]"
                 />
               </div>
 
               <div className="p-4 rounded-2xl bg-[#f6f1ea] border border-[#e7dccd] space-y-2">
                 <div className="flex justify-between font-semibold">
                   <span>3-Year Fixed Rate (% p.a.)</span>
-                  <span className="font-num text-[#2a1418]">{interestRatePct.toFixed(2)}%</span>
+                  <span className="font-num text-[#021125]">{interestRatePct.toFixed(2)}%</span>
                 </div>
                 <input
                   type="range"
@@ -295,13 +295,13 @@ export default function FintechXShowcasePage() {
                   step={0.05}
                   value={interestRatePct}
                   onChange={(e) => setInterestRatePct(Number(e.target.value))}
-                  className="w-full accent-[#2a1418]"
+                  className="w-full accent-[#021125]"
                 />
               </div>
             </div>
           </div>
 
-          <div className="lg:col-span-5 rounded-3xl bg-[#2a1418] text-white p-6 sm:p-7 space-y-5 border border-[#c9a257]/40">
+          <div className="lg:col-span-5 rounded-3xl bg-[#021125] text-white p-6 sm:p-7 space-y-5 border border-[#c9a257]/40">
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-bold uppercase tracking-wider text-[#c9a257]">
                 Estimated Monthly Installment
@@ -337,7 +337,7 @@ export default function FintechXShowcasePage() {
             <div className="pt-2 flex flex-wrap gap-2">
               <Link
                 href="/os/los"
-                className="flex-1 inline-flex items-center justify-center gap-2 rounded-full bg-[#c9a257] hover:bg-[#b08a3e] py-2.5 px-4 text-xs font-bold text-[#2a1418] transition"
+                className="flex-1 inline-flex items-center justify-center gap-2 rounded-full bg-[#c9a257] hover:bg-[#b08a3e] py-2.5 px-4 text-xs font-bold text-[#021125] transition"
               >
                 <span>Run 24-Bank Underwriting</span>
                 <ArrowRight className="size-3.5" />
@@ -360,7 +360,7 @@ export default function FintechXShowcasePage() {
             <span className="inline-flex items-center gap-1.5 rounded-full bg-white border border-[#e7dccd] px-3 py-1 text-[11px] font-semibold text-[#7d5f1f]">
               End-to-End Architecture
             </span>
-            <h2 className="text-2xl sm:text-3xl font-bold text-[#2a1418] mt-2">
+            <h2 className="text-2xl sm:text-3xl font-bold text-[#021125] mt-2">
               Built for Corporate Origination, DLD Transfers &amp; FTA Accounting
             </h2>
           </div>
@@ -418,10 +418,10 @@ export default function FintechXShowcasePage() {
                   <span className="bw-badge">{card.tag}</span>
                   <ArrowUpRight className="size-4 text-[#7d5f1f]" />
                 </div>
-                <h3 className="text-base font-bold text-[#2a1418]">{card.title}</h3>
+                <h3 className="text-base font-bold text-[#021125]">{card.title}</h3>
                 <p className="text-xs text-[#766661] leading-relaxed">{card.desc}</p>
               </div>
-              <div className="pt-3 border-t border-[#e7dccd] flex items-center justify-between text-xs font-semibold text-[#2a1418]">
+              <div className="pt-3 border-t border-[#e7dccd] flex items-center justify-between text-xs font-semibold text-[#021125]">
                 <span>Open Workbench</span>
                 <ChevronRight className="size-3.5 text-[#7d5f1f]" />
               </div>
@@ -436,7 +436,7 @@ export default function FintechXShowcasePage() {
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
               <span className="bw-badge">24-Bank UAE Lending Panel</span>
-              <h2 className="text-xl sm:text-2xl font-bold text-[#2a1418] mt-2">
+              <h2 className="text-xl sm:text-2xl font-bold text-[#021125] mt-2">
                 Representative Institutional Mortgage Rate Cards (Conventional &amp; Islamic)
               </h2>
             </div>
@@ -460,7 +460,7 @@ export default function FintechXShowcasePage() {
               <tbody className="divide-y divide-[#e7dccd]">
                 {BANK_PANEL_RATES.map((row) => (
                   <tr key={row.code} className="hover:bg-[#fbf7f1]">
-                    <td className="py-3 px-4 font-bold text-[#2a1418]">{row.bank}</td>
+                    <td className="py-3 px-4 font-bold text-[#021125]">{row.bank}</td>
                     <td className="py-3 px-4 font-num text-[#766661]">{row.code}</td>
                     <td className="py-3 px-4 font-num font-bold text-emerald-800">{row.introRate}</td>
                     <td className="py-3 px-4 font-num">{row.revertRate}</td>
@@ -480,7 +480,7 @@ export default function FintechXShowcasePage() {
       <section id="pricing" className="max-w-7xl mx-auto px-4 sm:px-6 py-12 space-y-8">
         <div className="text-center max-w-2xl mx-auto space-y-2">
           <span className="bw-badge">Transparent CBUAE KFS Fee Structure</span>
-          <h2 className="text-2xl sm:text-3xl font-bold text-[#2a1418]">
+          <h2 className="text-2xl sm:text-3xl font-bold text-[#021125]">
             Advisory Mandates &amp; B2B RERA Partner Splits
           </h2>
           <p className="text-xs sm:text-sm text-[#766661]">
@@ -494,14 +494,14 @@ export default function FintechXShowcasePage() {
               key={tier.title}
               className={`rounded-3xl p-7 flex flex-col justify-between gap-6 border ${
                 tier.highlighted
-                  ? 'bg-[#2a1418] text-white border-[#c9a257]/50 shadow-xl'
-                  : 'bg-white text-[#2a1418] border-[#e7dccd] shadow-2xs'
+                  ? 'bg-[#021125] text-white border-[#c9a257]/50 shadow-xl'
+                  : 'bg-white text-[#021125] border-[#e7dccd] shadow-2xs'
               }`}
             >
               <div className="space-y-4">
                 <span
                   className={`inline-block rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider ${
-                    tier.highlighted ? 'bg-[#c9a257] text-[#2a1418]' : 'bg-[#f1ebe1] text-[#7d5f1f]'
+                    tier.highlighted ? 'bg-[#c9a257] text-[#021125]' : 'bg-[#f1ebe1] text-[#7d5f1f]'
                   }`}
                 >
                   {tier.badge}
@@ -534,8 +534,8 @@ export default function FintechXShowcasePage() {
                 href={tier.ctaHref}
                 className={`inline-flex items-center justify-center gap-2 rounded-full py-2.5 px-5 text-xs font-bold transition ${
                   tier.highlighted
-                    ? 'bg-[#c9a257] text-[#2a1418] hover:bg-[#b08a3e]'
-                    : 'bg-[#2a1418] text-white hover:bg-[#3b161d]'
+                    ? 'bg-[#c9a257] text-[#021125] hover:bg-[#b08a3e]'
+                    : 'bg-[#021125] text-white hover:bg-[#072244]'
                 }`}
               >
                 <span>{tier.ctaLabel}</span>
@@ -551,10 +551,10 @@ export default function FintechXShowcasePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 flex flex-wrap items-center justify-between gap-4 text-xs text-[#766661]">
           <div className="flex items-center gap-3">
             <img src="/brand/icon-gold-squircle.svg" alt="Betterway" className="size-7 rounded-lg" />
-            <span className="font-semibold text-[#2a1418]">Betterway Mortgages LLC</span>
+            <span className="font-semibold text-[#021125]">Betterway Mortgages LLC</span>
             <span>· CBUAE Reg. MB-2025-041 · RERA ORN 31048 · FTA TRN 100492817300003</span>
           </div>
-          <div className="flex items-center gap-4 font-semibold text-[#2a1418]">
+          <div className="flex items-center gap-4 font-semibold text-[#021125]">
             <Link href="/os" className="hover:underline">Corporate OS</Link>
             <Link href="/partners" className="hover:underline">RERA Partner Hub</Link>
             <Link href="/portal" className="hover:underline">Client Portal</Link>

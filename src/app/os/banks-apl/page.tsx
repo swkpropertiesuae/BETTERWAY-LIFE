@@ -76,15 +76,15 @@ export default async function BanksAndAplPage({
         <div className="bw-card p-4 grid grid-cols-2 sm:grid-cols-6 gap-3 text-xs">
           <div>
             <div className="text-slate-500">Fixing Date</div>
-            <div className="font-num font-bold text-[#2a1418] mt-0.5">{String(latestEibor.fixing_date)}</div>
+            <div className="font-num font-bold text-[#021125] mt-0.5">{String(latestEibor.fixing_date)}</div>
           </div>
           <div>
             <div className="text-slate-500">O/N EIBOR</div>
-            <div className="font-num font-bold text-[#2a1418] mt-0.5">{formatMicroPct(Number(latestEibor.overnight_micro))}</div>
+            <div className="font-num font-bold text-[#021125] mt-0.5">{formatMicroPct(Number(latestEibor.overnight_micro))}</div>
           </div>
           <div>
             <div className="text-slate-500">1M EIBOR</div>
-            <div className="font-num font-bold text-[#2a1418] mt-0.5">{formatMicroPct(Number(latestEibor.one_month_micro))}</div>
+            <div className="font-num font-bold text-[#021125] mt-0.5">{formatMicroPct(Number(latestEibor.one_month_micro))}</div>
           </div>
           <div>
             <div className="text-slate-500">3M EIBOR</div>
@@ -92,11 +92,11 @@ export default async function BanksAndAplPage({
           </div>
           <div>
             <div className="text-slate-500">6M EIBOR</div>
-            <div className="font-num font-bold text-[#2a1418] mt-0.5">{formatMicroPct(Number(latestEibor.six_month_micro))}</div>
+            <div className="font-num font-bold text-[#021125] mt-0.5">{formatMicroPct(Number(latestEibor.six_month_micro))}</div>
           </div>
           <div>
             <div className="text-slate-500">1Y EIBOR</div>
-            <div className="font-num font-bold text-[#2a1418] mt-0.5">{formatMicroPct(Number(latestEibor.one_year_micro))}</div>
+            <div className="font-num font-bold text-[#021125] mt-0.5">{formatMicroPct(Number(latestEibor.one_year_micro))}</div>
           </div>
         </div>
       )}
@@ -104,7 +104,7 @@ export default async function BanksAndAplPage({
       {/* Maker-Checker Queue + New Rate Submission */}
       <div className="grid lg:grid-cols-12 gap-6">
         <div className="lg:col-span-7 bw-card p-5 space-y-3">
-          <h2 className="font-display font-bold text-sm text-[#2a1418]">
+          <h2 className="font-display font-bold text-sm text-[#021125]">
             Maker-Checker Rate Approval Queue ({pendingCards.length} Pending — Self-Approval Blocked)
           </h2>
           {pendingCards.length === 0 ? (
@@ -116,7 +116,7 @@ export default async function BanksAndAplPage({
                   <div className="flex items-center gap-3">
                     <img src={String(rc.logo_path)} alt="" className="h-7 w-7 object-contain bg-white rounded p-0.5 border border-slate-200" />
                     <div>
-                      <div className="font-bold text-[#2a1418]">
+                      <div className="font-bold text-[#021125]">
                         {String(rc.bank_name)} · <span className="font-num">{String(rc.product_code)}</span>
                       </div>
                       <div className="text-slate-600 font-num">
@@ -137,7 +137,7 @@ export default async function BanksAndAplPage({
         </div>
 
         <div className="lg:col-span-5 bw-card p-5 space-y-3">
-          <h2 className="font-display font-bold text-sm text-[#2a1418]">Submit New Bank Rate Card (Maker)</h2>
+          <h2 className="font-display font-bold text-sm text-[#021125]">Submit New Bank Rate Card (Maker)</h2>
           <form method="POST" action="/api/v1/actions" className="grid grid-cols-2 gap-2.5 text-xs">
             <input type="hidden" name="action" value="submit_rate_card" />
             <input type="hidden" name="returnTo" value="/os/banks-apl" />
@@ -181,7 +181,7 @@ export default async function BanksAndAplPage({
       <div className="bw-card p-5 space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
-            <h2 className="font-display font-bold text-base text-[#2a1418]">
+            <h2 className="font-display font-bold text-base text-[#021125]">
               Tower-Level Approved Project List (APL) Matrix ({projects.length} UAE Developments Seeded)
             </h2>
             <p className="text-xs text-slate-500">
@@ -217,7 +217,7 @@ export default async function BanksAndAplPage({
           {aplRows.map((a) => (
             <div key={String(a.id)} className="rounded-lg border border-slate-200 p-3 flex items-center justify-between gap-2">
               <div className="min-w-0">
-                <div className="font-bold text-[#2a1418] truncate">{String(a.project_name)}</div>
+                <div className="font-bold text-[#021125] truncate">{String(a.project_name)}</div>
                 <div className="text-[11px] text-slate-500">{String(a.bank_short)} · Max LTV {formatBps(Number(a.max_ltv_bps))}</div>
               </div>
               <span
@@ -234,7 +234,7 @@ export default async function BanksAndAplPage({
 
       {/* 24 UAE Banks Panel Directory */}
       <div className="bw-card overflow-hidden">
-        <div className="px-5 py-3.5 border-b border-slate-200 font-display font-bold text-sm text-[#2a1418]">
+        <div className="px-5 py-3.5 border-b border-slate-200 font-display font-bold text-sm text-[#021125]">
           24 UAE Licensed Lenders — DBR Card Policy, Subvention Slabs, Clawback Window & BDM SLA
         </div>
         <div className="overflow-x-auto">
@@ -256,7 +256,7 @@ export default async function BanksAndAplPage({
                 <tr key={String(b.id)} className="hover:bg-slate-50">
                   <td className="px-4 py-2.5 flex items-center gap-2.5">
                     <img src={String(b.logo_path)} alt="" className="h-6 w-6 object-contain rounded bg-white p-0.5 border border-slate-200" />
-                    <span className="font-semibold text-[#2a1418]">{String(b.name_en)}</span>
+                    <span className="font-semibold text-[#021125]">{String(b.name_en)}</span>
                   </td>
                   <td className="px-4 py-2.5">{String(b.structure)}</td>
                   <td className="px-4 py-2.5 text-end font-num">{formatBps(Number(b.card_limit_dbr_bps))}</td>

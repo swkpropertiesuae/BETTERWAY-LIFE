@@ -6,21 +6,21 @@
   --font-mono: "JetBrains Mono Variable", ui-monospace, 'SFMono-Regular', Menlo, monospace;
   --font-serif: 'Instrument Serif', Georgia, 'Times New Roman', serif;
 
-  /* Brand palette (no stock blue, teal or purple) */
-  --ember: #7a1f2b;
-  --flame: #96303d;
-  --fold: #5a1620;
-  --brass: #b08a3e;
-  --brass-deep: #7d5f1f;
-  --amber: #9a6f1f;
+  /* Betterway Master Brand Kit palette (Midnight Banking Navy #021125 & Sovereign Gold #D7B04E) */
+  --ember: #021125;
+  --flame: #072244;
+  --fold: #010915;
+  --brass: #d7b04e;
+  --brass-deep: #8a6518;
+  --amber: #b45309;
   --blaze: #bc3a26;
   --crimson: #8c2a1c;
-  --live: #587536;
-  --ocean: #3b566d;
-  --sky: #4d6a82;
-  --navy: #2a1418;
-  --copper: #9c4626;
-  --plum: #723d57;
+  --live: #0d8a52;
+  --ocean: #072244;
+  --sky: #0f4c81;
+  --navy: #021125;
+  --copper: #a67c21;
+  --plum: #072244;
 
   --radius-xs: 6px;
   --radius-sm: 8px;
@@ -38,54 +38,54 @@
 
 :root,
 [data-theme='light'] {
-  --bg: #f6f1ea;
-  --bg-sunken: #ece4d8;
-  --sidebar: #2a1418;
+  --bg: #f8f9fa;
+  --bg-sunken: #f3efe7;
+  --sidebar: #021125;
   --surface: #ffffff;
-  --surface-2: #faf6f0;
-  --surface-hover: #f3ece1;
-  --fill: #efe7da;
-  --fill-strong: #e3d8c6;
-  --border: #e7dccd;
-  --border-soft: #efe6d8;
-  --border-strong: #d3c4ae;
+  --surface-2: #f8f9fa;
+  --surface-hover: #f3efe7;
+  --fill: #f3efe7;
+  --fill-strong: #e2e6ea;
+  --border: #e2e6ea;
+  --border-soft: #edf1f5;
+  --border-strong: #cbd5e1;
 
-  --text: #2a1418;
-  --text-2: #4d3a3c;
-  --text-3: #76665f;
-  --text-inv: #faf6f0;
+  --text: #021125;
+  --text-2: #4a5868;
+  --text-3: #64748b;
+  --text-inv: #f8f9fa;
 
-  --primary: #7a1f2b;
-  --primary-hover: #651822;
+  --primary: #021125;
+  --primary-hover: #072244;
   --primary-text: #ffffff;
 
-  --accent: #7a1f2b;
-  --accent-text: #7a1f2b;
-  --accent-soft: #f6e6e6;
-  --accent-ring: rgba(122, 31, 43, 0.22);
+  --accent: #021125;
+  --accent-text: #021125;
+  --accent-soft: #faf3e0;
+  --accent-ring: rgba(215, 176, 78, 0.32);
 
-  --success: #587536;
-  --success-soft: #eaf0e0;
-  --warning: #9a6f1f;
-  --warning-soft: #f9f3e3;
+  --success: #0d8a52;
+  --success-soft: #ecfdf5;
+  --warning: #b45309;
+  --warning-soft: #fef3c7;
   --danger: #bc3a26;
   --danger-soft: #fbebe7;
-  --info: #3b566d;
+  --info: #072244;
   --info-soft: #e8eef2;
-  --neutral-soft: #efe7da;
+  --neutral-soft: #f3efe7;
 
-  --chart-1: #7a1f2b;
-  --chart-2: #b08a3e;
-  --chart-3: #3b566d;
-  --chart-4: #6a8a42;
-  --chart-5: #9c4626;
-  --chart-grid: #efe6d8;
+  --chart-1: #021125;
+  --chart-2: #d7b04e;
+  --chart-3: #072244;
+  --chart-4: #0d8a52;
+  --chart-5: #a67c21;
+  --chart-grid: #e2e6ea;
 
   /* Tints used by launcher cards, tiles and calendar groups */
-  --tint-rose: #f3e0de;
-  --tint-brass: #f3e9cf;
-  --tint-stone: #ebe2d3;
-  --tint-plum: #ecdde3;
+  --tint-rose: #eef2f6;
+  --tint-brass: #faf3e0;
+  --tint-stone: #f3efe7;
+  --tint-plum: #e8eef5;
   --tint-ink: #e3eaee;
 
   --shadow-sm: 0 1px 2px rgba(42, 20, 24, 0.05);
@@ -127,7 +127,7 @@
 
   --primary: #c9a257;
   --primary-hover: #d6b36a;
-  --primary-text: #2a1418;
+  --primary-text: #021125;
 
   --accent: #d4707c;
   --accent-text: #e08b95;

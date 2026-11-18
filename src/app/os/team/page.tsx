@@ -4,6 +4,7 @@ import { requireStaffUser } from '@/server/auth/request';
 import { formatAed } from '@/lib/format';
 import { PageHeader } from '@/components/page-header';
 import { OsBanner } from '@/components/os-banner';
+import { StaffAvatar } from '@/components/staff-avatar';
 
 export const dynamic = 'force-dynamic';
 
@@ -63,7 +64,7 @@ export default async function InternalTeamWorkloadPage({
 
   const staffRows = db
     .prepare(
-      `SELECT u.id, u.email, u.full_name_en, u.role, u.phone, u.status,
+      `SELECT u.id, u.email, u.full_name_en, u.role, u.phone, u.status, u.avatar_url,
               e.designation, e.department, e.basic_salary_fils, e.housing_allowance_fils, e.monthly_draw_fils,
               (SELECT COUNT(*) FROM leads l WHERE l.assigned_advisor_id = u.id) as open_leads_count,
               (SELECT COUNT(*) FROM deals d WHERE d.advisor_id = u.id OR d.underwriter_id = u.id OR d.progression_manager_id = u.id) as active_deals_count,
@@ -127,7 +128,7 @@ export default async function InternalTeamWorkloadPage({
           <div className="text-[11px] font-semibold uppercase tracking-wider text-[var(--text-3)]">
             Commission Split Policy
           </div>
-          <div className="text-2xl font-bold font-num text-[#7a1f2b] mt-1">50% / 50%</div>
+          <div className="text-2xl font-bold font-num text-[#021125] mt-1">50% / 50%</div>
           <div className="text-xs text-[var(--text-3)] mt-1">Net Pool After Partner Referral Share</div>
         </div>
       </div>
@@ -156,9 +157,12 @@ export default async function InternalTeamWorkloadPage({
               <div>
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-[#2a1418] text-white font-bold text-xs flex items-center justify-center shrink-0">
-                      {initials}
-                    </div>
+                    <StaffAvatar
+                      name={name}
+                      email={email}
+                      avatarUrl={member.avatar_url ? String(member.avatar_url) : null}
+                      size={44}
+                    />
                     <div>
                       <h3 className="font-bold text-sm text-[var(--text)]">{name}</h3>
                       <div className="text-xs text-[var(--text-3)]">{designation}</div>
@@ -191,7 +195,7 @@ export default async function InternalTeamWorkloadPage({
                   <div className="h-1.5 rounded-full bg-[var(--bg-2)] overflow-hidden">
                     <div
                       className={`h-full rounded-full ${
-                        capacityPct > 80 ? 'bg-amber-500' : 'bg-[#7a1f2b]'
+                        capacityPct > 80 ? 'bg-amber-500' : 'bg-[#021125]'
                       }`}
                       style={{ width: `${capacityPct}%` }}
                     />
@@ -222,7 +226,7 @@ export default async function InternalTeamWorkloadPage({
               Betterway Mortgages LLC — Internal Role &amp; Governance Matrix
             </h2>
             <p className="text-xs text-[var(--text-3)]">
-              Strict single-company internal hierarchy: Supreme Owner (Shabib Siraj) → Manager (Mohammad Haseeb) → Compliance / Advisors
+              Strict single-company internal hierarchy: Supreme Owner (Shabib Siraj / Warda) → Team Manager (Daniel Xavier) → HR (Rahaba Azeez) / Coordinator (Elton Frank) / Advisors (Asif Khan, Reshma Rajan, Mohammad Nusrik)
             </p>
           </div>
           <Link href="/os/recycle-bin" className="bw-btn-ghost !text-xs">
@@ -234,10 +238,10 @@ export default async function InternalTeamWorkloadPage({
             <thead className="bg-[var(--bg)] text-[var(--text-3)] border-b border-[var(--border)]">
               <tr>
                 <th className="px-4 py-2.5 text-left font-semibold">Internal Operating Capability</th>
-                <th className="px-4 py-2.5 text-center font-semibold">Owner (Shabib Siraj)</th>
-                <th className="px-4 py-2.5 text-center font-semibold">Manager (Mohammad Haseeb)</th>
-                <th className="px-4 py-2.5 text-center font-semibold">MLRO / Compliance</th>
-                <th className="px-4 py-2.5 text-center font-semibold">Mortgage Advisor</th>
+                <th className="px-4 py-2.5 text-center font-semibold">Owner (Shabib Siraj / Warda)</th>
+                <th className="px-4 py-2.5 text-center font-semibold">Team Manager (Daniel Xavier)</th>
+                <th className="px-4 py-2.5 text-center font-semibold">HR / Coordinator (Rahaba / Elton)</th>
+                <th className="px-4 py-2.5 text-center font-semibold">Advisors &amp; Marketing (Asif / Reshma / Nusrik)</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[var(--border)]">

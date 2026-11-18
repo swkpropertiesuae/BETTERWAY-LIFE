@@ -42,7 +42,7 @@ export default async function PolicyWikiPage({
                   {String(a.clause_ref)} ({String(a.policy_version)})
                 </span>
               </div>
-              <h2 className="font-display font-bold text-base text-[#2a1418]">
+              <h2 className="font-display font-bold text-base text-[#021125]">
                 {lang === 'ar' && a.title_ar ? String(a.title_ar) : String(a.title_en)}
               </h2>
               <p className="text-xs text-slate-700 leading-relaxed">
@@ -53,7 +53,7 @@ export default async function PolicyWikiPage({
         </div>
 
         <div className="lg:col-span-5 bw-card p-5 space-y-3 text-xs h-fit">
-          <h2 className="font-display font-bold text-base text-[#2a1418]">Publish New Bank Policy Circular</h2>
+          <h2 className="font-display font-bold text-base text-[#021125]">Publish New Bank Policy Circular</h2>
           <form method="POST" action="/api/v1/actions" className="space-y-2.5">
             <input type="hidden" name="action" value="create_wiki_article" />
             <input type="hidden" name="returnTo" value="/os/wiki" />

@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { NAV_FLAT } from './nav';
 import { DubaiClock, OsFrame, QuickAdd } from '@/components/os-chrome';
+import { StaffAvatar } from '@/components/staff-avatar';
 import type { OsItem } from '@/lib/os-apps';
 import { Assistant } from './Assistant';
 import { useGlide } from '@/estate-os/lib/motion';
@@ -219,8 +220,8 @@ function LiveAccountMenu() {
     <Menu
       width={260}
       trigger={(p) => (
-        <button {...p} className="swk-avatar" aria-label="Account menu">
-          {initialsOf(me.name || email || '?')}
+        <button {...p} className="swk-avatar overflow-hidden p-0" aria-label="Account menu">
+          <StaffAvatar name={me.name || email || 'BW'} email={email} size={36} />
         </button>
       )}
       items={[
@@ -254,8 +255,8 @@ function DemoAccountMenu() {
     <Menu
       width={260}
       trigger={(p) => (
-        <button {...p} className="swk-avatar" aria-label="Account menu">
-          {initialsOf(me.name)}
+        <button {...p} className="swk-avatar overflow-hidden p-0" aria-label="Account menu">
+          <StaffAvatar name={me.name} email={me.email} size={36} />
         </button>
       )}
       items={[

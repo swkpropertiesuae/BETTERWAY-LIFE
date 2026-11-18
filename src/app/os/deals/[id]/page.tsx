@@ -12,7 +12,7 @@ const TABS = ['overview', 'quote', 'borrowers', 'documents', 'banks', 'property'
 const LEVEL: Record<string, string> = { CRITICAL: 'bg-red-50 text-red-800 border-red-200', WARN: 'bg-amber-50 text-amber-800 border-amber-200', INFO: 'bg-slate-50 text-slate-700 border-slate-200' };
 
 const Field = ({ k, v }: { k: string; v: React.ReactNode }) => (
-  <div className="flex justify-between gap-3 py-1.5 border-b border-slate-100 text-xs"><span className="text-slate-500">{k}</span><span className="font-medium text-[#2a1418] text-end">{v ?? '—'}</span></div>
+  <div className="flex justify-between gap-3 py-1.5 border-b border-slate-100 text-xs"><span className="text-slate-500">{k}</span><span className="font-medium text-[#021125] text-end">{v ?? '—'}</span></div>
 );
 
 export default async function DealForm({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ tab?: string; notice?: string; error?: string }> }) {
@@ -53,7 +53,7 @@ export default async function DealForm({ params, searchParams }: { params: Promi
           <div className="flex items-center gap-3">
             <Avatar name={String(client)} size={48} />
             <div>
-            <h1 className="font-display text-2xl font-extrabold text-[#2a1418]">{client}</h1>
+            <h1 className="font-display text-2xl font-extrabold text-[#021125]">{client}</h1>
             <div className="text-xs text-slate-500">{deal.deal_ref} · {String(deal.transaction_type).replace('_', ' ')} · {deal.community_name} · Advisor {deal.advisor ?? '—'}</div>
             </div>
             <Ring size={52} value={(miles.filter((m) => m.state === 'done').length / 12) * 100} color="#8aa56e">{miles.filter((m) => m.state === 'done').length}/12</Ring>
@@ -88,7 +88,7 @@ export default async function DealForm({ params, searchParams }: { params: Promi
         <div className="text-[10px] text-slate-500">Milestone {miles.find((m) => m.state === 'current')?.no ?? '12'} of 12 · {miles.find((m) => m.state === 'current')?.label ?? 'Complete'} · owner {miles.find((m) => m.state === 'current')?.owner ?? '—'}</div>
         <div className="flex flex-wrap gap-1">
           {w.track.map((t) => (
-            <div key={t.stage} className={`px-2.5 py-1 text-[11px] rounded-full border ${t.state === 'done' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : t.state === 'current' ? 'bg-[#2a1418] border-[#2a1418] text-white font-semibold' : 'bg-white border-slate-200 text-slate-400'}`}>{t.label}</div>
+            <div key={t.stage} className={`px-2.5 py-1 text-[11px] rounded-full border ${t.state === 'done' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : t.state === 'current' ? 'bg-[#021125] border-[#021125] text-white font-semibold' : 'bg-white border-slate-200 text-slate-400'}`}>{t.label}</div>
           ))}
           {w.closed && <div className="px-2.5 py-1 text-[11px] rounded-full bg-red-50 text-red-800 border border-red-200 font-bold">{w.stage}</div>}
         </div>
@@ -96,7 +96,7 @@ export default async function DealForm({ params, searchParams }: { params: Promi
 
       {/* smart banner */}
       <div className="bw-card p-3 border-s-4 border-[#c9a257] text-xs">
-        <span className="text-slate-500">Next · {w.nextAction.owner}: </span><span className="font-semibold text-[#2a1418]">{w.nextAction.text}</span>
+        <span className="text-slate-500">Next · {w.nextAction.owner}: </span><span className="font-semibold text-[#021125]">{w.nextAction.text}</span>
         {real.length > 1 && <ul className="list-disc ms-5 mt-1 text-red-700">{real.map((b) => <li key={b}>{b}</li>)}</ul>}
         {hint && <div className="text-slate-500 mt-1">{hint}</div>}
       </div>
@@ -173,7 +173,7 @@ export default async function DealForm({ params, searchParams }: { params: Promi
 
       {tab === 'banks' && (
         <div className="bw-card p-4 text-xs">
-          {w.bankClock && <div className="mb-3 rounded-2xl bg-[#f6e6e6] p-3"><b>{w.bankClock.bank}</b> SLA {w.bankClock.days} business days for this stage · due by <b>{w.bankClock.dueBy}</b>{w.bankClock.contacts.length > 0 && <span> · contacts: {w.bankClock.contacts.map((c) => `${c.role} (${c.channel})`).join(', ')}</span>}</div>}
+          {w.bankClock && <div className="mb-3 rounded-2xl bg-[#faf3e0] p-3"><b>{w.bankClock.bank}</b> SLA {w.bankClock.days} business days for this stage · due by <b>{w.bankClock.dueBy}</b>{w.bankClock.contacts.length > 0 && <span> · contacts: {w.bankClock.contacts.map((c) => `${c.role} (${c.channel})`).join(', ')}</span>}</div>}
           <h2 className="font-bold text-sm mb-2">Bank submissions</h2>
           {subs.length === 0 ? <div className="text-slate-500">Not submitted yet. <a className="underline" href={`/os/los?dealId=${dealId}`}>Open underwriting</a></div> : subs.map((s) => (
             <div key={s.id} className="py-2 border-b border-slate-100 grid grid-cols-2 md:grid-cols-6 gap-2"><b>{s.bank}</b><span>{s.priority}</span><span>{s.status}</span><span>DBR {formatBps(s.calculated_dbr_bps)}</span><span>LTV {formatBps(s.calculated_ltv_bps)}</span><span>IPA {s.ipa_ref || '—'} {s.ipa_expires_at ? `exp ${s.ipa_expires_at}` : ''}</span></div>))}</div>

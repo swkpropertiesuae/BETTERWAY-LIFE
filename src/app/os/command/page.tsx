@@ -224,7 +224,7 @@ export default async function CommandBoardPage({
               Executive Governance &amp; Scheduled Reporting
             </div>
             <p className="font-semibold text-sm text-slate-900 mt-0.5">
-              Managing Director: Shabib Siraj · Operations Manager: Mohammad Haseeb
+              Managing Director: Shabib Siraj · Executive Director: Warda · Team Manager: Daniel Xavier
             </p>
             <p className="text-xs text-slate-500 mt-0.5">
               Standard Operating Hours: Mon–Fri 10:00–19:00 GST · Sat 10:00–16:00 GST (10:05 GST Punctuality Cutoff)

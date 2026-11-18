@@ -23,6 +23,8 @@ export function initializeDatabase(
   ensure('data_rows', 'applied', 'INTEGER NOT NULL DEFAULT 0');
   ensure('users', 'totp_secret', "TEXT NOT NULL DEFAULT ''");
   ensure('users', 'mfa_enabled', 'INTEGER NOT NULL DEFAULT 0');
+  ensure('users', 'avatar_url', 'TEXT');
+  ensure('employees', 'avatar_url', 'TEXT');
   ensure('leads', 'lost_reason', "TEXT NOT NULL DEFAULT ''");
   ensure('company_settings', 'production_lock_enabled', 'INTEGER NOT NULL DEFAULT 0');
   ensure('vendor_bills', 'approval_status', "TEXT NOT NULL DEFAULT 'APPROVED'");
@@ -125,4 +127,8 @@ export function getDb(): DatabaseSync {
 export function createTestDb(shouldSeed = true): DatabaseSync {
   const db = new DatabaseSync(':memory:');
   return initializeDatabase(db, shouldSeed, false);
+}
+
+export function createInMemoryDb(opts?: { seed?: boolean }): DatabaseSync {
+  return createTestDb(opts?.seed ?? true);
 }

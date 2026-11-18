@@ -138,7 +138,7 @@ export default async function LosUnderwritingPage({
               href={`/os/los?dealId=${String(d.id)}`}
               className={`rounded-lg px-3 py-1.5 text-xs font-semibold border ${
                 Number(d.id) === dealId
-                  ? 'bg-[#2a1418] text-white border-[#2a1418]'
+                  ? 'bg-[#021125] text-white border-[#021125]'
                   : 'bg-white text-slate-700 border-slate-300 hover:border-[#c9a257]'
               }`}
             >
@@ -177,7 +177,7 @@ export default async function LosUnderwritingPage({
       {/* Deal Structure + Household Fact-Find */}
       <div className="grid lg:grid-cols-12 gap-6">
         <div className="lg:col-span-5 bw-card p-5 space-y-4">
-          <h2 className="font-display font-bold text-sm text-[#2a1418]">Deal Structure, LTV & Housing Grant</h2>
+          <h2 className="font-display font-bold text-sm text-[#021125]">Deal Structure, LTV & Housing Grant</h2>
           <form method="POST" action="/api/v1/actions" className="grid grid-cols-2 gap-2.5 text-xs">
             <input type="hidden" name="action" value="update_deal_terms" />
             <input type="hidden" name="dealId" value={dealId} />
@@ -251,7 +251,7 @@ export default async function LosUnderwritingPage({
         </div>
 
         <div className="lg:col-span-7 bw-card p-5 space-y-4">
-          <h2 className="font-display font-bold text-sm text-[#2a1418]">
+          <h2 className="font-display font-bold text-sm text-[#021125]">
             Household Applicants & AECB Liabilities (3% vs 5% Card Limit Engine)
           </h2>
 
@@ -267,7 +267,7 @@ export default async function LosUnderwritingPage({
                 <input type="hidden" name="applicantId" value={String(a.id)} />
                 <input type="hidden" name="returnTo" value={`/os/los?dealId=${dealId}`} />
                 <div className="sm:col-span-2">
-                  <div className="font-bold text-[#2a1418]">
+                  <div className="font-bold text-[#021125]">
                     {String(a.full_name_en)} <span className="bw-badge bg-amber-100 text-[#7d5f1f]">{String(a.applicant_role)}</span>
                   </div>
                   <select name="residencyType" defaultValue={String(a.residency_type)} className="bw-input mt-1">
@@ -302,7 +302,7 @@ export default async function LosUnderwritingPage({
               {liabilities.map((l) => (
                 <div key={String(l.id)} className="flex flex-wrap items-center justify-between gap-2 rounded border border-slate-200 px-3 py-2 text-xs">
                   <div>
-                    <span className="font-semibold text-[#2a1418]">{String(l.liability_type)}</span> · {String(l.lender_name)}
+                    <span className="font-semibold text-[#021125]">{String(l.liability_type)}</span> · {String(l.lender_name)}
                     <span className="font-num text-slate-500 ms-2">
                       Limit: {formatAed(Number(l.credit_limit_fils))} · Monthly EMI: {formatAed(Number(l.monthly_emi_fils))}
                     </span>
@@ -349,7 +349,7 @@ export default async function LosUnderwritingPage({
       <div className="bw-card overflow-hidden">
         <div className="px-5 py-4 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
           <div>
-            <h2 className="font-display font-bold text-base text-[#2a1418]">
+            <h2 className="font-display font-bold text-base text-[#021125]">
               Ranked 24-Bank Eligibility & True 5-Year Total Cost Comparison ({uw.eligibleOffers.length} Eligible / {uw.knockouts.length} Knocked Out)
             </h2>
             <p className="text-xs text-slate-500">
@@ -379,7 +379,7 @@ export default async function LosUnderwritingPage({
                     <span className="font-num font-bold text-slate-400">#{idx + 1}</span>
                     <img src={o.logoPath} alt={o.bankShort} className="h-6 w-6 object-contain rounded bg-white p-0.5 border border-slate-200" />
                     <div>
-                      <div className="font-bold text-[#2a1418]">{o.bankName}</div>
+                      <div className="font-bold text-[#021125]">{o.bankName}</div>
                       <div className="text-[10px] text-slate-500">{o.structure}</div>
                     </div>
                   </td>
@@ -387,7 +387,7 @@ export default async function LosUnderwritingPage({
                     <span className="font-num font-semibold">{o.productCode}</span>
                     <div className="text-[10px] text-slate-500">{o.fixedYears}Y Fixed · {o.financeMode}</div>
                   </td>
-                  <td className="px-4 py-3 text-end font-num font-bold text-[#2a1418]">{formatBps(o.introRateBps)}</td>
+                  <td className="px-4 py-3 text-end font-num font-bold text-[#021125]">{formatBps(o.introRateBps)}</td>
                   <td className="px-4 py-3 text-end font-num text-slate-600">{formatBps(o.effectiveRevertRateBps)}</td>
                   <td className="px-4 py-3 text-end font-num font-semibold">{formatAed(o.introEmiFils)}</td>
                   <td className="px-4 py-3 text-end font-num">{formatBps(o.calculatedDbrBps)}</td>
@@ -423,7 +423,7 @@ export default async function LosUnderwritingPage({
             <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
               UAE Refinance &amp; Sharia Structuring Desk
             </span>
-            <h3 className="font-display font-bold text-sm text-[#2a1418]">
+            <h3 className="font-display font-bold text-sm text-[#021125]">
               Buyout Break-Even Calculator (CBUAE AED 10,000 Penalty Cap) &amp; Islamic Structure
             </h3>
           </div>
@@ -475,7 +475,7 @@ export default async function LosUnderwritingPage({
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
                 Tenant-to-Buyer Conversion Engine (Dubai Ejari vs. Mortgage Equity)
               </span>
-              <h3 className="font-display font-bold text-sm text-[#2a1418]">
+              <h3 className="font-display font-bold text-sm text-[#021125]">
                 5-Year Rent vs. Buy Wealth Comparison (Includes 4% DLD, 0.25% Mortgage Reg &amp; Principal Equity)
               </h3>
             </div>
@@ -512,7 +512,7 @@ export default async function LosUnderwritingPage({
             <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
               UAE Bank Credit Policy Stress Checks
             </span>
-            <h3 className="font-display font-bold text-sm text-[#2a1418]">
+            <h3 className="font-display font-bold text-sm text-[#021125]">
               7x Annual Income Cap (LTI) &amp; Age-at-Maturity (65/70) Diagnostics
             </h3>
           </div>
@@ -540,7 +540,7 @@ export default async function LosUnderwritingPage({
 
       <div className="grid lg:grid-cols-12 gap-6">
         <div className="lg:col-span-5 bw-card p-5 space-y-3">
-          <h3 className="font-display font-bold text-sm text-[#2a1418]">
+          <h3 className="font-display font-bold text-sm text-[#021125]">
             Parallel Primary + Backup Bank IPA Submission
           </h3>
           <form method="POST" action="/api/v1/actions" className="space-y-3 text-xs">
@@ -572,7 +572,7 @@ export default async function LosUnderwritingPage({
         </div>
 
         <div className="lg:col-span-7 bw-card p-5 space-y-3">
-          <h3 className="font-display font-bold text-sm text-[#2a1418]">Active Bank Submissions & FOL Audit</h3>
+          <h3 className="font-display font-bold text-sm text-[#021125]">Active Bank Submissions & FOL Audit</h3>
           {submissions.length === 0 ? (
             <div className="text-xs text-slate-400">No bank IPA packages submitted yet for {String(deal.deal_ref)}.</div>
           ) : (
@@ -588,7 +588,7 @@ export default async function LosUnderwritingPage({
                   <input type="hidden" name="submissionId" value={String(s.id)} />
                   <input type="hidden" name="returnTo" value={`/os/los?dealId=${dealId}`} />
                   <div className="sm:col-span-2">
-                    <div className="font-bold text-[#2a1418]">{String(s.bank_name)} ({String(s.priority)})</div>
+                    <div className="font-bold text-[#021125]">{String(s.bank_name)} ({String(s.priority)})</div>
                     <div className="font-num text-[11px] text-slate-500">
                       {String(s.product_code)} · DBR {formatBps(Number(s.calculated_dbr_bps))}
                     </div>

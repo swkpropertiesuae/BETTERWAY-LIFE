@@ -83,7 +83,7 @@ export default async function MarketPulsePage({
       </div>
 
       {/* 24-Area Interactive Stock-Ticker Selector */}
-      <div className="bg-[#2a1418] rounded-[6px] p-4 border border-[#3a2326]">
+      <div className="bg-[#021125] rounded-[6px] p-4 border border-[#3a2326]">
         <div className="flex items-center justify-between mb-2.5">
           <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#c9a257]">
             Dubai 24-Corridor Live Valuation Index — Click Any Area to Load Site-Visit Companion
@@ -146,7 +146,7 @@ export default async function MarketPulsePage({
           </div>
 
           {/* 15-Year Future Trajectory (2026 -> 2041) */}
-          <div className="p-4 rounded-[6px] bg-[#2a1418] text-white border border-[#3a2326] space-y-2.5">
+          <div className="p-4 rounded-[6px] bg-[#021125] text-white border border-[#3a2326] space-y-2.5">
             <div className="text-[10px] font-bold uppercase tracking-widest text-[#c9a257]">
               15-Year Future Trajectory (2026 → 2041 DLD &amp; 2040 Urban Plan)
             </div>

@@ -92,7 +92,7 @@ export default async function ConveyancingPage({
               key={String(d.id)}
               href={`/os/conveyancing?dealId=${String(d.id)}`}
               className={`rounded-lg px-3 py-1.5 text-xs font-semibold border ${
-                Number(d.id) === dealId ? 'bg-[#2a1418] text-white border-[#2a1418]' : 'bg-white text-slate-700 border-slate-300'
+                Number(d.id) === dealId ? 'bg-[#021125] text-white border-[#021125]' : 'bg-white text-slate-700 border-slate-300'
               }`}
             >
               <span className="font-num">{String(d.deal_ref)}</span> · {String(d.primary_name)}
@@ -105,7 +105,7 @@ export default async function ConveyancingPage({
       <div className="grid lg:grid-cols-12 gap-6">
         <div className="lg:col-span-6 bw-card p-5 space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="font-display font-bold text-base text-[#2a1418]">
+            <h2 className="font-display font-bold text-base text-[#021125]">
               72-Hour DLD Registration Trustee Manager&apos;s Cheque Splitter
             </h2>
             <span className="bw-badge bg-amber-100 text-[#7d5f1f]">Exact Integer Fils</span>
@@ -114,29 +114,29 @@ export default async function ConveyancingPage({
           <div className="divide-y divide-slate-100 text-xs">
             <div className="py-2 flex justify-between">
               <span className="text-slate-600">1. Seller Mortgagee Bank Payoff ({bufferDays}d per-diem buffer)</span>
-              <span className="font-num font-semibold text-[#2a1418]">{formatAed(pack.cheques.sellerBankPayoffFils)}</span>
+              <span className="font-num font-semibold text-[#021125]">{formatAed(pack.cheques.sellerBankPayoffFils)}</span>
             </div>
             <div className="py-2 flex justify-between">
               <span className="text-slate-600">2. Seller Net Proceeds Manager&apos;s Cheque</span>
-              <span className="font-num font-semibold text-[#2a1418]">{formatAed(pack.cheques.sellerNetFils)}</span>
+              <span className="font-num font-semibold text-[#021125]">{formatAed(pack.cheques.sellerNetFils)}</span>
             </div>
             <div className="py-2 flex justify-between">
               <span className="text-slate-600">3. Dubai Land Department Transfer (4% + AED 580 / Handover AED 580)</span>
-              <span className="font-num font-semibold text-[#2a1418]">{formatAed(pack.cheques.dldTransferFils)}</span>
+              <span className="font-num font-semibold text-[#021125]">{formatAed(pack.cheques.dldTransferFils)}</span>
             </div>
             <div className="py-2 flex justify-between">
               <span className="text-slate-600">4. DLD Mortgage Registration (0.25% of Loan + AED 290)</span>
-              <span className="font-num font-semibold text-[#2a1418]">{formatAed(pack.cheques.mortgageRegFils)}</span>
+              <span className="font-num font-semibold text-[#021125]">{formatAed(pack.cheques.mortgageRegFils)}</span>
             </div>
             <div className="py-2 flex justify-between">
               <span className="text-slate-600">5. DLD Registration Trustee Fee (incl. VAT)</span>
-              <span className="font-num font-semibold text-[#2a1418]">{formatAed(pack.cheques.trusteeFeeFils)}</span>
+              <span className="font-num font-semibold text-[#021125]">{formatAed(pack.cheques.trusteeFeeFils)}</span>
             </div>
             <div className="py-2 flex justify-between">
               <span className="text-slate-600">6. RERA Brokerage Commission Cheque (2% + 5% VAT)</span>
-              <span className="font-num font-semibold text-[#2a1418]">{formatAed(pack.cheques.agencyFeeInclVatFils)}</span>
+              <span className="font-num font-semibold text-[#021125]">{formatAed(pack.cheques.agencyFeeInclVatFils)}</span>
             </div>
-            <div className="py-3 flex justify-between bg-slate-50 px-2 rounded font-bold text-sm text-[#2a1418]">
+            <div className="py-3 flex justify-between bg-slate-50 px-2 rounded font-bold text-sm text-[#021125]">
               <span>Total Settlement Table Outflow</span>
               <span className="font-num">{formatAed(pack.cheques.totalManagerChequesFils)}</span>
             </div>
@@ -165,7 +165,7 @@ export default async function ConveyancingPage({
 
         {/* Conveyancing Case Editor */}
         <div className="lg:col-span-6 bw-card p-5 space-y-3">
-          <h2 className="font-display font-bold text-base text-[#2a1418]">
+          <h2 className="font-display font-bold text-base text-[#021125]">
             Update Contract F, Seller Liability Letter, Valuation & NOC Milestones
           </h2>
           <form method="POST" action="/api/v1/actions" className="grid grid-cols-2 gap-2.5 text-xs">
@@ -256,7 +256,7 @@ export default async function ConveyancingPage({
             <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
               In-House Sales Progression &amp; Finance-to-Finance Coordination
             </span>
-            <h2 className="font-display font-bold text-base text-[#2a1418]">
+            <h2 className="font-display font-bold text-base text-[#021125]">
               RICS Panel Valuation Access, Developer E-NOC Portal &amp; DLD Finance-to-Finance Blocking Ceremony
             </h2>
           </div>
@@ -333,7 +333,7 @@ export default async function ConveyancingPage({
 
       {/* Bilingual Contract F Special Conditions */}
       <div className="bw-card p-5 space-y-3">
-        <h2 className="font-display font-bold text-base text-[#2a1418]">
+        <h2 className="font-display font-bold text-base text-[#021125]">
           Auto-Generated Bilingual Dubai REST Contract F (MOU) Protective Special Conditions
         </h2>
         <div className="grid md:grid-cols-2 gap-4">
