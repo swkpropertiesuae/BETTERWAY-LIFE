@@ -28,7 +28,7 @@ export default async function HandoverPortalPage({
 
   return (
     <div className="space-y-6">
-      {/* Executive Midnight & Champagne Header */}
+      {/* Executive Oxblood & Brass Header */}
       <div className="rounded-2xl bg-white text-gray-900 p-6 border border-gray-200 shadow-xs space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
@@ -142,8 +142,8 @@ export default async function HandoverPortalPage({
             <ul className="list-disc pl-5 space-y-2">
               <li>
                 <strong>Runtime &amp; UI:</strong> Next.js 16 App Router, TypeScript 5, Tailwind CSS 4 with the
-                signature <em>Midnight Navy (#061022), Champagne Gold (#c9a96e), and Warm Dubai Sand (#f6f2ea)</em>{' '}
-                design system and Compact 2-Column Numbered App Sidebar.
+                signature <em>Oxblood (#7a1f2b), Brass (#c9a257), and Bone (#f6f1ea)</em>{' '}
+                design system, SWK-style header and per-app sidebar.
               </li>
               <li>
                 <strong>Database &amp; Integrity:</strong> SQLite with Write-Ahead Logging (WAL), integer Fils (

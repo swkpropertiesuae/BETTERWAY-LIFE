@@ -29,7 +29,7 @@ export default async function MarketPulsePage({
     <div className="space-y-6">
       <OsBanner notice={sp.notice} error={sp.error} />
 
-      {/* Midnight & Champagne Header Banner */}
+      {/* Oxblood & Brass Header Banner */}
       <div className="rounded-2xl bg-white text-gray-900 p-6 border border-gray-200 shadow-xs flex flex-wrap items-center justify-between gap-4">
         <div>
           <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-700">
@@ -83,9 +83,9 @@ export default async function MarketPulsePage({
       </div>
 
       {/* 24-Area Interactive Stock-Ticker Selector */}
-      <div className="bg-[#0F172A] rounded-[6px] p-4 border border-[#1E293B]">
+      <div className="bg-[#2a1418] rounded-[6px] p-4 border border-[#3a2326]">
         <div className="flex items-center justify-between mb-2.5">
-          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#2DD4BF]">
+          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#c9a257]">
             Dubai 24-Corridor Live Valuation Index — Click Any Area to Load Site-Visit Companion
           </span>
           <span className="text-[11px] text-slate-300 font-num">Selected: {selectedArea.ticker}</span>
@@ -99,7 +99,7 @@ export default async function MarketPulsePage({
                 href={`/os/market?area=${area.code}`}
                 className={`p-2.5 rounded-xl border transition text-left ${
                   active
-                    ? 'bg-[#c9a96e]/20 border-slate-900 text-white shadow-sm'
+                    ? 'bg-[#c9a257]/20 border-slate-900 text-white shadow-sm'
                     : 'bg-white/[0.04] border-white/10 text-gray-500 hover:bg-white/[0.08]'
                 }`}
               >
@@ -146,8 +146,8 @@ export default async function MarketPulsePage({
           </div>
 
           {/* 15-Year Future Trajectory (2026 -> 2041) */}
-          <div className="p-4 rounded-[6px] bg-[#0F172A] text-white border border-[#1E293B] space-y-2.5">
-            <div className="text-[10px] font-bold uppercase tracking-widest text-[#2DD4BF]">
+          <div className="p-4 rounded-[6px] bg-[#2a1418] text-white border border-[#3a2326] space-y-2.5">
+            <div className="text-[10px] font-bold uppercase tracking-widest text-[#c9a257]">
               15-Year Future Trajectory (2026 → 2041 DLD &amp; 2040 Urban Plan)
             </div>
             <div className="space-y-1.5 text-xs pt-1">

@@ -58,7 +58,7 @@ export default async function RecycleBinPage({
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <span className="px-3 py-1.5 rounded-lg bg-[#c9a96e]/20 border border-slate-300 text-xs font-bold text-slate-300">
+          <span className="px-3 py-1.5 rounded-lg bg-[#c9a257]/20 border border-slate-300 text-xs font-bold text-slate-300">
             {supremeOwner
               ? 'Supreme Owner Mode (Shabib Siraj)'
               : canDecide

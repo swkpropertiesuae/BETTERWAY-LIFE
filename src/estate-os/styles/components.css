@@ -38,11 +38,11 @@
   width: 34px;
   height: 34px;
   border-radius: 10px;
-  background: linear-gradient(145deg, #0f294a 0%, #05162c 100%);
-  border: 1px solid rgba(215, 176, 78, 0.45);
+  background: linear-gradient(145deg, #3b161d 0%, #1f0d10 100%);
+  border: 1px solid rgba(201, 162, 87, 0.45);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.18),
-    0 6px 16px -6px rgba(11, 31, 58, 0.45);
+    0 6px 16px -6px rgba(42, 20, 24, 0.45);
   display: grid;
   place-items: center;
   flex-shrink: 0;
@@ -673,8 +673,8 @@ button.kpi:hover {
 }
 
 .btn-accent:hover:not(:disabled) {
-  background: #0b3b66;
-  border-color: #0b3b66;
+  background: #651822;
+  border-color: #651822;
 }
 
 .btn-ghost {
@@ -700,8 +700,8 @@ button.kpi:hover {
 }
 
 .btn-danger-solid:hover:not(:disabled) {
-  background: #d21f16;
-  border-color: #d21f16;
+  background: #c8321f;
+  border-color: #c8321f;
 }
 
 .btn-sm {
@@ -1670,7 +1670,7 @@ button.kpi:hover {
 }
 
 .toast.success .t-icon { color: var(--live); }
-.toast.error .t-icon { color: #ff6a5f; }
+.toast.error .t-icon { color: #e0705e; }
 .toast.warning .t-icon { color: var(--amber); }
 .toast.info .t-icon { color: var(--ember); }
 

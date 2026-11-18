@@ -15,8 +15,9 @@ import {
   UserCog,
   Zap,
 } from 'lucide-react';
-import { NAV, NAV_FLAT, PAGE_TITLE } from './nav';
-import { Brand } from './Brand';
+import { NAV_FLAT } from './nav';
+import { DubaiClock, OsFrame, QuickAdd } from '@/components/os-chrome';
+import type { OsItem } from '@/lib/os-apps';
 import { Assistant } from './Assistant';
 import { useGlide } from '@/estate-os/lib/motion';
 import { Avatar, Button, Menu, Switch } from '@/estate-os/components/ui';
@@ -34,11 +35,8 @@ import { relTime } from '@/estate-os/lib/format';
 import type { Role } from '@/estate-os/store/types';
 
 export function Shell({ page, children }: { page: string; children: ReactNode }) {
-  const collapsed = useUi((s) => s.collapsed);
-  const mobileOpen = useUi((s) => s.mobileOpen);
-  const setMobileOpen = useUi((s) => s.setMobileOpen);
   const setCmd = useUi((s) => s.setCmd);
-
+  const me = useMe();
   useEffect(() => {
     const on = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
@@ -53,46 +51,22 @@ export function Shell({ page, children }: { page: string; children: ReactNode })
     window.addEventListener('keydown', on);
     return () => window.removeEventListener('keydown', on);
   }, [setCmd]);
-
-  useEffect(() => setMobileOpen(false), [page, setMobileOpen]);
-
+  const canSee = useMemo(() => (item: OsItem) => !item.cap || can(me.role, item.cap as Parameters<typeof can>[1]), [me.role]);
   return (
-    <div className="app" data-collapsed={collapsed} data-mobile-open={mobileOpen}>
-      <div className="sb-scrim" onClick={() => setMobileOpen(false)} />
-      <Sidebar page={page} />
-      <Assistant />
-      <div className="main">
-        <Topbar page={page} />
-        <main className="content" id="main">
-          {children}
-        </main>
-      </div>
+    <>
+      <OsFrame pathname="/os" estateKey={page} canSee={canSee} header={<HeaderActions />} sidebarFooter={<KillSwitch />}>
+        <Assistant />
+        {children}
+      </OsFrame>
       <CommandPalette />
-    </div>
+    </>
   );
 }
 
-/* ─────────── Sidebar ─────────── */
-
-function Sidebar({ page }: { page: string }) {
-  const collapsed = useUi((s) => s.collapsed);
-  const setCollapsed = useUi((s) => s.setCollapsed);
-  const me = useMe();
+/* ─────────── Sidebar footer: global outbound kill switch ─────────── */
+function KillSwitch() {
   const org = useOrg();
-  const approvals = useOrgList('approvals');
-  const conversations = useOrgList('conversations');
-  const tasks = useOrgList('tasks');
   const canKill = useCan('outbound.kill');
-
-  const counts: Record<string, number | undefined> = {
-    approvals: approvals.filter((a) => a.status === 'pending').length || undefined,
-    inbox: conversations.reduce((s, c) => s + c.unread, 0) || undefined,
-    tasks: tasks.filter((t) => t.assignedTo === me.id && t.status !== 'completed' && t.status !== 'cancelled' && t.dueAt < Date.now()).length || undefined,
-  };
-
-  // One pill glides to the active item (styles/motion.css).
-  const nav = useGlide<HTMLDivElement>('.sb-item.active', [page, collapsed, me.role]);
-
   const toggleKill = async (v: boolean) => {
     if (v) {
       const r = await confirm({
@@ -106,154 +80,62 @@ function Sidebar({ page }: { page: string }) {
     if (!(await ok(() => actions.setOutboundPaused(org, v)))) return;
     toast({ kind: v ? 'warning' : 'success', title: v ? 'Outbound paused' : 'Outbound resumed', body: v ? 'Kill switch engaged for this organization.' : 'Queued work will re-check policy before sending.' });
   };
-
+  if (!canKill) {
+    return (
+      <div className="swk-kill" title={org.outboundPaused ? 'Outbound paused' : 'Outbound live'}>
+        <span className={cx('status-dot', !org.outboundPaused && 'live')} style={org.outboundPaused ? { background: 'var(--blaze)' } : undefined} />
+        <div className="grow">{org.outboundPaused ? 'Outbound paused' : 'Outbound live'}</div>
+      </div>
+    );
+  }
   return (
-    <nav className="sidebar" aria-label="Primary">
-      <div className="sb-brand">
-        <Brand />
-        <Button
-          variant="ghost"
-          size="sm"
-          iconOnly
-          className="sb-collapse desktop-only"
-          icon={collapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
-          onClick={() => setCollapsed(!collapsed)}
-          aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-        />
+    <div className={cx('swk-kill', org.outboundPaused && 'on')}>
+      <OctagonPause size={16} />
+      <div className="grow">
+        <div style={{ fontWeight: 600 }}>{org.outboundPaused ? 'Outbound paused' : 'Outbound live'}</div>
+        <small>Global kill switch</small>
       </div>
-      {useStore.getState().orgs.length > 1 && (
-        <div className="sb-org">
-          <select
-            value={org.id}
-            onChange={(e) => {
-              useStore.getState().switchOrg(e.target.value);
-              toast({
-                kind: 'info',
-                title: `Switched workspace`,
-                body: useStore.getState().orgs.find((o) => o.id === e.target.value)?.name ?? '',
-              });
-            }}
-            className="input"
-            style={{ height: 32, fontSize: 12.5, fontWeight: 600, padding: '0 8px' }}
-            aria-label="Switch workspace"
-          >
-            {useStore.getState().orgs.map((o) => (
-              <option key={o.id} value={o.id}>
-                {o.name} · {o.city.split(',')[0]}
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
-      <div ref={nav.box} className="sb-scroll has-pill">
-        <span ref={nav.ink} className="sb-pill" aria-hidden />
-        {NAV.map((section) => {
-          const items = section.items.filter((i) => !i.cap || can(me.role, i.cap));
-          if (!items.length) return null;
-          return (
-            <div className="sb-section" key={section.section}>
-              <div className="sb-label">{section.section}</div>
-              {items.map((item) => {
-                const Icon = item.icon;
-                const count = counts[item.key];
-                const targetHref = item.href ?? `/os#/${item.key}`;
-                return (
-                  <a
-                    key={item.key}
-                    href={targetHref}
-                    className={cx('sb-item', page === item.key && 'active')}
-                    aria-current={page === item.key ? 'page' : undefined}
-                    title={collapsed ? item.label : undefined}
-                  >
-                    <Icon size={16} strokeWidth={1.8} />
-                    <span>{item.label}</span>
-                    {count != null && (item.key === 'approvals' ? <i className="pip" aria-label={`${count} pending`} /> : <span className="count">{count}</span>)}
-                  </a>
-                );
-              })}
-            </div>
-          );
-        })}
-      </div>
-      <div className="sb-footer">
-        {canKill && !collapsed ? (
-          <div className={cx('sb-kill', org.outboundPaused && 'on')}>
-            <OctagonPause size={16} />
-            <div className="grow sb-footer-text">
-              <div style={{ fontWeight: 600 }}>{org.outboundPaused ? 'Outbound paused' : 'Outbound live'}</div>
-              <div style={{ fontSize: 11.5, opacity: 0.75 }}>Global kill switch</div>
-            </div>
-            <Switch on={org.outboundPaused} onChange={toggleKill} danger label="Pause all outbound" />
-          </div>
-        ) : (
-          <div className="row" style={{ justifyContent: 'center' }} title={org.outboundPaused ? 'Outbound paused' : 'Outbound live'}>
-            <span className={cx('status-dot', !org.outboundPaused && 'live')} style={org.outboundPaused ? { background: 'var(--blaze)' } : undefined} />
-          </div>
-        )}
-      </div>
-    </nav>
+      <Switch on={org.outboundPaused} onChange={toggleKill} danger label="Pause all outbound" />
+    </div>
   );
 }
 
-/* ─────────── Topbar ─────────── */
-
-function Topbar({ page }: { page: string }) {
+/* ─────────── Header actions (right side of the SWK header) ─────────── */
+function HeaderActions() {
   const theme = useUi((s) => s.theme);
   const toggleTheme = useUi((s) => s.toggleTheme);
   const setCmd = useUi((s) => s.setCmd);
-  const setMobileOpen = useUi((s) => s.setMobileOpen);
   const org = useOrg();
-  const [scrolled, setScrolled] = useState(false);
-  useEffect(() => {
-    const on = () => setScrolled(window.scrollY > 4);
-    window.addEventListener('scroll', on, { passive: true });
-    return () => window.removeEventListener('scroll', on);
-  }, []);
-  const section = NAV_FLAT.find((n) => n.key === page)?.section;
   return (
-    <header className={cx('topbar', scrolled && 'scrolled')}>
-      <Button variant="ghost" size="sm" iconOnly className="mobile-only" icon={<MenuIcon size={18} />} onClick={() => setMobileOpen(true)} aria-label="Open navigation" />
-      <div className="crumbs">
-        <span className="desktop-only">{org.name}</span>
-        <span className="desktop-only">/</span>
-        {section && <span className="desktop-only">{section}</span>}
-        {section && <span className="desktop-only">/</span>}
-        <b className="truncate">{PAGE_TITLE[page] ?? 'Not found'}</b>
-      </div>
-      <div className="ml-auto row" style={{ gap: 6 }}>
-        {!LIVE && (
-          <span className="demo-pill desktop-only" title="CBUAE 3M EIBOR Benchmark & UAE Dirham Workspace">
-            3M EIBOR 4.18% · AED
-          </span>
-        )}
-        {LIVE && APP_ENV !== 'production' && (
-          <span className="demo-pill" title="Not the production environment: test data only">
-            {APP_ENV === 'staging' ? 'Staging' : APP_ENV} — test data
-          </span>
-        )}
-        {org.outboundPaused && (
-          <span className="badge badge-danger desktop-only" title="Global kill switch engaged">
-            <OctagonPause size={12} /> Outbound paused
-          </span>
-        )}
-        <button className="search-trigger" onClick={() => setCmd(true)} aria-label="Search (Ctrl K)">
-          <Search size={15} />
-          <span className="label">Search leads, properties…</span>
-          <span className="kbd">Ctrl K</span>
-        </button>
-        <Button
-          variant="ghost"
-          iconOnly
-          icon={theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
-          onClick={toggleTheme}
-          aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-          title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
-        />
-        <Notifications />
-        <AccountMenu />
-      </div>
-    </header>
+    <>
+      <DubaiClock />
+      {!LIVE && (
+        <span className="swk-chip brass swk-hide-lg" title="CBUAE 3M EIBOR Benchmark & UAE Dirham Workspace">
+          3M EIBOR 4.18% · AED
+        </span>
+      )}
+      {LIVE && APP_ENV !== 'production' && (
+        <span className="swk-chip brass" title="Not the production environment: test data only">
+          {APP_ENV === 'staging' ? 'Staging' : APP_ENV} — test data
+        </span>
+      )}
+      {org.outboundPaused && (
+        <span className="swk-chip warn swk-hide-md" title="Global kill switch engaged">
+          <OctagonPause size={12} /> Outbound paused
+        </span>
+      )}
+      <button className="swk-search-pill" onClick={() => setCmd(true)} aria-label="Search (Ctrl K)">
+        <Search size={15} />
+        <span>Search leads, banks, deals…</span>
+        <kbd>Ctrl K</kbd>
+      </button>
+      <button className="swk-tbtn" onClick={toggleTheme} aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'} title={theme === 'dark' ? 'Light mode' : 'Dark mode'}>
+        {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
+      </button>
+      <Notifications />
+      <QuickAdd />
+      <AccountMenu />
+    </>
   );
 }
 
@@ -279,10 +161,10 @@ function Notifications() {
   const dotColor: Record<string, string> = { failure: 'var(--blaze)', approval: 'var(--amber)', lead: 'var(--ember)', appointment: 'var(--sky)', task: 'var(--text-3)', system: 'var(--text-3)' };
   return (
     <div className="menu-anchor" ref={ref}>
-      <span className="icon-btn-badge">
-        <Button variant="ghost" iconOnly icon={<Bell size={17} />} onClick={() => setOpen((o) => !o)} aria-label={`Notifications, ${unread} unread`} aria-expanded={open} />
-        {unread > 0 && <span className="badge-count">{unread}</span>}
-      </span>
+      <button className="swk-tbtn" onClick={() => setOpen((o) => !o)} aria-label={`Notifications, ${unread} unread`} aria-expanded={open}>
+        <Bell size={17} />
+        {unread > 0 && <span className="count">{unread}</span>}
+      </button>
       {open && (
         <div className="panel" role="dialog" aria-label="Notifications">
           <div className="row" style={{ padding: '14px 16px 10px' }}>
@@ -320,6 +202,10 @@ function Notifications() {
   );
 }
 
+function initialsOf(name: string) {
+  return name.split(/[\s@.]+/).filter(Boolean).slice(0, 2).map((x) => x[0]!.toUpperCase()).join('') || '?';
+}
+
 function AccountMenu() {
   return LIVE ? <LiveAccountMenu /> : <DemoAccountMenu />;
 }
@@ -333,8 +219,8 @@ function LiveAccountMenu() {
     <Menu
       width={260}
       trigger={(p) => (
-        <button {...p} className="row" style={{ gap: 8, padding: '3px 4px', borderRadius: 999 }} aria-label="Account menu">
-          <Avatar name={me.name || email || '?'} hue={me.hue} />
+        <button {...p} className="swk-avatar" aria-label="Account menu">
+          {initialsOf(me.name || email || '?')}
         </button>
       )}
       items={[
@@ -368,8 +254,8 @@ function DemoAccountMenu() {
     <Menu
       width={260}
       trigger={(p) => (
-        <button {...p} className="row" style={{ gap: 8, padding: '3px 4px', borderRadius: 999 }} aria-label="Account menu">
-          <Avatar name={me.name} hue={me.hue} />
+        <button {...p} className="swk-avatar" aria-label="Account menu">
+          {initialsOf(me.name)}
         </button>
       )}
       items={[

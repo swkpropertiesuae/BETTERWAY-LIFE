@@ -19,7 +19,7 @@ export default async function Search({ searchParams }: { searchParams: Promise<{
   const none = !deals.length && !leads.length && !banks.length && !emps.length;
   return (
     <div className="max-w-3xl mx-auto space-y-4">
-      <h1 className="font-display text-xl font-bold text-[#021125]">Search: “{q}”</h1>
+      <h1 className="font-display text-xl font-bold text-[#2a1418]">Search: “{q}”</h1>
       {q && none && <div className="text-sm text-slate-500">No matches.</div>}
       <Sec t="Deals" rows={deals} href={(r) => `/os/deals/${r.id}`} line={(r) => `${r.deal_ref} · ${r.n ?? ''} · ${r.stage}`} />
       <Sec t="Leads" rows={leads} href={(r) => `/os/crm?leadId=${r.id}`} line={(r) => `${r.n} · ${r.p} · ${r.stage}`} />

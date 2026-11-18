@@ -108,7 +108,7 @@ export default async function Pipeline({
             href={`/os/deals?dept=${activeDept}&view=table${sp.q ? `&q=${encodeURIComponent(sp.q)}` : ''}`}
             className={`inline-flex items-center gap-1.5 rounded-[7px] px-3 py-1 font-semibold ${
               activeView === 'table'
-                ? 'bg-[#1c1c1c] text-white'
+                ? 'bg-[#2a1418] text-white'
                 : 'text-[var(--muted)] hover:text-[var(--ink)]'
             }`}
           >
@@ -119,7 +119,7 @@ export default async function Pipeline({
             href={`/os/deals?dept=${activeDept}&view=kanban${sp.q ? `&q=${encodeURIComponent(sp.q)}` : ''}`}
             className={`inline-flex items-center gap-1.5 rounded-[7px] px-3 py-1 font-semibold ${
               activeView === 'kanban'
-                ? 'bg-[#1c1c1c] text-white'
+                ? 'bg-[#2a1418] text-white'
                 : 'text-[var(--muted)] hover:text-[var(--ink)]'
             }`}
           >
@@ -150,7 +150,7 @@ export default async function Pipeline({
                 href={`/os/deals?dept=${d.id}&view=${activeView}`}
                 className={`px-3 py-1.5 rounded-[9px] font-semibold border transition ${
                   activeDept === d.id
-                    ? 'bg-[#1c1c1c] text-white border-[#1c1c1c]'
+                    ? 'bg-[#2a1418] text-white border-[#2a1418]'
                     : 'bg-[var(--surface-2)] text-[var(--muted)] border-[var(--line)] hover:text-[var(--ink)]'
                 }`}
               >
@@ -174,7 +174,7 @@ export default async function Pipeline({
                 name="mine"
                 value="1"
                 defaultChecked={sp.mine === '1'}
-                className="accent-[#0f4c81]"
+                className="accent-[#7a1f2b]"
               />
               <span>My deals</span>
             </label>
@@ -193,7 +193,7 @@ export default async function Pipeline({
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-[#E2E8F0] dark:border-[#1E293B] bg-[#F8FAFC] dark:bg-[#090D16] text-[11px] font-bold uppercase text-[#64748B]">
+                <tr className="border-b border-[#e7dccd] dark:border-[#3a2326] bg-[#faf6f0] dark:bg-[#231115] text-[11px] font-bold uppercase text-[#766661]">
                   <th className="py-3 px-4">Borrower &amp; Residency</th>
                   <th className="py-3 px-3">Property &amp; Loan Tag</th>
                   <th className="py-3 px-3">Bank &amp; Product</th>
@@ -203,7 +203,7 @@ export default async function Pipeline({
                   <th className="py-3 px-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#E2E8F0] dark:divide-[#1E293B]">
+              <tbody className="divide-y divide-[#e7dccd] dark:divide-[#3a2326]">
                 {list.map((r) => {
                   const pctDocs = Math.round((r.verifiedDocs / r.totalReqDocs) * 100);
                   const rad = 10;
@@ -220,39 +220,39 @@ export default async function Pipeline({
                   return (
                     <tr
                       key={r.id}
-                      className="hover:bg-[#F8FAFC] dark:hover:bg-[#1E293B]/50 transition"
+                      className="hover:bg-[#faf6f0] dark:hover:bg-[#3a2326]/50 transition"
                     >
                       <td className="py-3.5 px-4">
                         <div className="flex items-center gap-2">
                           <Link
                             href={`/os/deals/${r.id}`}
-                            className="font-bold text-[#0F172A] dark:text-[#F8FAFC] hover:text-[#0D9488] hover:underline"
+                            className="font-bold text-[#2a1418] dark:text-[#faf6f0] hover:text-[#7a1f2b] hover:underline"
                           >
                             {r.client ?? r.deal_ref}
                           </Link>
-                          <span className="rounded-[4px] border border-[#E2E8F0] dark:border-[#1E293B] bg-[#F8FAFC] dark:bg-[#090D16] px-1.5 py-0.5 text-[10px] font-semibold text-[#64748B]">
+                          <span className="rounded-[4px] border border-[#e7dccd] dark:border-[#3a2326] bg-[#faf6f0] dark:bg-[#231115] px-1.5 py-0.5 text-[10px] font-semibold text-[#766661]">
                             {resLabel}
                           </span>
                         </div>
-                        <div className="font-mono text-[11px] text-[#64748B] mt-0.5">
+                        <div className="font-mono text-[11px] text-[#766661] mt-0.5">
                           {r.deal_ref} • {r.transaction_type.replace(/_/g, ' ')}
                         </div>
                       </td>
 
                       <td className="py-3.5 px-3">
-                        <div className="font-semibold text-[#0F172A] dark:text-[#F8FAFC]">
+                        <div className="font-semibold text-[#2a1418] dark:text-[#faf6f0]">
                           {r.community_name || 'Dubai Hills Estate'}
                         </div>
-                        <div className="font-mono text-[11px] text-[#0D9488] font-semibold">
+                        <div className="font-mono text-[11px] text-[#7a1f2b] font-semibold">
                           {formatAedWhole(r.target_loan_fils)} • {r.ltvPct}% LTV
                         </div>
                       </td>
 
                       <td className="py-3.5 px-3">
-                        <span className="inline-flex items-center rounded-[4px] bg-[#0F172A] text-white dark:bg-[#F8FAFC] dark:text-[#090D16] px-2 py-0.5 font-mono text-[11px] font-bold">
+                        <span className="inline-flex items-center rounded-[4px] bg-[#2a1418] text-white dark:bg-[#faf6f0] dark:text-[#231115] px-2 py-0.5 font-mono text-[11px] font-bold">
                           {r.bank_short || r.bank || 'ENBD'}
                         </span>
-                        <span className="ml-2 font-mono text-[11px] text-[#64748B]">
+                        <span className="ml-2 font-mono text-[11px] text-[#766661]">
                           3.99% 3Yr Fixed
                         </span>
                       </td>
@@ -261,10 +261,10 @@ export default async function Pipeline({
                         <span
                           className={`inline-flex items-center rounded-[4px] px-2 py-0.5 font-mono text-xs font-bold border ${
                             r.dbrPct <= 45
-                              ? 'bg-[#F0FDFA] text-[#0D9488] border-[#0D9488]/30'
+                              ? 'bg-[#f8ecec] text-[#7a1f2b] border-[#7a1f2b]/30'
                               : r.dbrPct <= 50
-                                ? 'bg-[#FFFBEB] text-[#D97706] border-[#D97706]/30'
-                                : 'bg-[#FEF2F2] text-[#DC2626] border-[#DC2626]/30'
+                                ? 'bg-[#f9f3e3] text-[#a8741a] border-[#a8741a]/30'
+                                : 'bg-[#fbebe7] text-[#c8321f] border-[#c8321f]/30'
                           }`}
                         >
                           {r.dbrPct}% DBR
@@ -279,7 +279,7 @@ export default async function Pipeline({
                               cy="14"
                               r={rad}
                               fill="none"
-                              stroke="#E2E8F0"
+                              stroke="#e7dccd"
                               strokeWidth="3"
                             />
                             <circle
@@ -287,7 +287,7 @@ export default async function Pipeline({
                               cy="14"
                               r={rad}
                               fill="none"
-                              stroke="#0D9488"
+                              stroke="#7a1f2b"
                               strokeWidth="3"
                               strokeDasharray={`${dash} ${circ}`}
                               strokeLinecap="round"
@@ -304,15 +304,15 @@ export default async function Pipeline({
                           <span
                             className={`font-mono text-[10px] font-bold px-2 py-0.5 rounded ${
                               crit
-                                ? 'bg-[#FEF2F2] text-[#DC2626]'
-                                : 'bg-[#F0FDFA] text-[#0D9488]'
+                                ? 'bg-[#fbebe7] text-[#c8321f]'
+                                : 'bg-[#f8ecec] text-[#7a1f2b]'
                             }`}
                           >
                             {(STAGE_META as Record<string, { label: string }>)[r.stage]?.label ??
                               r.stage}
                           </span>
                         </div>
-                        <div className="text-[11px] text-[#64748B] truncate max-w-[240px] mt-0.5">
+                        <div className="text-[11px] text-[#766661] truncate max-w-[240px] mt-0.5">
                           → {r.w.nextAction.text}
                         </div>
                       </td>
@@ -324,7 +324,7 @@ export default async function Pipeline({
                             className="bw-btn-ghost text-[11px]"
                             title="Open in 24-Bank Underwriting LOS"
                           >
-                            <Landmark className="size-3.5 text-[#0D9488]" />
+                            <Landmark className="size-3.5 text-[#7a1f2b]" />
                             <span>LOS</span>
                           </Link>
                           <Link
@@ -332,12 +332,12 @@ export default async function Pipeline({
                             className="bw-btn-ghost text-[11px]"
                             title="Open DLD Conveyancing & Cheque Pack"
                           >
-                            <Send className="size-3.5 text-[#0D9488]" />
+                            <Send className="size-3.5 text-[#7a1f2b]" />
                             <span>DLD</span>
                           </Link>
                           <Link href={`/os/deals/${r.id}`} className="bw-btn-navy text-[11px]">
                             <span>Deal Desk</span>
-                            <ArrowUpRight className="size-3.5 text-[#2DD4BF]" />
+                            <ArrowUpRight className="size-3.5 text-[#c9a257]" />
                           </Link>
                         </div>
                       </td>
@@ -360,24 +360,24 @@ export default async function Pipeline({
             return (
               <div
                 key={s}
-                className="bw-card p-3.5 flex flex-col justify-between space-y-3 bg-[#F8FAFC] dark:bg-[#090D16]"
+                className="bw-card p-3.5 flex flex-col justify-between space-y-3 bg-[#faf6f0] dark:bg-[#231115]"
               >
-                <div className="flex items-center justify-between border-b border-[#E2E8F0] dark:border-[#1E293B] pb-2">
-                  <span className="flex items-center gap-2 text-xs font-bold text-[#0F172A] dark:text-[#F8FAFC]">
+                <div className="flex items-center justify-between border-b border-[#e7dccd] dark:border-[#3a2326] pb-2">
+                  <span className="flex items-center gap-2 text-xs font-bold text-[#2a1418] dark:text-[#faf6f0]">
                     <span
                       className={`size-2 rounded-full ${
-                        items.length > 0 ? 'bg-[#0D9488]' : 'bg-[#CBD5E1]'
+                        items.length > 0 ? 'bg-[#7a1f2b]' : 'bg-[#d3c4ae]'
                       }`}
                     />
                     <span className="truncate">{stageLabel}</span>
                   </span>
-                  <span className="font-mono text-[11px] font-bold px-2 py-0.5 rounded bg-white dark:bg-[#111827] border border-[#E2E8F0] dark:border-[#1E293B]">
+                  <span className="font-mono text-[11px] font-bold px-2 py-0.5 rounded bg-white dark:bg-[#2a1418] border border-[#e7dccd] dark:border-[#3a2326]">
                     {items.length}
                   </span>
                 </div>
 
                 {items.length === 0 ? (
-                  <div className="py-4 text-center text-[11px] text-[#64748B]">
+                  <div className="py-4 text-center text-[11px] text-[#766661]">
                     No files in this stage
                   </div>
                 ) : (
@@ -388,38 +388,38 @@ export default async function Pipeline({
                         <Link
                           key={r.id}
                           href={`/os/deals/${r.id}`}
-                          className={`block rounded-[6px] border p-3 text-xs bg-white dark:bg-[#111827] transition hover:border-[#0D9488] space-y-2 ${
+                          className={`block rounded-[6px] border p-3 text-xs bg-white dark:bg-[#2a1418] transition hover:border-[#7a1f2b] space-y-2 ${
                             crit
-                              ? 'border-[#DC2626]/50'
-                              : 'border-[#E2E8F0] dark:border-[#1E293B]'
+                              ? 'border-[#c8321f]/50'
+                              : 'border-[#e7dccd] dark:border-[#3a2326]'
                           }`}
                         >
                           <div className="flex items-center justify-between gap-2">
-                            <span className="font-bold text-[#0F172A] dark:text-[#F8FAFC] truncate">
+                            <span className="font-bold text-[#2a1418] dark:text-[#faf6f0] truncate">
                               {r.client ?? r.deal_ref}
                             </span>
-                            <span className="font-mono text-[10px] font-semibold text-[#64748B]">
+                            <span className="font-mono text-[10px] font-semibold text-[#766661]">
                               {r.deal_ref}
                             </span>
                           </div>
 
                           <div className="flex items-center justify-between font-mono text-[11px]">
-                            <span className="font-bold text-[#0D9488]">
+                            <span className="font-bold text-[#7a1f2b]">
                               {formatAedWhole(r.target_loan_fils)} ({r.ltvPct}% LTV)
                             </span>
-                            <span className="px-1.5 py-0.5 rounded bg-[#0F172A] text-white text-[10px] font-bold">
+                            <span className="px-1.5 py-0.5 rounded bg-[#2a1418] text-white text-[10px] font-bold">
                               {r.bank_short || r.bank || 'ENBD'}
                             </span>
                           </div>
 
-                          <div className="flex items-center justify-between pt-1.5 border-t border-[#E2E8F0] dark:border-[#1E293B] font-mono text-[10px]">
-                            <span className="text-[#0D9488] font-bold">{r.dbrPct}% DBR</span>
-                            <span className="text-[#64748B]">
+                          <div className="flex items-center justify-between pt-1.5 border-t border-[#e7dccd] dark:border-[#3a2326] font-mono text-[10px]">
+                            <span className="text-[#7a1f2b] font-bold">{r.dbrPct}% DBR</span>
+                            <span className="text-[#766661]">
                               {r.verifiedDocs}/{r.totalReqDocs} Docs
                             </span>
                           </div>
 
-                          <div className="text-[11px] text-[#64748B] truncate">
+                          <div className="text-[11px] text-[#766661] truncate">
                             → {r.w.nextAction.text}
                           </div>
                         </Link>

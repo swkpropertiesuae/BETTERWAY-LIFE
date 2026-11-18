@@ -134,7 +134,7 @@ export function InboxClient({
   return (
     <div className="bw-card overflow-hidden grid grid-cols-1 lg:grid-cols-12 min-h-[680px]">
       {/* PANE 1: CONVERSATION LIST */}
-      <div className="lg:col-span-3 border-b lg:border-b-0 lg:border-r border-[var(--border)] flex flex-col bg-[#fafaff]">
+      <div className="lg:col-span-3 border-b lg:border-b-0 lg:border-r border-[var(--border)] flex flex-col bg-[#fdf9f4]">
         <div className="p-3.5 border-b border-[var(--border)] space-y-2.5">
           <input
             type="text"
@@ -157,7 +157,7 @@ export function InboxClient({
                 onClick={() => setFilter(tab.id)}
                 className={`px-2.5 py-1 rounded-full text-[11px] font-semibold transition-colors ${
                   filter === tab.id
-                    ? 'bg-[#1c1c1c] text-white'
+                    ? 'bg-[#2a1418] text-white'
                     : 'bg-white text-[var(--text-2)] border border-[var(--border)] hover:text-[var(--text)]'
                 }`}
               >
@@ -177,7 +177,7 @@ export function InboxClient({
                 type="button"
                 onClick={() => setSelectedLeadId(lead.id)}
                 className={`w-full text-left p-3.5 transition-colors hover:bg-white ${
-                  active ? 'bg-white border-l-[3px] border-l-[#0f4c81]' : ''
+                  active ? 'bg-white border-l-[3px] border-l-[#7a1f2b]' : ''
                 }`}
               >
                 <div className="flex items-center justify-between gap-2">
@@ -202,7 +202,7 @@ export function InboxClient({
                     {lead.sourceChannel}
                   </span>
                   {aiOn ? (
-                    <span className="inline-flex items-center gap-1 text-[10.5px] font-semibold text-[#0f4c81]">
+                    <span className="inline-flex items-center gap-1 text-[10.5px] font-semibold text-[#7a1f2b]">
                       <Bot className="w-3 h-3" /> AI Active
                     </span>
                   ) : (
@@ -228,7 +228,7 @@ export function InboxClient({
                   <h3 className="font-bold text-[15px] text-[var(--text)]">{activeLead.contactName}</h3>
                   <span className="bw-badge bg-[var(--bg-2)] text-[var(--text-2)]">{activeLead.stage}</span>
                   {isAiActive && (
-                    <span className="bw-badge bg-[#0f4c81]/12 text-[#0f4c81] border-[#0f4c81]/25">
+                    <span className="bw-badge bg-[#7a1f2b]/12 text-[#7a1f2b] border-[#7a1f2b]/25">
                       <Bot className="w-3 h-3" /> AI Concierge Responding
                     </span>
                   )}
@@ -255,7 +255,7 @@ export function InboxClient({
             </div>
 
             {/* Messages Stream */}
-            <div className="flex-1 p-5 space-y-3.5 overflow-y-auto bg-[#f6f7f9]/60 max-h-[440px]">
+            <div className="flex-1 p-5 space-y-3.5 overflow-y-auto bg-[#f7f2ea]/60 max-h-[440px]">
               {threadMessages.map((m) => {
                 const isInternal = m.channel === 'INTERNAL_NOTE';
                 const isAi = m.channel === 'AI_CONCIERGE' || m.senderName.includes('AI');
@@ -271,16 +271,16 @@ export function InboxClient({
                         isInternal
                           ? 'bg-amber-50/90 border-amber-300 text-amber-950'
                           : isAi
-                            ? 'bg-[#eaf2f9] border-[#0f4c81]/30 text-[#0b1f3a]'
+                            ? 'bg-[#f6e6e6] border-[#7a1f2b]/30 text-[#2a1418]'
                             : isClient
                               ? 'bg-white border-[var(--border)] text-[var(--text)]'
-                              : 'bg-[#0b1f3a] border-[#0b1f3a] text-white'
+                              : 'bg-[#2a1418] border-[#2a1418] text-white'
                       }`}
                     >
                       <div className="flex items-center justify-between gap-4 mb-1.5 text-[10.5px] opacity-75 font-medium">
                         <span className="inline-flex items-center gap-1 font-semibold">
                           {isInternal && <Lock className="w-3 h-3 text-amber-700" />}
-                          {isAi && <Sparkles className="w-3 h-3 text-[#0f4c81]" />}
+                          {isAi && <Sparkles className="w-3 h-3 text-[#7a1f2b]" />}
                           {m.channel} · {m.senderName}
                         </span>
                         <span className="font-num">{m.createdAt}</span>
@@ -319,7 +319,7 @@ export function InboxClient({
                           channel === ch.id
                             ? ch.id === 'INTERNAL_NOTE'
                               ? 'bg-amber-600 text-white'
-                              : 'bg-[#1c1c1c] text-white'
+                              : 'bg-[#2a1418] text-white'
                             : 'bg-[var(--bg-2)] text-[var(--text-2)] hover:text-[var(--text)]'
                         }`}
                       >
@@ -333,7 +333,7 @@ export function InboxClient({
                 <button
                   type="button"
                   onClick={generateAiSuggestion}
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-[#0f4c81]/12 text-[#0f4c81] hover:bg-[#0f4c81]/20 transition-colors"
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-[#7a1f2b]/12 text-[#7a1f2b] hover:bg-[#7a1f2b]/20 transition-colors"
                 >
                   <Sparkles className="w-3 h-3" />
                   AI Draft Reply
@@ -376,7 +376,7 @@ export function InboxClient({
       </div>
 
       {/* PANE 3: BORROWER UNDERWRITING & BANK PRODUCT MATCHES */}
-      <div className="lg:col-span-3 p-4 bg-[#fafaff] space-y-4 overflow-y-auto">
+      <div className="lg:col-span-3 p-4 bg-[#fdf9f4] space-y-4 overflow-y-auto">
         {activeLead && (
           <>
             <div className="bw-card p-3.5 space-y-2.5">
@@ -412,10 +412,10 @@ export function InboxClient({
                 Matched UAE Bank Offers (Click to Insert)
               </div>
               {RECOMMENDED_BANK_OFFERS.map((offer) => (
-                <div key={offer.code} className="bw-card p-3 space-y-1.5 hover:border-[#0f4c81]/40 transition-colors">
+                <div key={offer.code} className="bw-card p-3 space-y-1.5 hover:border-[#7a1f2b]/40 transition-colors">
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-xs text-[var(--text)]">{offer.bank}</span>
-                    <span className="font-num font-bold text-xs text-[#0f4c81]">{offer.rate}</span>
+                    <span className="font-num font-bold text-xs text-[#7a1f2b]">{offer.rate}</span>
                   </div>
                   <div className="text-[11px] text-[var(--text-3)]">
                     {offer.ltv} · Reversion: <span className="font-num">{offer.reversion}</span>
@@ -428,7 +428,7 @@ export function InboxClient({
                         `Hi ${activeLead.contactName.split(' ')[0]}, we have matched your AED ${activeLead.targetPropertyAed.toLocaleString('en-US')} purchase with ${offer.bank} at ${offer.rate} (${offer.ltv}, ${offer.note}). Shall I send your Key Facts Statement (KFS)?`,
                       )
                     }
-                    className="w-full mt-1 py-1 px-2 rounded bg-[var(--bg-2)] hover:bg-[#1c1c1c] hover:text-white text-[11px] font-semibold text-[var(--text-2)] transition-colors"
+                    className="w-full mt-1 py-1 px-2 rounded bg-[var(--bg-2)] hover:bg-[#2a1418] hover:text-white text-[11px] font-semibold text-[var(--text-2)] transition-colors"
                   >
                     + Insert {offer.code} Quote into Reply
                   </button>

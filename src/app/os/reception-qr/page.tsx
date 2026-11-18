@@ -78,7 +78,7 @@ export default async function ReceptionQrPage({
               {Array.from({ length: 25 }).map((_, idx) => (
                 <div
                   key={idx}
-                  className={`rounded-sm ${idx % 2 === 0 || idx % 7 === 0 ? 'bg-[#f1e3c2]' : 'bg-gray-900'}`}
+                  className={`rounded-sm ${idx % 2 === 0 || idx % 7 === 0 ? 'bg-[#f3e9cf]' : 'bg-gray-900'}`}
                 />
               ))}
             </div>

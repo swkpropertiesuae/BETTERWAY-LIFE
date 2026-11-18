@@ -50,7 +50,7 @@ export default async function SingleDivisionWorkspacePage({
                     : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100'
                 }`}
               >
-                <span className={`font-num text-[10px] font-bold ${idx === 0 ? 'text-[#d4b475]' : 'text-slate-400'}`}>
+                <span className={`font-num text-[10px] font-bold ${idx === 0 ? 'text-[#d0b074]' : 'text-slate-400'}`}>
                   0{idx + 1}
                 </span>
                 <span>{sub.title}</span>
@@ -105,7 +105,7 @@ export default async function SingleDivisionWorkspacePage({
                   <div className="flex items-center justify-between">
                     <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-slate-900 text-white font-num text-[10px] font-bold">
                       <span>STAGE 0{idx + 1}</span>
-                      <span className="text-[#d4b475]">· {sub.code}</span>
+                      <span className="text-[#d0b074]">· {sub.code}</span>
                     </span>
                     <CheckCircle2 className="h-4 w-4 text-slate-300 group-hover:text-slate-900 transition" />
                   </div>

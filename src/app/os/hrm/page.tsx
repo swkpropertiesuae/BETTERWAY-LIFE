@@ -60,7 +60,7 @@ export default async function HrmAndWpsPage({
       <div className="grid md:grid-cols-4 gap-4 text-xs">
         <div className="bw-card p-5">
           <div className="text-slate-500">MOHRE Emiratisation / Nafis Status</div>
-          <div className="font-display text-lg font-bold text-[#021125] mt-1">
+          <div className="font-display text-lg font-bold text-[#2a1418] mt-1">
             {nafis.emiratiCount} Qualifying Emiratis / {nafis.totalHeadcount} Staff
           </div>
           <div className={`mt-1 font-semibold ${nafis.compliant ? 'text-emerald-700' : 'text-rose-700'}`}>
@@ -70,19 +70,19 @@ export default async function HrmAndWpsPage({
 
         <div className="bw-card p-5">
           <div className="text-slate-500">GPSSA Pension Rule (UAE Nationals)</div>
-          <div className="font-display text-lg font-bold text-[#021125] mt-1">5.0% Employee · 12.5% Employer</div>
+          <div className="font-display text-lg font-bold text-[#2a1418] mt-1">5.0% Employee · 12.5% Employer</div>
           <div className="text-slate-600 mt-1">Auto-computed on Basic + Housing in monthly WPS run</div>
         </div>
 
         <div className="bw-card p-5">
           <div className="text-slate-500">Statutory EOSB Formula (Decree-Law 33/2021)</div>
-          <div className="font-display text-lg font-bold text-[#021125] mt-1">21d (Yrs 1–5) · 30d (Yr 5+)</div>
+          <div className="font-display text-lg font-bold text-[#2a1418] mt-1">21d (Yrs 1–5) · 30d (Yr 5+)</div>
           <div className="text-slate-600 mt-1">Strictly on Basic Salary (allowances &amp; commissions excluded)</div>
         </div>
 
         <div className="bw-card p-5">
           <div className="text-slate-500">90/60/30-Day Visa, EID &amp; RERA BRN Radar</div>
-          <div className="font-display text-lg font-bold text-[#021125] mt-1 font-num">
+          <div className="font-display text-lg font-bold text-[#2a1418] mt-1 font-num">
             {radar.expiredCount} Expired · {radar.critical30dCount + radar.warning60dCount + radar.upcoming90dCount} Due &le;90d
           </div>
           <div className="text-slate-600 mt-1">
@@ -94,7 +94,7 @@ export default async function HrmAndWpsPage({
       {/* Run Monthly WPS Payroll + Download .SIF */}
       <div className="grid lg:grid-cols-12 gap-6">
         <div className="lg:col-span-5 bw-card p-5 space-y-3 text-xs">
-          <h2 className="font-display font-bold text-base text-[#021125]">
+          <h2 className="font-display font-bold text-base text-[#2a1418]">
             Generate Monthly MOHRE WPS `.SIF` File
           </h2>
           <p className="text-slate-600">
@@ -124,7 +124,7 @@ export default async function HrmAndWpsPage({
         </div>
 
         <div className="lg:col-span-7 bw-card p-5 space-y-3 text-xs">
-          <h2 className="font-display font-bold text-base text-[#021125]">
+          <h2 className="font-display font-bold text-base text-[#2a1418]">
             Generated MOHRE WPS `.SIF` Batches ({payrollRuns.length})
           </h2>
           {payrollRuns.length === 0 ? (
@@ -135,7 +135,7 @@ export default async function HrmAndWpsPage({
                 <div key={String(pr.id)} className="rounded-lg border border-slate-200 p-3 space-y-2">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div>
-                      <span className="font-bold text-[#021125] font-num">{String(pr.period_month)}</span> ·{' '}
+                      <span className="font-bold text-[#2a1418] font-num">{String(pr.period_month)}</span> ·{' '}
                       <span className="font-num text-slate-600">{String(pr.sif_filename)}</span> · Net Transfer:{' '}
                       <strong className="font-num">{formatAed(Number(pr.total_net_fils))}</strong>
                     </div>
@@ -156,7 +156,7 @@ export default async function HrmAndWpsPage({
       {/* Employee Directory, EOSB Accrual & Official Payslip Table */}
       <div className="bw-card overflow-hidden">
         <div className="px-5 py-3.5 border-b border-slate-200 flex items-center justify-between">
-          <span className="font-display font-bold text-sm text-[#021125]">
+          <span className="font-display font-bold text-sm text-[#2a1418]">
             UAE Active Staff, Recoverable Draw Deficits, Live Statutory EOSB Gratuity &amp; Printable Payslips
           </span>
           <span className="text-[11px] font-semibold text-slate-500 font-num">
@@ -197,7 +197,7 @@ export default async function HrmAndWpsPage({
                 return (
                   <tr key={String(e.id)} className="hover:bg-slate-50/70">
                     <td className="px-4 py-3">
-                      <div className="font-bold text-[#021125]">
+                      <div className="font-bold text-[#2a1418]">
                         {String(e.full_name)}{' '}
                         {Number(e.is_uae_national) === 1 && (
                           <span className="bw-badge bg-emerald-100 text-emerald-900">UAE National · Nafis</span>
@@ -217,7 +217,7 @@ export default async function HrmAndWpsPage({
                       {formatAed(Number(e.monthly_draw_fils))} /{' '}
                       <span className="text-rose-700">{formatAed(Number(e.draw_deficit_fils))}</span>
                     </td>
-                    <td className="px-4 py-3 text-end font-num font-bold text-[#021125]">
+                    <td className="px-4 py-3 text-end font-num font-bold text-[#2a1418]">
                       {eosb ? `${formatAed(eosb.gratuityFils)} (${eosb.netServiceYears}y)` : `GPSSA ${String(e.gpssa_number)}`}
                     </td>
                     <td className="px-4 py-3 text-end">
@@ -225,7 +225,7 @@ export default async function HrmAndWpsPage({
                         href={`/os/print/payslip/${String(e.id)}`}
                         className="inline-flex items-center gap-1 rounded border border-slate-300 bg-white hover:bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-800"
                       >
-                        <FileText className="h-3 w-3 text-[#8A6518]" />
+                        <FileText className="h-3 w-3 text-[#7d5f1f]" />
                         Payslip PDF
                       </Link>
                     </td>
@@ -241,8 +241,8 @@ export default async function HrmAndWpsPage({
       <div className="grid lg:grid-cols-12 gap-6 text-xs">
         <div className="lg:col-span-7 bw-card p-5 space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className="font-display font-bold text-sm text-[#021125] flex items-center gap-1.5">
-              <ShieldCheck className="h-4 w-4 text-[#8A6518]" />
+            <h3 className="font-display font-bold text-sm text-[#2a1418] flex items-center gap-1.5">
+              <ShieldCheck className="h-4 w-4 text-[#7d5f1f]" />
               90/60/30-Day Staff Visa, Emirates ID, RERA BRN &amp; Medical Expiry Radar
             </h3>
             <span className="font-num text-[11px] font-semibold text-slate-500">
@@ -315,7 +315,7 @@ export default async function HrmAndWpsPage({
 
         {/* Leave Logger + Approved Leave Ledger */}
         <div className="lg:col-span-5 bw-card p-5 space-y-3">
-          <h3 className="font-display font-bold text-sm text-[#021125]">
+          <h3 className="font-display font-bold text-sm text-[#2a1418]">
             Record Statutory Annual / Sick / Parental / Unpaid Leave
           </h3>
           <form method="POST" action="/api/v1/actions" className="grid grid-cols-2 gap-2.5">

@@ -103,7 +103,7 @@ export default async function OfficialCorporateDocumentPrintPage({
       {/* Printable A4 Sheet Container */}
       <div className="bg-white border border-slate-300 rounded-xl shadow-sm p-8 sm:p-10 space-y-6 print:border-0 print:shadow-none print:p-0">
         {/* Official Corporate Letterhead */}
-        <div className="flex flex-wrap items-start justify-between gap-6 border-b-2 border-[#0f172a] pb-6">
+        <div className="flex flex-wrap items-start justify-between gap-6 border-b-2 border-[#2a1418] pb-6">
           <div className="flex items-start gap-3.5">
             <img
               src="/brand/icon-gold-squircle.svg"
@@ -129,7 +129,7 @@ export default async function OfficialCorporateDocumentPrintPage({
           </div>
 
           <div className="text-right font-num">
-            <span className="inline-flex items-center gap-1 rounded bg-[#0f172a] text-[#d4b475] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider">
+            <span className="inline-flex items-center gap-1 rounded bg-[#2a1418] text-[#d0b074] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider">
               <ShieldCheck className="h-3 w-3" />
               Verified Corporate Issue
             </span>
@@ -168,12 +168,12 @@ export default async function OfficialCorporateDocumentPrintPage({
 
               <div className="overflow-x-auto">
                 <table className="w-full text-xs border border-slate-200">
-                  <thead className="bg-[#0f172a] text-white">
+                  <thead className="bg-[#2a1418] text-white">
                     <tr>
                       <th className="py-2.5 px-3 text-left">Comparison Parameter</th>
                       {prop.options.map((opt) => (
                         <th key={opt.rank} className="py-2.5 px-3 text-left border-l border-slate-700">
-                          <div className="text-[#d4b475] text-[10px] uppercase font-num">Option 0{opt.rank} {opt.rank === 1 ? '· Recommended' : ''}</div>
+                          <div className="text-[#d0b074] text-[10px] uppercase font-num">Option 0{opt.rank} {opt.rank === 1 ? '· Recommended' : ''}</div>
                           <div className="text-sm font-bold">{opt.bankName}</div>
                           <div className="text-[10px] text-slate-300 font-num">{opt.productCode} · {opt.financeMode}</div>
                         </th>
@@ -278,7 +278,7 @@ export default async function OfficialCorporateDocumentPrintPage({
             <div className="space-y-6">
               <div className="flex flex-wrap items-center justify-between gap-4 bg-slate-50 border border-slate-200 rounded-lg p-4">
                 <div>
-                  <span className="px-2 py-0.5 rounded bg-slate-900 text-[#d4b475] text-[10px] font-bold uppercase font-num">
+                  <span className="px-2 py-0.5 rounded bg-slate-900 text-[#d0b074] text-[10px] font-bold uppercase font-num">
                     UAE Federal Tax Authority · Tax Invoice (Peppol PINT-AE UBL 2.1)
                   </span>
                   <h2 className="text-lg font-bold text-slate-900 mt-1 font-num">{String(inv?.invoice_number || 'BW-INV-2026-0001')}</h2>
@@ -294,7 +294,7 @@ export default async function OfficialCorporateDocumentPrintPage({
               </div>
 
               <table className="w-full text-xs border border-slate-200">
-                <thead className="bg-[#0f172a] text-white">
+                <thead className="bg-[#2a1418] text-white">
                   <tr>
                     <th className="py-2.5 px-3 text-left">#</th>
                     <th className="py-2.5 px-3 text-left">Description of Regulated Mortgage Brokerage Supply</th>
@@ -355,7 +355,7 @@ export default async function OfficialCorporateDocumentPrintPage({
             <div className="space-y-6">
               <div className="flex flex-wrap items-center justify-between gap-4 bg-slate-50 border border-slate-200 rounded-lg p-4">
                 <div>
-                  <span className="px-2 py-0.5 rounded bg-slate-900 text-[#d4b475] text-[10px] font-bold uppercase font-num">
+                  <span className="px-2 py-0.5 rounded bg-slate-900 text-[#d0b074] text-[10px] font-bold uppercase font-num">
                     MOHRE Wage Protection System (WPS) · Official Employee Payslip
                   </span>
                   <h2 className="text-lg font-bold text-slate-900 mt-1">
@@ -374,7 +374,7 @@ export default async function OfficialCorporateDocumentPrintPage({
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
                 <div className="border border-slate-200 rounded-lg overflow-hidden">
-                  <div className="bg-[#0f172a] text-white px-4 py-2 font-bold">Earnings &amp; Allowances (AED)</div>
+                  <div className="bg-[#2a1418] text-white px-4 py-2 font-bold">Earnings &amp; Allowances (AED)</div>
                   <div className="p-4 space-y-2 font-num">
                     <div className="flex justify-between"><span>Basic Salary (EOSB Base)</span><span className="font-semibold">{formatAed(basic)}</span></div>
                     <div className="flex justify-between"><span>Housing Allowance</span><span>{formatAed(housing)}</span></div>
@@ -388,7 +388,7 @@ export default async function OfficialCorporateDocumentPrintPage({
                 </div>
 
                 <div className="border border-slate-200 rounded-lg overflow-hidden">
-                  <div className="bg-[#0f172a] text-white px-4 py-2 font-bold">Statutory Deductions &amp; EOSB Accrual</div>
+                  <div className="bg-[#2a1418] text-white px-4 py-2 font-bold">Statutory Deductions &amp; EOSB Accrual</div>
                   <div className="p-4 space-y-2 font-num">
                     <div className="flex justify-between">
                       <span>GPSSA UAE National Pension (5.0%)</span>
@@ -430,7 +430,7 @@ export default async function OfficialCorporateDocumentPrintPage({
             <div className="space-y-6">
               <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 flex flex-wrap items-center justify-between gap-4">
                 <div>
-                  <span className="px-2 py-0.5 rounded bg-slate-900 text-[#d4b475] text-[10px] font-bold uppercase font-num">
+                  <span className="px-2 py-0.5 rounded bg-slate-900 text-[#d0b074] text-[10px] font-bold uppercase font-num">
                     Dubai Land Department (DLD) Trustee · Settlement &amp; Manager&apos;s Cheque Schedule
                   </span>
                   <h2 className="text-lg font-bold text-slate-900 mt-1">
@@ -445,7 +445,7 @@ export default async function OfficialCorporateDocumentPrintPage({
               </div>
 
               <table className="w-full text-xs border border-slate-200">
-                <thead className="bg-[#0f172a] text-white">
+                <thead className="bg-[#2a1418] text-white">
                   <tr>
                     <th className="py-2.5 px-3 text-left">Cheque #</th>
                     <th className="py-2.5 px-3 text-left">Payee / Beneficiary at DLD Trustee Table</th>
@@ -479,21 +479,21 @@ export default async function OfficialCorporateDocumentPrintPage({
           const aip = generateBuyerPreQualificationCertificate(db, numId);
           return (
             <div className="space-y-6">
-              <div className="bg-[#0f172a] text-white rounded-xl p-6 flex flex-wrap items-center justify-between gap-4 border border-[#d4b475]/40">
+              <div className="bg-[#2a1418] text-white rounded-xl p-6 flex flex-wrap items-center justify-between gap-4 border border-[#d0b074]/40">
                 <div>
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-[#d4b475] font-num">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-[#d0b074] font-num">
                     Official 60-Day Mortgage Pre-Qualification Certificate (Agreement in Principle)
                   </span>
                   <h2 className="text-xl font-bold mt-1">
                     Verified Buyer: {aip.buyerDisplayName}
                   </h2>
                   <p className="text-xs text-slate-300 mt-0.5">
-                    Certificate Ref: <span className="font-num font-bold text-[#d4b475]">{aip.certificateRef}</span> · Valid Through: <span className="font-num font-bold">{aip.validUntilDate}</span> ({aip.validityDays} Calendar Days)
+                    Certificate Ref: <span className="font-num font-bold text-[#d0b074]">{aip.certificateRef}</span> · Valid Through: <span className="font-num font-bold">{aip.validUntilDate}</span> ({aip.validityDays} Calendar Days)
                   </p>
                 </div>
                 <div className="text-right font-num">
                   <div className="text-[11px] text-slate-300">Maximum Qualified Property Purchase Price</div>
-                  <div className="text-2xl font-bold text-[#d4b475]">{formatAed(aip.maxQualifiedPropertyBudgetFils)}</div>
+                  <div className="text-2xl font-bold text-[#d0b074]">{formatAed(aip.maxQualifiedPropertyBudgetFils)}</div>
                 </div>
               </div>
 
@@ -536,7 +536,7 @@ export default async function OfficialCorporateDocumentPrintPage({
             <div className="space-y-6">
               <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 flex flex-wrap items-center justify-between gap-4">
                 <div>
-                  <span className="px-2 py-0.5 rounded bg-[#0f172a] text-[#d4b475] text-[10px] font-bold uppercase font-num">
+                  <span className="px-2 py-0.5 rounded bg-[#2a1418] text-[#d0b074] text-[10px] font-bold uppercase font-num">
                     Bank Relationship Manager (BDM) Fast-Pass Underwriting Cover Sheet
                   </span>
                   <h2 className="text-lg font-bold text-slate-900 mt-1">
@@ -577,7 +577,7 @@ export default async function OfficialCorporateDocumentPrintPage({
               </div>
 
               <div className="border border-slate-200 rounded-lg overflow-hidden text-xs">
-                <div className="bg-[#0f172a] text-white px-4 py-2 font-bold">
+                <div className="bg-[#2a1418] text-white px-4 py-2 font-bold">
                   Credit Underwriter Packaging Notes &amp; Policy Mitigants (24–48h Fast-Pass)
                 </div>
                 <ul className="p-4 space-y-2 list-disc list-inside text-slate-700">

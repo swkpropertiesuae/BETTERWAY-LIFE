@@ -20,7 +20,7 @@ export default async function Security({ searchParams }: { searchParams: Promise
       <div className="bw-card p-5 text-xs space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <div className="font-bold text-sm text-[#021125]">Commercial Production Security Lock (`PRODUCTION_MODE`)</div>
+            <div className="font-bold text-sm text-[#2a1418]">Commercial Production Security Lock (`PRODUCTION_MODE`)</div>
             <p className="text-slate-600 mt-0.5">
               When active, disables the quick executive role switcher in the top navbar and enforces strict credential + TOTP MFA session authentication across all nodes.
             </p>

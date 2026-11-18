@@ -64,7 +64,7 @@ export default async function CrmPage({
       </PageHeader>
 
       <div className="bw-card p-5">
-        <h2 className="font-display font-bold text-sm text-[#021125] mb-3">
+        <h2 className="font-display font-bold text-sm text-[#2a1418] mb-3">
           {tr(lang, 'Capture New Omnichannel Lead (Starts 5-Minute Response Clock)', 'إضافة عميل محتمل جديد')}
         </h2>
         <form method="POST" action="/api/v1/actions" className="grid sm:grid-cols-6 gap-2.5">
@@ -96,7 +96,7 @@ export default async function CrmPage({
 
       <div className="grid lg:grid-cols-12 gap-6">
         <div className="lg:col-span-7 bw-card overflow-hidden">
-          <div className="px-5 py-3.5 border-b border-slate-200 font-display font-bold text-sm text-[#021125]">
+          <div className="px-5 py-3.5 border-b border-slate-200 font-display font-bold text-sm text-[#2a1418]">
             Active Leads ({leads.length})
           </div>
           <div className="overflow-x-auto">
@@ -120,7 +120,7 @@ export default async function CrmPage({
                       className={`hover:bg-amber-50/40 ${id === selectedLeadId ? 'bg-amber-50/70' : ''}`}
                     >
                       <td className="px-4 py-3">
-                        <a href={`/os/crm?leadId=${id}`} className="font-bold text-[#021125] hover:underline block">
+                        <a href={`/os/crm?leadId=${id}`} className="font-bold text-[#2a1418] hover:underline block">
                           {String(l.contact_name)}
                         </a>
                         <span className="font-num text-slate-500">{String(l.contact_phone)}</span>
@@ -128,7 +128,7 @@ export default async function CrmPage({
                       <td className="px-4 py-3">
                         <div className="font-semibold text-slate-800">{String(l.source_channel)}</div>
                         {l.partner_company ? (
-                          <div className="text-[11px] text-[#8A6518]">
+                          <div className="text-[11px] text-[#7d5f1f]">
                             {String(l.partner_company)} ({String(l.rera_brn)})
                           </div>
                         ) : (
@@ -175,7 +175,7 @@ export default async function CrmPage({
             <>
               <div className="bw-card p-5 space-y-3">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-display font-bold text-sm text-[#021125]">
+                  <h3 className="font-display font-bold text-sm text-[#2a1418]">
                     Convert Lead #{String(selectedLead.id)} ({String(selectedLead.contact_name)}) → 24-Bank LOS Deal
                   </h3>
                 </div>
@@ -242,7 +242,7 @@ export default async function CrmPage({
               </div>
 
               <div className="bw-card p-5 space-y-3">
-                <h3 className="font-display font-bold text-sm text-[#021125]">
+                <h3 className="font-display font-bold text-sm text-[#2a1418]">
                   Unified WhatsApp / Email / Call / Internal Thread
                 </h3>
                 <div className="space-y-2 max-h-56 overflow-y-auto">

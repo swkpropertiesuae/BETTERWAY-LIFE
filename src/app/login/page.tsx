@@ -15,7 +15,7 @@ function FloatingPathsSvg({ position }: { position: number }) {
 
   return (
     <div className="pointer-events-none absolute inset-0">
-      <svg className="h-full w-full" style={{ color: '#d7b04e' }} fill="none" viewBox="0 0 696 316">
+      <svg className="h-full w-full" style={{ color: '#c9a257' }} fill="none" viewBox="0 0 696 316">
         {paths.map((p) => (
           <path
             key={p.id}
@@ -88,7 +88,7 @@ export default async function LoginPage({
 
   return (
     <div className="swk-login2">
-      {/* Left Sovereign Midnight Banking Navy Aside (.swk-login2-aside) */}
+      {/* Left Oxblood brand aside (.swk-login2-aside) */}
       <aside className="swk-login2-aside">
         <div className="swk-login2-fade" aria-hidden />
         <FloatingPathsSvg position={1} />
@@ -97,13 +97,13 @@ export default async function LoginPage({
           <img
             src="/brand/icon-gold-squircle-midnight.svg"
             alt="Betterway Mortgages Icon"
-            className="h-12 w-12 rounded-xl border border-[#d7b04e]/40 shadow-lg"
+            className="h-12 w-12 rounded-xl border border-[#c9a257]/40 shadow-lg"
           />
           <div>
             <div className="text-xl font-bold tracking-tight text-white">
-              Betterway <span className="text-[#d7b04e]">Mortgages</span>
+              Betterway <span className="text-[#c9a257]">Mortgages</span>
             </div>
-            <div className="font-mono text-[10.5px] uppercase tracking-[0.18em] text-[#94a3b8]">
+            <div className="font-mono text-[10.5px] uppercase tracking-[0.18em] text-[#a89a90]">
               Corporate Operating System
             </div>
           </div>
@@ -127,13 +127,13 @@ export default async function LoginPage({
             <img
               src="/brand/icon-gold-squircle-midnight.svg"
               alt="Betterway Mortgages"
-              className="h-10 w-10 rounded-xl border border-[#0b1f3a]/15 shadow-xs"
+              className="h-10 w-10 rounded-xl border border-[#2a1418]/15 shadow-xs"
             />
             <div>
-              <div className="text-base font-bold tracking-tight text-[#0b1f3a]">
-                Betterway <span className="text-[#0f4c81] font-mono">OS</span>
+              <div className="text-base font-bold tracking-tight text-[#2a1418]">
+                Betterway <span className="text-[#7a1f2b] font-mono">OS</span>
               </div>
-              <div className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#64748b]">
+              <div className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#766661]">
                 Betterway Mortgages LLC · Dubai
               </div>
             </div>
@@ -143,16 +143,16 @@ export default async function LoginPage({
           <p className="swk-login2-sub">Sign in to your Betterway Mortgages OS workspace.</p>
 
           {user && (
-            <div className="mb-4 rounded-xl bg-[#eaf2f9] border border-[#b8c4d4] p-3 flex items-center justify-between gap-3">
+            <div className="mb-4 rounded-xl bg-[#f6e6e6] border border-[#c9b9a2] p-3 flex items-center justify-between gap-3">
               <div className="flex items-center gap-2 min-w-0">
-                <CheckCircle2 size={16} className="text-[#0f4c81] shrink-0" />
-                <div className="text-xs text-[#0b1f3a] truncate">
+                <CheckCircle2 size={16} className="text-[#7a1f2b] shrink-0" />
+                <div className="text-xs text-[#2a1418] truncate">
                   Active session: <b>{user.full_name_en}</b>
                 </div>
               </div>
               <Link
                 href={defaultHomeForRole(user.role)}
-                className="inline-flex items-center gap-1 rounded-lg bg-[#0b1f3a] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#0f4c81] transition shrink-0"
+                className="inline-flex items-center gap-1 rounded-lg bg-[#2a1418] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#7a1f2b] transition shrink-0"
               >
                 <span>Open OS</span>
                 <ArrowRight size={13} />
@@ -161,7 +161,7 @@ export default async function LoginPage({
           )}
 
           {sp.error && (
-            <div className="mb-4 rounded-xl bg-[#fde8e8] border border-[#f8b4b4] p-3 text-[#991b1b] text-xs font-medium">
+            <div className="mb-4 rounded-xl bg-[#fbebe7] border border-[#ecb4a8] p-3 text-[#8c2a1c] text-xs font-medium">
               {sp.error}
             </div>
           )}
@@ -170,7 +170,7 @@ export default async function LoginPage({
             <div>
               <label
                 htmlFor="email"
-                className="block mb-1.5 text-[12.5px] font-semibold text-[#334155]"
+                className="block mb-1.5 text-[12.5px] font-semibold text-[#4d3a3c]"
               >
                 Email address
               </label>
@@ -190,10 +190,10 @@ export default async function LoginPage({
 
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label htmlFor="password" className="text-[12.5px] font-semibold text-[#334155]">
+                <label htmlFor="password" className="text-[12.5px] font-semibold text-[#4d3a3c]">
                   Password
                 </label>
-                <span className="text-xs font-semibold text-[#0f4c81]">Internal SSO Active</span>
+                <span className="text-xs font-semibold text-[#7a1f2b]">Internal SSO Active</span>
               </div>
               <div className="swk-login2-field">
                 <Lock size={17} />
@@ -218,8 +218,8 @@ export default async function LoginPage({
           </form>
 
           {/* 1-Click Authorized Internal Staff Directory Access */}
-          <div className="mt-6 pt-5 border-t border-[#e2e8f0]">
-            <div className="text-[10.5px] font-mono font-bold uppercase tracking-wider text-[#64748b] mb-2.5">
+          <div className="mt-6 pt-5 border-t border-[#e7dccd]">
+            <div className="text-[10.5px] font-mono font-bold uppercase tracking-wider text-[#766661] mb-2.5">
               1-Click Internal Staff Directory Sign-In
             </div>
             <div className="grid grid-cols-2 gap-1.5">
@@ -229,18 +229,18 @@ export default async function LoginPage({
                   <input type="hidden" name="password" value="Betterway#2026" />
                   <button
                     type="submit"
-                    className="w-full text-left p-2 border border-[#d5dde7] rounded-lg bg-[#f8fafc] hover:bg-[#eaf2f9] hover:border-[#0f4c81] transition cursor-pointer"
+                    className="w-full text-left p-2 border border-[#e0d4c2] rounded-lg bg-[#faf6f0] hover:bg-[#f6e6e6] hover:border-[#7a1f2b] transition cursor-pointer"
                   >
-                    <div className="text-xs font-semibold text-[#0b1f3a] truncate">{u.label}</div>
-                    <div className="text-[10px] text-[#64748b] truncate">{u.role}</div>
+                    <div className="text-xs font-semibold text-[#2a1418] truncate">{u.label}</div>
+                    <div className="text-[10px] text-[#766661] truncate">{u.role}</div>
                   </button>
                 </form>
               ))}
             </div>
           </div>
 
-          <p className="mt-6 flex items-center gap-1.5 text-[11.5px] text-[#64748b]">
-            <ShieldCheck size={14} className="text-[#0f4c81]" />
+          <p className="mt-6 flex items-center gap-1.5 text-[11.5px] text-[#766661]">
+            <ShieldCheck size={14} className="text-[#7a1f2b]" />
             Encrypted session · activity is audited · © {new Date().getFullYear()} Betterway Mortgages LLC
           </p>
         </div>
