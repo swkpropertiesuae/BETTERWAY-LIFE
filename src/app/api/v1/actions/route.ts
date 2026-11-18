@@ -66,6 +66,19 @@ import {
   toggleProductionSecurityLock,
   updateSalesProgressionAndBlockingDesk,
 } from '@/server/engines/commercial-workflows-engine';
+import {
+  enqueueMobileOfflineAction,
+  replayMobileOfflineQueue,
+  resolveMobileSyncConflict,
+} from '@/server/engines/mobile-app-engine';
+import {
+  createAndAutoFillStudioDocument,
+} from '@/server/engines/pdf-studio-engine';
+import {
+  createHrOperationRequest,
+  reviewHrOperationRequestByRahaba,
+  type HrRequestType,
+} from '@/server/engines/rahaba-hr-operations-engine';
 
 const STAFF_ROLES: UserRole[] = [
   'SUPER_ADMIN',
@@ -1180,6 +1193,92 @@ export async function POST(req: Request) {
           bounceReason: String(body.bounceReason || ''),
         });
         return respondOk(`Cheque ${t.chequeRef} transitioned to ${t.newStatus}`);
+      }
+
+      case 'mobile_enqueue_offline': {
+        assertRole(user, STAFF_ROLES);
+        const q = enqueueMobileOfflineAction(db, {
+          idempotencyKey: String(body.idempotencyKey || `idem-${Date.now()}`),
+          userEmail: String(body.userEmail || user.email),
+          deviceId: String(body.deviceId || 'BW-IOS-PRO-01'),
+          actionType: (body.actionType as 'SITE_VISIT_CHECKIN') || 'SITE_VISIT_CHECKIN',
+          targetTable: (body.targetTable as 'deals') || 'deals',
+          targetId: String(body.targetId || '1'),
+          baseRecordVersion: Number(body.baseRecordVersion ?? 1),
+          payload: {
+            note: String(body.note || 'Logged via Betterway ONE Mobile App'),
+            gpsCoords: String(body.gpsCoords || '25.1972,55.2744'),
+          },
+        });
+        return respondOk(`Offline action queued (${q.id} · ${q.sync_status})`, q);
+      }
+
+      case 'mobile_replay_queue': {
+        assertRole(user, STAFF_ROLES);
+        const rep = replayMobileOfflineQueue(
+          db,
+          String(body.userEmail || user.email),
+          String(body.deviceId || 'BW-IOS-PRO-01'),
+        );
+        return respondOk(
+          `Mobile Offline Queue Replayed: ${rep.syncedCount} synced, ${rep.conflictCount} conflict(s), ${rep.failedCount} rejected`,
+          rep,
+        );
+      }
+
+      case 'mobile_resolve_conflict': {
+        assertRole(user, STAFF_ROLES);
+        const resolved = resolveMobileSyncConflict(
+          db,
+          user.email,
+          String(body.conflictId),
+          (body.resolution as 'ACCEPT_CLIENT' | 'ACCEPT_SERVER' | 'MERGED') || 'ACCEPT_CLIENT',
+        );
+        return respondOk(`Conflict ${resolved.id} resolved (${resolved.resolution_strategy})`, resolved);
+      }
+
+      case 'create_studio_document': {
+        assertRole(user, STAFF_ROLES);
+        const doc = createAndAutoFillStudioDocument(db, {
+          templateId: String(body.templateId || 'hr-salary-certificate'),
+          dealId: body.dealId ? Number(body.dealId) : 1,
+          employeeEmail: String(body.employeeEmail || user.email),
+          createdByEmail: user.email,
+        });
+        return respondOk(`Document ${doc.docRef} (${doc.title}) generated in PDF Studio`, doc);
+      }
+
+      case 'create_hr_operation_request': {
+        assertRole(user, STAFF_ROLES);
+        const reqItem = createHrOperationRequest(db, {
+          requesterEmail: String(body.requesterEmail || user.email),
+          requestType: (body.requestType as HrRequestType) || 'SALARY_CERTIFICATE',
+          subject: String(body.subject || 'HR Certificate Request'),
+          details: String(body.details || 'Submitted to Rahaba Azeez HR & Operations Desk'),
+          priority: (body.priority as 'LOW' | 'NORMAL' | 'HIGH' | 'CRITICAL') || 'HIGH',
+        });
+        return respondOk(
+          `HR Request ${reqItem.requestRef} routed to Rahaba Azeez (HR & Company Operations)`,
+          reqItem,
+        );
+      }
+
+      case 'review_hr_operation_request': {
+        assertRole(user, STAFF_ROLES);
+        const rev = reviewHrOperationRequestByRahaba(db, {
+          requestId: Number(body.requestId),
+          actorEmail: user.email,
+          decision:
+            (body.decision as 'APPROVED_ISSUED' | 'ESCALATED_MANAGER_OWNER' | 'REJECTED') ||
+            'APPROVED_ISSUED',
+          rahabaNotes: String(
+            body.rahabaNotes || 'Verified & stamped by Rahaba Azeez (HR & Company Operations)',
+          ),
+        });
+        return respondOk(
+          `HR Request ${rev.requestRef} marked ${rev.status} by ${rev.reviewedByName}`,
+          rev,
+        );
       }
 
       default:

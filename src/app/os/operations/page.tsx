@@ -3,7 +3,9 @@ import { getDb } from '@/server/db';
 import { requireStaffUser } from '@/server/auth/request';
 import { formatAedWhole } from '@/lib/format';
 import { OsBanner } from '@/components/os-banner';
+import { StaffAvatar } from '@/components/staff-avatar';
 import { PERMITTED_UAE_PAYMENT_CHANNELS } from '@/server/engines/swk-enterprise-engine';
+import { getRahabaOperationsDashboard } from '@/server/engines/rahaba-hr-operations-engine';
 
 export const dynamic = 'force-dynamic';
 
@@ -101,8 +103,11 @@ export default async function CompanyOperationsPage({
     )
     .all() as Array<Record<string, unknown>>;
 
+  const rahabaDash = getRahabaOperationsDashboard(db);
+
   const tabs = [
     { id: 'overview', label: 'Overview & Tasks' },
+    { id: 'rahaba-hr', label: 'Rahaba HR & Attendance Desk' },
     { id: 'tasks', label: 'Internal Tasks Board' },
     { id: 'reports', label: 'Daily Work Reports' },
     { id: 'rates', label: 'Bank Rate Cards & FOLs' },
@@ -191,6 +196,255 @@ export default async function CompanyOperationsPage({
           );
         })}
       </div>
+
+      {/* Rahaba Azeez — HR, 10:05 AM Attendance & Company Operations Desk */}
+      {(activeTab === 'overview' || activeTab === 'rahaba-hr') && (
+        <div className="space-y-5">
+          {/* Rahaba Azeez Executive HR Banner */}
+          <div className="rounded-2xl bg-[#021125] text-white p-5 border-b-4 border-[#D7B04E] flex flex-wrap items-center justify-between gap-4">
+            <div className="flex items-center gap-3.5">
+              <StaffAvatar
+                name={rahabaDash.hrLead.fullNameEn}
+                email={rahabaDash.hrLead.email}
+                size={52}
+              />
+              <div>
+                <div className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#D7B04E]">
+                  HR, 10:05 AM GST ATTENDANCE &amp; COMPANY OPERATIONS DESK
+                </div>
+                <h2 className="font-display text-xl font-bold mt-0.5">
+                  {rahabaDash.hrLead.fullNameEn} — {rahabaDash.hrLead.designation} ({rahabaDash.hrLead.email})
+                </h2>
+                <p className="text-xs text-slate-300 mt-0.5">
+                  Managing Reception QR roll call, MOHRE salary certificates, employer NOCs, leave approvals, staff visa/RERA renewals &amp; daily work reports.
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-wrap items-center gap-2 text-xs">
+              <Link
+                href="/os/reception-qr"
+                className="px-3.5 py-2 rounded-xl bg-[#D7B04E] text-[#021125] font-bold"
+              >
+                Open Reception QR Stand →
+              </Link>
+              <Link
+                href="/os/studio"
+                className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold"
+              >
+                Issue HR Letter in PDF Studio →
+              </Link>
+              <Link
+                href="/os/mobile?staff=rahaba%40betterwaymortgages.com"
+                className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold"
+              >
+                Rahaba Mobile App →
+              </Link>
+            </div>
+          </div>
+
+          {/* 9-Staff 10:05 AM GST Attendance & Daily Report Roll Call */}
+          <div className="bw-card p-5 space-y-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <h3 className="font-display font-bold text-base text-[#021125]">
+                  Live 10:05 AM GST Reception QR Roll Call &amp; Staff Accountability ({rahabaDash.dateGst})
+                </h3>
+                <p className="text-xs text-slate-500">
+                  Every Betterway staff member with official studio portrait, shift check-in status, and daily work report indicator.
+                </p>
+              </div>
+              <div className="flex items-center gap-2 text-xs font-num">
+                <span className="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-900 font-bold">
+                  Checked In: {rahabaDash.kpis.checkedInCount}/{rahabaDash.kpis.totalStaff}
+                </span>
+                <span className="px-2.5 py-1 rounded-full bg-amber-100 text-[#8A6518] font-bold">
+                  Pending HR Queue: {rahabaDash.kpis.pendingHrRequests}
+                </span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
+              {rahabaDash.staffRollCall.map((member) => (
+                <div
+                  key={member.email}
+                  className="rounded-xl border border-slate-200 p-3.5 bg-slate-50/70 flex items-center justify-between gap-2.5"
+                >
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <StaffAvatar name={member.fullNameEn} email={member.email} size={40} />
+                    <div className="min-w-0">
+                      <div className="font-bold text-[#021125] truncate">{member.fullNameEn}</div>
+                      <div className="text-[11px] text-[#8A6518] font-semibold truncate">
+                        {member.designation}
+                      </div>
+                      <div className="text-[10px] text-slate-500 font-num truncate">
+                        {member.empCode} · Visa: {member.visaExpiryDate}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="text-right shrink-0 space-y-1">
+                    <span
+                      className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold ${
+                        member.attendanceStatus === 'ON_TIME'
+                          ? 'bg-emerald-100 text-emerald-800'
+                          : member.attendanceStatus === 'LATE'
+                            ? 'bg-rose-100 text-rose-800'
+                            : 'bg-slate-200 text-slate-700'
+                      }`}
+                    >
+                      {member.checkedInToday
+                        ? `${member.checkInTimeGst} · ${member.attendanceStatus}`
+                        : 'AWAITING QR'}
+                    </span>
+                    <div className="text-[10px] text-slate-500">
+                      {member.submittedDailyReport ? 'Report Logged ✓' : 'Report Due 19:00'}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Submit HR / Operations Request to Rahaba Azeez + Approval Queue */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 text-xs">
+            <div className="lg:col-span-4 bw-card p-5 space-y-3">
+              <div className="flex items-center gap-2">
+                <StaffAvatar name="Rahaba Azeez" email="rahaba@betterwaymortgages.com" size={32} />
+                <div>
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-[#8A6518]">
+                    HR &amp; Operations Desk
+                  </div>
+                  <h3 className="font-display font-bold text-base text-[#021125]">
+                    Submit Request to Rahaba Azeez
+                  </h3>
+                </div>
+              </div>
+              <form method="POST" action="/api/v1/actions" className="space-y-2.5">
+                <input type="hidden" name="action" value="create_hr_operation_request" />
+                <input type="hidden" name="returnTo" value={`/os/operations?tab=${activeTab}`} />
+                <label className="block">
+                  <span className="font-semibold text-slate-700">Staff Member</span>
+                  <select name="requesterEmail" defaultValue={user.email} className="bw-input mt-1 w-full">
+                    {rahabaDash.staffRollCall.map((s) => (
+                      <option key={s.email} value={s.email}>
+                        {s.fullNameEn} ({s.designation})
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="block">
+                  <span className="font-semibold text-slate-700">Request Category</span>
+                  <select name="requestType" className="bw-input mt-1 w-full">
+                    <option value="SALARY_CERTIFICATE">Salary Certificate (MOHRE / Bank)</option>
+                    <option value="EMPLOYMENT_NOC">Employer No Objection Certificate (NOC)</option>
+                    <option value="OFFER_LETTER">Employment Offer Letter</option>
+                    <option value="LEAVE_REQUEST">Annual / Sick / Unpaid Leave Approval</option>
+                    <option value="LATE_ATTENDANCE_EXCUSE">10:05 AM Attendance / Client Visit Excuse</option>
+                    <option value="VISA_RERA_RENEWAL">Visa / Emirates ID / RERA BRN PRO Renewal</option>
+                    <option value="EXPENSE_REIMBURSEMENT">Company Expense Reimbursement</option>
+                    <option value="DISCIPLINARY_WARNING">Punctuality / Attendance Notice</option>
+                  </select>
+                </label>
+                <label className="block">
+                  <span className="font-semibold text-slate-700">Subject</span>
+                  <input
+                    name="subject"
+                    required
+                    placeholder="e.g. Salary Certificate addressed to Emirates NBD"
+                    className="bw-input mt-1 w-full"
+                  />
+                </label>
+                <label className="block">
+                  <span className="font-semibold text-slate-700">Details &amp; Supporting Notes</span>
+                  <textarea
+                    name="details"
+                    rows={2}
+                    required
+                    placeholder="Specify bank addressee, leave dates, or DLD trustee appointment..."
+                    className="bw-input mt-1 w-full"
+                  />
+                </label>
+                <button type="submit" className="bw-btn-gold w-full justify-center">
+                  Route Request to Rahaba Azeez (HR)
+                </button>
+              </form>
+            </div>
+
+            <div className="lg:col-span-8 bw-card p-5 space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="font-display font-bold text-base text-[#021125]">
+                  Rahaba Azeez HR &amp; Company Operations Queue ({rahabaDash.requests.length})
+                </h3>
+                <Link href="/os/studio" className="text-xs font-bold text-[#8A6518] hover:underline">
+                  Open PDF Studio Vault →
+                </Link>
+              </div>
+              <div className="space-y-2.5 max-h-[420px] overflow-y-auto pr-1">
+                {rahabaDash.requests.map((req) => (
+                  <div
+                    key={req.id}
+                    className="rounded-xl border border-slate-200 p-3.5 bg-slate-50/70 space-y-2"
+                  >
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex items-center gap-2.5">
+                        <StaffAvatar name={req.requesterName} email={req.requesterEmail} size={32} />
+                        <div>
+                          <div className="font-bold text-[#021125]">
+                            <span className="font-num text-[#8A6518]">{req.requestRef}</span> · {req.subject}
+                          </div>
+                          <div className="text-[11px] text-slate-500">
+                            Requested by <strong>{req.requesterName}</strong> · Type:{' '}
+                            <strong>{req.requestType.replace(/_/g, ' ')}</strong>
+                          </div>
+                        </div>
+                      </div>
+                      <span
+                        className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                          req.status === 'APPROVED_ISSUED'
+                            ? 'bg-emerald-100 text-emerald-800'
+                            : req.status === 'ESCALATED_MANAGER_OWNER'
+                              ? 'bg-amber-100 text-amber-900'
+                              : 'bg-[#021125] text-[#D7B04E]'
+                        }`}
+                      >
+                        {req.status}
+                      </span>
+                    </div>
+                    <p className="text-slate-600 text-[11px]">{req.details}</p>
+                    {req.rahabaNotes && (
+                      <div className="text-[11px] text-emerald-900 bg-emerald-50/80 border border-emerald-200 rounded-lg px-2.5 py-1.5">
+                        <strong>Rahaba Azeez Note:</strong> {req.rahabaNotes}
+                      </div>
+                    )}
+                    {req.status === 'PENDING_RAHABA' && (
+                      <div className="flex flex-wrap gap-2 pt-1">
+                        <form method="POST" action="/api/v1/actions">
+                          <input type="hidden" name="action" value="review_hr_operation_request" />
+                          <input type="hidden" name="returnTo" value={`/os/operations?tab=${activeTab}`} />
+                          <input type="hidden" name="requestId" value={String(req.id)} />
+                          <input type="hidden" name="decision" value="APPROVED_ISSUED" />
+                          <button type="submit" className="bw-btn-navy text-[11px] py-1 px-3">
+                            Approve &amp; Issue Studio PDF ✓
+                          </button>
+                        </form>
+                        <form method="POST" action="/api/v1/actions">
+                          <input type="hidden" name="action" value="review_hr_operation_request" />
+                          <input type="hidden" name="returnTo" value={`/os/operations?tab=${activeTab}`} />
+                          <input type="hidden" name="requestId" value={String(req.id)} />
+                          <input type="hidden" name="decision" value="ESCALATED_MANAGER_OWNER" />
+                          <button type="submit" className="bw-btn-gold text-[11px] py-1 px-3">
+                            Escalate to Daniel / Shabib / Warda
+                          </button>
+                        </form>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Overview or Internal Tasks Tab: Assign & Complete Internal Tasks */}
       {(activeTab === 'overview' || activeTab === 'tasks') && (
@@ -451,7 +705,10 @@ export default async function CompanyOperationsPage({
               {dailyReports.map((r) => (
                 <div key={String(r.id)} className="p-4 rounded-xl bg-gray-50 border border-slate-200/80">
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <span className="font-bold text-slate-900 text-sm">{String(r.employee_name)}</span>
+                    <span className="font-bold text-slate-900 text-sm flex items-center gap-2">
+                      <StaffAvatar name={String(r.employee_name)} size={26} />
+                      <span>{String(r.employee_name)}</span>
+                    </span>
                     <span className="font-num text-xs font-semibold text-slate-700">{String(r.report_date)}</span>
                   </div>
                   <p className="text-xs text-slate-700 mt-2">{String(r.summary_notes)}</p>
@@ -477,7 +734,7 @@ export default async function CompanyOperationsPage({
       )}
 
       {/* Other Operational Tabs */}
-      {activeTab !== 'overview' && activeTab !== 'tasks' && activeTab !== 'reports' && (
+      {activeTab !== 'overview' && activeTab !== 'rahaba-hr' && activeTab !== 'tasks' && activeTab !== 'reports' && (
         <div className="bw-card p-5 space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
@@ -607,8 +864,13 @@ export default async function CompanyOperationsPage({
                 <tbody className="divide-y divide-slate-100">
                   {employees.map((e) => (
                     <tr key={String(e.id)}>
-                      <td className="py-2.5 px-3 font-bold text-slate-900">{String(e.full_name_en)}</td>
-                      <td className="py-2.5 px-3">{String(e.role)}</td>
+                      <td className="py-2.5 px-3 font-bold text-slate-900">
+                        <div className="flex items-center gap-2">
+                          <StaffAvatar name={String(e.full_name_en)} email={String(e.email || '')} size={26} />
+                          <span>{String(e.full_name_en)}</span>
+                        </div>
+                      </td>
+                      <td className="py-2.5 px-3">{String(e.designation || e.role)}</td>
                       <td className="py-2.5 px-3 font-num">{String(e.emp_code || 'BW-EMP')}</td>
                       <td className="py-2.5 px-3 font-num">{String(e.visa_expiry_date || '2028-12-31')}</td>
                     </tr>

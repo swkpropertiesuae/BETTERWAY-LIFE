@@ -32,6 +32,8 @@ export function initializeDatabase(
   ensure('conveyancing_cases', 'valuation_access_status', "TEXT NOT NULL DEFAULT 'ACCESS_CONFIRMED'");
   ensure('conveyancing_cases', 'developer_portal_name', "TEXT NOT NULL DEFAULT 'Emaar Sakani Portal'");
   ensure('conveyancing_cases', 'dld_blocking_stage', "TEXT NOT NULL DEFAULT 'NOT_REQUIRED'");
+  ensure('deals', 'record_version', 'INTEGER NOT NULL DEFAULT 1');
+  ensure('leads', 'record_version', 'INTEGER NOT NULL DEFAULT 1');
   const items: [string, string, string][] = [
     ['Regulatory', 'Confirm LTV caps (resident, non-resident, first/second home, over AED 5M, off-plan) against the current CBUAE rulebook', 'Compliance'],
     ['Regulatory', 'Confirm DLD fees (transfer, mortgage registration, admin, trustee) against the current DLD schedule and import Fees_and_Closing_Costs', 'Finance'],

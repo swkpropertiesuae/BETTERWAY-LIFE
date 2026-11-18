@@ -8,6 +8,12 @@ import {
   queryBankPolicyCoPilot,
   type StatementLine,
 } from '@/server/engines/statement-and-policy-copilot';
+import {
+  askBetterwayGpt,
+  listAiChatThreads,
+  listAiDigitalEmployees,
+} from '@/server/engines/betterway-gpt-engine';
+import { BetterwayGptClient } from '@/components/betterway-gpt-client';
 
 const DEFAULT_STMT_RAW = [
   '2026-09-28|WPS SALARY TRANSFER EMIRATES GROUP|0|42000',
@@ -50,9 +56,36 @@ export default async function BiAndCopilotPage({
   const stmtRaw = sp.stmt || DEFAULT_STMT_RAW;
   const stmtAnalysis = analyzeBankStatementLines(parseStatementText(stmtRaw));
 
+  let threads = listAiChatThreads(db, user.email);
+  if (threads.length === 0) {
+    askBetterwayGpt(db, {
+      userEmail: user.email,
+      prompt: 'Show our live mortgage pipeline, 3M EIBOR, top UAE bank rates, and Rahaba HR attendance status today',
+      mode: 'LIVE_OS_DATA',
+    });
+    threads = listAiChatThreads(db, user.email);
+  }
+  const digitalEmployees = listAiDigitalEmployees(db);
+
   return (
     <div className="space-y-5 max-w-7xl mx-auto">
-      <PageHeader app="Reporting" appHref="/os/bi-copilot" title="Executive BI" sub={tr(lang, 'Clawback-Adjusted Treasury Forecast, Statement Parser & Policy Co-Pilot', 'توقعات الخزينة المعدلة، كاشف الالتزامات ومساعد السياسات الموثق')} />
+      <PageHeader
+        app="BetterwayGPT & BI"
+        appHref="/os/bi-copilot"
+        title="BetterwayGPT — Private Company ChatGPT, AI Employees & Executive BI"
+        sub={tr(
+          lang,
+          'Multi-Thread Live OS ChatGPT, 6 Digital AI Employees, Voice Receptionist, Statement Parser & Treasury Forecast',
+          'محادثة الذكاء الاصطناعي الخاصة بالشركة، الموظفون الرقميون، محلل كشوف الحسابات وتوقعات الخزينة',
+        )}
+      />
+
+      <BetterwayGptClient
+        userEmail={user.email}
+        userName={user.full_name_en}
+        initialThreads={threads}
+        initialEmployees={digitalEmployees}
+      />
 
       {/* Stage-Weighted Forecast Cards */}
       <div className="grid md:grid-cols-3 gap-4">

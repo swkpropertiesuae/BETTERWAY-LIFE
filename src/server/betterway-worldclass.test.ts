@@ -16,6 +16,29 @@ import {
   getStaffProfileByNameOrEmail,
 } from '@/lib/staff-directory';
 import { computeToolkitAll } from '@/lib/uae-deal-toolkit';
+import {
+  buildBetterwayMobileBundle,
+  enqueueMobileOfflineAction,
+  replayMobileOfflineQueue,
+  resolveMobileSyncConflict,
+  formatMobileLockScreenNotification,
+} from '@/server/engines/mobile-app-engine';
+import {
+  askBetterwayGpt,
+  listAiDigitalEmployees,
+  runAiDigitalEmployee,
+} from '@/server/engines/betterway-gpt-engine';
+import {
+  listStudioTemplates,
+  createAndAutoFillStudioDocument,
+  transformStudioDocumentWithAi,
+  getMasterWorkflowBookletChapters,
+} from '@/server/engines/pdf-studio-engine';
+import {
+  createHrOperationRequest,
+  reviewHrOperationRequestByRahaba,
+  getRahabaOperationsDashboard,
+} from '@/server/engines/rahaba-hr-operations-engine';
 
 test('BW-1: Official Betterway Mortgages LLC roster seeds 9 exact accounts with studio avatars for the 6 staff and clean Warda profile', () => {
   const db = createInMemoryDb({ seed: true });
@@ -214,4 +237,150 @@ test('BW-4: Website-to-OS interconnection ingests public enquiries, calculator s
     ['Daniel Xavier', 'Reshma Rajan', 'Asif Khan'].includes(out.assignedAdvisor.fullNameEn),
   );
   assert.ok(out.assignedAdvisor.avatarUrl.startsWith('/staff/'));
+});
+
+test('BW-5: Betterway ONE Mobile App & Offline Sync Engine handles scoped bundles, idempotent offline queue, version conflicts & lock-screen redaction', () => {
+  const db = createInMemoryDb({ seed: true });
+  ensureCommercialProductionReady(db);
+
+  const bundle = buildBetterwayMobileBundle(db, 'asif@betterwaymortgages.com', 'BW-IOS-ASIF-01');
+  assert.equal(bundle.staff.fullNameEn, 'Asif Khan');
+  assert.equal(bundle.staff.avatarUrl, '/staff/asif-khan.jpg');
+  assert.match(bundle.encryptedChecksum, /^AES256-GCM-/);
+  assert.ok(bundle.assignedDeals.length > 0);
+
+  // Enqueue with idempotency key (duplicate call must be idempotent)
+  const firstDealId = Number(bundle.assignedDeals[0]!.id);
+  const q1 = enqueueMobileOfflineAction(db, {
+    idempotencyKey: 'idem-asif-visit-001',
+    userEmail: 'asif@betterwaymortgages.com',
+    deviceId: 'BW-IOS-ASIF-01',
+    actionType: 'SITE_VISIT_CHECKIN',
+    targetTable: 'deals',
+    targetId: String(firstDealId),
+    baseRecordVersion: 1,
+    payload: { gpsCoords: '25.1972,55.2744', note: 'Met buyer at Downtown Dubai viewing' },
+  });
+  const q1Dup = enqueueMobileOfflineAction(db, {
+    idempotencyKey: 'idem-asif-visit-001',
+    userEmail: 'asif@betterwaymortgages.com',
+    deviceId: 'BW-IOS-ASIF-01',
+    actionType: 'SITE_VISIT_CHECKIN',
+    targetTable: 'deals',
+    targetId: String(firstDealId),
+    baseRecordVersion: 1,
+    payload: { gpsCoords: '25.1972,55.2744', note: 'Met buyer at Downtown Dubai viewing' },
+  });
+  assert.equal(q1.id, q1Dup.id);
+
+  // Enqueue stale baseRecordVersion (0 < 1) to trigger version conflict review
+  enqueueMobileOfflineAction(db, {
+    idempotencyKey: 'idem-asif-conflict-002',
+    userEmail: 'asif@betterwaymortgages.com',
+    deviceId: 'BW-IOS-ASIF-01',
+    actionType: 'UPDATE_DEAL_NOTE',
+    targetTable: 'deals',
+    targetId: String(firstDealId),
+    baseRecordVersion: 0,
+    payload: { note: 'Offline rate switch request to 3.89% fixed' },
+  });
+
+  const replay = replayMobileOfflineQueue(db, 'asif@betterwaymortgages.com', 'BW-IOS-ASIF-01');
+  assert.equal(replay.syncedCount, 1);
+  assert.equal(replay.conflictCount, 1);
+  assert.equal(replay.conflictIds.length, 1);
+
+  const resolved = resolveMobileSyncConflict(
+    db,
+    'daniel@betterwaymortgages.com',
+    replay.conflictIds[0]!,
+    'ACCEPT_CLIENT',
+  );
+  assert.equal(resolved.status, 'RESOLVED');
+
+  const notif = formatMobileLockScreenNotification(
+    { title: 'VIP Client Salary Certificate Uploaded', recordType: 'DEAL', recordId: 'BW-2026-001' },
+    true,
+  );
+  assert.equal(notif.suppressedByQuietHours, true);
+  assert.doesNotMatch(notif.lockScreenText, /Salary Certificate/i);
+  assert.match(notif.lockScreenText, /Betterway ONE/i);
+});
+
+test('BW-6: BetterwayGPT complete own ChatGPT & Digital AI Employees engine answers from live OS data and executes autonomous routines', () => {
+  const db = createInMemoryDb({ seed: true });
+  ensureCommercialProductionReady(db);
+
+  const chatRes = askBetterwayGpt(db, {
+    userEmail: 'daniel@betterwaymortgages.com',
+    prompt: 'Show our live pipeline summary, top UAE bank rates, and Rahaba HR attendance status today',
+    mode: 'LIVE_OS_DATA',
+  });
+  assert.ok(chatRes.threadId);
+  assert.match(chatRes.reply, /Betterway Mortgages/i);
+  assert.match(chatRes.reply, /DBR|EIBOR|Pipeline/i);
+  assert.ok(chatRes.citations.length > 0);
+  assert.ok(chatRes.liveMetrics.activeDealsCount >= 1);
+
+  const agents = listAiDigitalEmployees(db);
+  assert.ok(agents.length >= 6);
+  const runRes = runAiDigitalEmployee(db, 'rahaba-hr-attendance', 'rahaba@betterwaymortgages.com');
+  assert.equal(runRes.status, 'COMPLETED');
+  assert.match(runRes.outputSummary, /Rahaba Azeez|Attendance|10:05/i);
+});
+
+test('BW-7: PDF & Document Studio auto-fills placeholders from DB, translates EN/AR, and serves the 20-chapter workflow booklet', () => {
+  const db = createInMemoryDb({ seed: true });
+  ensureCommercialProductionReady(db);
+
+  const templates = listStudioTemplates();
+  assert.ok(templates.length >= 10);
+  assert.ok(templates.some((t) => t.category === 'HR & Rahaba Operations'));
+
+  const doc = createAndAutoFillStudioDocument(db, {
+    templateId: 'hr-salary-certificate',
+    employeeEmail: 'asif@betterwaymortgages.com',
+    dealId: 1,
+    createdByEmail: 'rahaba@betterwaymortgages.com',
+  });
+  assert.ok(doc.id > 0);
+  assert.match(doc.renderedBody, /Asif Khan/);
+  assert.doesNotMatch(doc.renderedBody, /\[Employee Name\]/);
+
+  const arabicDraft = transformStudioDocumentWithAi(doc.renderedBody, 'translate_ar');
+  assert.match(arabicDraft, /شهادة|التمويل العقاري|درهم/);
+
+  const chapters = getMasterWorkflowBookletChapters();
+  assert.equal(chapters.length, 20);
+});
+
+test('BW-8: Rahaba Azeez HR, Attendance & Company Operations Centre manages HR requests, certificates, attendance roll-call & escalations', () => {
+  const db = createInMemoryDb({ seed: true });
+  ensureCommercialProductionReady(db);
+
+  const reqItem = createHrOperationRequest(db, {
+    requesterEmail: 'asif@betterwaymortgages.com',
+    requestType: 'SALARY_CERTIFICATE',
+    subject: 'Salary Certificate addressed to Emirates NBD for personal auto loan',
+    details: 'Please issue stamped salary certificate showing AED 12,000 fixed + commission structure.',
+    priority: 'HIGH',
+  });
+  assert.match(reqItem.requestRef, /^BW-HR-/);
+  assert.equal(reqItem.assignedHrName, 'Rahaba Azeez');
+  assert.equal(reqItem.assignedHrAvatar, '/staff/rahaba-azeez.jpg');
+
+  const reviewed = reviewHrOperationRequestByRahaba(db, {
+    requestId: reqItem.id,
+    actorEmail: 'rahaba@betterwaymortgages.com',
+    decision: 'APPROVED_ISSUED',
+    rahabaNotes: 'Verified MOHRE contract & WPS history. Official PDF issued in Studio.',
+  });
+  assert.equal(reviewed.status, 'APPROVED_ISSUED');
+  assert.equal(reviewed.reviewedByName, 'Rahaba Azeez');
+
+  const dash = getRahabaOperationsDashboard(db, '2026-11-18');
+  assert.equal(dash.hrLead.fullNameEn, 'Rahaba Azeez');
+  assert.equal(dash.hrLead.avatarUrl, '/staff/rahaba-azeez.jpg');
+  assert.equal(dash.staffRollCall.length, 9);
+  assert.ok(dash.requests.length >= 1);
 });

@@ -1128,4 +1128,109 @@ CREATE TABLE IF NOT EXISTS pdc_cheque_register (
   gl_entry_id INTEGER REFERENCES gl_journal_entries(id),
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
+
+CREATE TABLE IF NOT EXISTS mobile_sync_queue (
+  id TEXT PRIMARY KEY,
+  idempotency_key TEXT NOT NULL UNIQUE,
+  user_email TEXT NOT NULL,
+  device_id TEXT NOT NULL,
+  action_type TEXT NOT NULL,
+  target_table TEXT NOT NULL,
+  target_id TEXT NOT NULL,
+  base_record_version INTEGER NOT NULL DEFAULT 1,
+  payload_json TEXT NOT NULL DEFAULT '{}',
+  source_timestamp TEXT NOT NULL DEFAULT (datetime('now')),
+  sync_status TEXT NOT NULL DEFAULT 'PENDING_SYNC' CHECK (sync_status IN ('PENDING_SYNC','SYNCED','NEEDS_REVIEW','FAILED')),
+  rejection_reason TEXT,
+  processed_at TEXT
+);
+
+CREATE TABLE IF NOT EXISTS mobile_sync_conflicts (
+  id TEXT PRIMARY KEY,
+  queue_item_id TEXT NOT NULL REFERENCES mobile_sync_queue(id) ON DELETE CASCADE,
+  target_table TEXT NOT NULL,
+  target_id TEXT NOT NULL,
+  base_version INTEGER NOT NULL,
+  server_version INTEGER NOT NULL,
+  server_values_json TEXT NOT NULL DEFAULT '{}',
+  client_values_json TEXT NOT NULL DEFAULT '{}',
+  affected_fields_json TEXT NOT NULL DEFAULT '[]',
+  status TEXT NOT NULL DEFAULT 'NEEDS_REVIEW' CHECK (status IN ('NEEDS_REVIEW','RESOLVED')),
+  resolved_by TEXT,
+  resolution_strategy TEXT,
+  resolved_at TEXT,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS ai_chat_threads (
+  id TEXT PRIMARY KEY,
+  user_email TEXT NOT NULL,
+  title TEXT NOT NULL,
+  mode TEXT NOT NULL DEFAULT 'LIVE_OS_DATA',
+  updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS ai_chat_messages (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  thread_id TEXT NOT NULL REFERENCES ai_chat_threads(id) ON DELETE CASCADE,
+  role TEXT NOT NULL CHECK (role IN ('user','assistant','system')),
+  content TEXT NOT NULL,
+  citations_json TEXT NOT NULL DEFAULT '[]',
+  metrics_json TEXT NOT NULL DEFAULT '{}',
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS ai_agent_runs (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  agent_slug TEXT NOT NULL,
+  agent_name TEXT NOT NULL,
+  triggered_by_email TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'COMPLETED' CHECK (status IN ('RUNNING','COMPLETED','REQUIRES_APPROVAL','FAILED')),
+  output_summary TEXT NOT NULL,
+  actions_taken_json TEXT NOT NULL DEFAULT '[]',
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS studio_documents (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  doc_ref TEXT NOT NULL UNIQUE,
+  template_id TEXT NOT NULL,
+  title TEXT NOT NULL,
+  category TEXT NOT NULL,
+  deal_id INTEGER REFERENCES deals(id) ON DELETE SET NULL,
+  employee_email TEXT,
+  rendered_body TEXT NOT NULL,
+  language TEXT NOT NULL DEFAULT 'en',
+  created_by_email TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'FINAL_READY' CHECK (status IN ('DRAFT','FINAL_READY','ISSUED_STAMPED')),
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS hr_operations_requests (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  request_ref TEXT NOT NULL UNIQUE,
+  requester_email TEXT NOT NULL,
+  requester_name TEXT NOT NULL,
+  requester_avatar TEXT,
+  request_type TEXT NOT NULL CHECK (request_type IN (
+    'SALARY_CERTIFICATE','EMPLOYMENT_NOC','OFFER_LETTER','LEAVE_REQUEST',
+    'LATE_ATTENDANCE_EXCUSE','VISA_RERA_RENEWAL','EXPENSE_REIMBURSEMENT','DISCIPLINARY_WARNING'
+  )),
+  subject TEXT NOT NULL,
+  details TEXT NOT NULL,
+  priority TEXT NOT NULL DEFAULT 'NORMAL' CHECK (priority IN ('LOW','NORMAL','HIGH','CRITICAL')),
+  assigned_hr_email TEXT NOT NULL DEFAULT 'rahaba@betterwaymortgages.com',
+  assigned_hr_name TEXT NOT NULL DEFAULT 'Rahaba Azeez',
+  assigned_hr_avatar TEXT NOT NULL DEFAULT '/staff/rahaba-azeez.jpg',
+  status TEXT NOT NULL DEFAULT 'PENDING_RAHABA' CHECK (status IN (
+    'PENDING_RAHABA','APPROVED_ISSUED','ESCALATED_MANAGER_OWNER','REJECTED'
+  )),
+  rahaba_notes TEXT NOT NULL DEFAULT '',
+  reviewed_by_email TEXT,
+  reviewed_by_name TEXT,
+  studio_doc_id INTEGER REFERENCES studio_documents(id) ON DELETE SET NULL,
+  reviewed_at TEXT,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
 `;

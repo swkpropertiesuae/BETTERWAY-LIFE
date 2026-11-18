@@ -674,10 +674,100 @@ export function ensureCommercialProductionReady(db: DatabaseSync) {
 
     // Point active bank rate cards to Shabib Siraj so foreign keys remain valid
     const shabibUser = db.prepare("SELECT id FROM users WHERE email = 'shabib@betterwaymortgages.com'").get() as { id: number } | undefined;
+    const danielUser = db.prepare("SELECT id FROM users WHERE email = 'daniel@betterwaymortgages.com'").get() as { id: number } | undefined;
+    const reshmaUser = db.prepare("SELECT id FROM users WHERE email = 'reshma@betterwaymortgages.com'").get() as { id: number } | undefined;
+    const asifUser = db.prepare("SELECT id FROM users WHERE email = 'asif@betterwaymortgages.com'").get() as { id: number } | undefined;
+    const eltonUser = db.prepare("SELECT id FROM users WHERE email = 'elton@betterwaymortgages.com'").get() as { id: number } | undefined;
+
     if (shabibUser) {
       db.prepare('UPDATE bank_rate_cards SET created_by = ?, approved_by = ?').run(shabibUser.id, shabibUser.id);
       db.prepare('UPDATE bank_project_apl SET updated_by = ?').run(shabibUser.id);
     }
+
+    // Seed 3 canonical Betterway live deals & leads attributed to Daniel Xavier, Reshma Rajan, Asif Khan & Elton Frank
+    const h1 = Number(
+      db
+        .prepare("INSERT INTO households (primary_name, segment) VALUES ('Khalid Al Nuaimi', 'UAE_NATIONAL')")
+        .run().lastInsertRowid,
+    );
+    const h2 = Number(
+      db
+        .prepare("INSERT INTO households (primary_name, segment) VALUES ('Dr. Tariq Al Mansoori', 'RESIDENT_SALARIED')")
+        .run().lastInsertRowid,
+    );
+    const h3 = Number(
+      db
+        .prepare("INSERT INTO households (primary_name, segment) VALUES ('Alistair & Victoria Sterling', 'RESIDENT_SALARIED')")
+        .run().lastInsertRowid,
+    );
+
+    const enbdBank = db.prepare("SELECT id FROM banks WHERE bank_key = 'ENBD' LIMIT 1").get() as { id: number } | undefined;
+    const fabBank = db.prepare("SELECT id FROM banks WHERE bank_key = 'FAB' LIMIT 1").get() as { id: number } | undefined;
+    const dibBank = db.prepare("SELECT id FROM banks WHERE bank_key = 'DIB' LIMIT 1").get() as { id: number } | undefined;
+
+    const insDeal = db.prepare(`
+      INSERT INTO deals (
+        deal_ref, origin_mode, household_id, lead_source_category, advisor_id, underwriter_id, progression_manager_id,
+        finance_preference, transaction_type, emirate, community_name, property_status, is_first_home,
+        purchase_price_fils, estimated_valuation_fils, target_loan_fils, tenure_months, stage, cdd_status, selected_bank_id
+      ) VALUES (?, 'LIVE', ?, 'COMPANY_OR_PARTNER', ?, ?, ?, ?, ?, 'dubai', ?, 'READY', 1, ?, ?, ?, 300, ?, 'CLEARED', ?)
+    `);
+
+    insDeal.run(
+      'BW-2026-0001',
+      h1,
+      danielUser?.id ?? null,
+      danielUser?.id ?? null,
+      eltonUser?.id ?? null,
+      'CONVENTIONAL_ONLY',
+      'READY_PURCHASE',
+      'Dubai Hills Estate',
+      350_000_000,
+      355_000_000,
+      280_000_000,
+      'FOL_ISSUED',
+      enbdBank?.id ?? null,
+    );
+    insDeal.run(
+      'BW-2026-0002',
+      h2,
+      asifUser?.id ?? null,
+      danielUser?.id ?? null,
+      eltonUser?.id ?? null,
+      'ISLAMIC_ONLY',
+      'READY_PURCHASE',
+      'Palm Jumeirah',
+      620_000_000,
+      625_000_000,
+      465_000_000,
+      'IPA_APPROVED',
+      dibBank?.id ?? null,
+    );
+    insDeal.run(
+      'BW-2026-0003',
+      h3,
+      reshmaUser?.id ?? null,
+      danielUser?.id ?? null,
+      eltonUser?.id ?? null,
+      'ANY',
+      'BUYOUT',
+      'Downtown Dubai',
+      410_000_000,
+      415_000_000,
+      310_000_000,
+      'UNDERWRITING_READY',
+      fabBank?.id ?? null,
+    );
+
+    const insLead = db.prepare(`
+      INSERT INTO leads (
+        contact_name, contact_phone, contact_email, source_channel, assigned_advisor_id,
+        desk, transaction_type, target_property_fils, stage, first_response_due_at, client_consent_logged_at
+      ) VALUES (?, ?, ?, 'WEBSITE_CALC', ?, 'RESIDENT_DESK', 'READY_PURCHASE', ?, 'NEW', datetime('now', '+5 minutes'), datetime('now'))
+    `);
+    insLead.run('Khalid Al Nuaimi', '+971504112233', 'khalid.nuaimi@example.ae', danielUser?.id ?? null, 350_000_000);
+    insLead.run('Dr. Tariq Al Mansoori', '+971505223344', 'tariq.mansoori@example.ae', asifUser?.id ?? null, 620_000_000);
+    insLead.run('Victoria Sterling', '+971506334455', 'victoria.sterling@example.ae', reshmaUser?.id ?? null, 410_000_000);
 
     db.prepare(`
       INSERT INTO system_flags (flag_key, flag_value, updated_at)

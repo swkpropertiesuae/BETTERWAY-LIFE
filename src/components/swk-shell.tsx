@@ -45,6 +45,7 @@ import {
   Send,
   Settings,
   Shield,
+  Smartphone,
   Sparkles,
   Sun,
   Target,
@@ -94,10 +95,12 @@ export const CORPORATE_NAV_SECTIONS = [
       { title: 'Deal Pipeline', url: '/os/deals', icon: ArrowLeftRight, desc: 'Track deals step by step' },
       { title: '10-Step Workflow', url: '/os/steps', icon: CheckSquare, desc: 'Sequential 10-step company guide' },
       { title: 'Playbook Engine', url: '/os/workflow', icon: Activity, desc: 'Automated stage playbooks & SLAs' },
-      { title: 'Daily Operations', url: '/os/operations', icon: Activity, desc: 'Company workflow control' },
+      { title: 'Daily Operations', url: '/os/operations', icon: Activity, desc: 'Company & Rahaba HR control' },
       { title: 'Market Pulse', url: '/os/market', icon: Target, desc: 'Dubai prices, yields & 15Y outlook' },
       { title: 'Attendance Check-In', url: '/os/reception-qr', icon: QrCode, desc: 'Office reception scan & check-in' },
-      { title: 'AI Assistant', url: '/os/bi-copilot', icon: Sparkles, desc: 'Smart underwriting & policy helper' },
+      { title: 'Betterway ONE Mobile', url: '/os/mobile', icon: Smartphone, desc: 'iOS/Android field app & sync' },
+      { title: 'BetterwayGPT & AI', url: '/os/bi-copilot', icon: Sparkles, desc: 'Private company ChatGPT & AI agents' },
+      { title: 'PDF & Document Studio', url: '/os/studio', icon: Printer, desc: 'HR letters, proposals & 20-ch PDF' },
       { title: 'Global Record Search', url: '/os/search', icon: Search, desc: 'Search borrowers, EIDs & files' },
     ],
   },
@@ -292,17 +295,33 @@ export function OsLayoutFrame({
       n.app.label.toLowerCase().includes(cmdQuery.toLowerCase()),
   );
 
-  const handleAiSend = (text?: string) => {
+  const handleAiSend = async (text?: string) => {
     const q = (text ?? aiInput).trim();
     if (!q) return;
     const uMsg = { id: `u-${Date.now()}`, role: 'user' as const, text: q };
-    const bMsg = {
-      id: `b-${Date.now() + 1}`,
-      role: 'assistant' as const,
-      text: `Betterway Mortgages OS:\n• 3M EIBOR Benchmark: ${eibor3mPct}%\n• CBUAE 50.0% DBR Hard Gate: Active across all 24 UAE banks (+2.0% stress buffer).\n• Net commission split: 50% Betterway Mortgages LLC / 50% Sales Advisor.`,
-    };
-    setAiMessages((prev) => [...prev, uMsg, bMsg]);
+    setAiMessages((prev) => [...prev, uMsg]);
     if (!text) setAiInput('');
+    try {
+      const res = await fetch('/api/v1/ai/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'chat', prompt: q, userEmail: user.email }),
+      });
+      const data = await res.json();
+      const replyText =
+        data?.reply ||
+        `BetterwayGPT:\n• 3M EIBOR Benchmark: ${eibor3mPct}%\n• CBUAE 50.0% DBR Hard Gate: Active across all 24 UAE banks (+2.0% stress buffer).\n• Net commission split: 50% Betterway Mortgages LLC / 50% Sales Advisor.`;
+      setAiMessages((prev) => [...prev, { id: `b-${Date.now() + 1}`, role: 'assistant' as const, text: replyText }]);
+    } catch {
+      setAiMessages((prev) => [
+        ...prev,
+        {
+          id: `b-${Date.now() + 1}`,
+          role: 'assistant' as const,
+          text: `BetterwayGPT:\n• 3M EIBOR Benchmark: ${eibor3mPct}%\n• CBUAE 50.0% DBR Hard Gate: Active across all 24 UAE banks (+2.0% stress buffer).\n• Net commission split: 50% Betterway Mortgages LLC / 50% Sales Advisor.`,
+        },
+      ]);
+    }
   };
 
   const header = (

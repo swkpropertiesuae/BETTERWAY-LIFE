@@ -12,6 +12,7 @@ export const metadata: Metadata = {
   title: 'Betterway Mortgages LLC — Corporate Operating System',
   description:
     'Betterway Mortgages LLC institutional operating system for client origination, credit underwriting, conveyancing, treasury, human capital, and regulatory compliance.',
+  manifest: '/manifest.json',
   icons: {
     icon: '/favicon.svg',
   },
@@ -19,6 +20,7 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   maximumScale: 1,
+  themeColor: '#021125',
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
@@ -27,8 +29,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const dir = lang === 'ar' ? 'rtl' : 'ltr';
 
   return (
-    <html lang={lang} dir={dir} className="bg-[#faf6f0] text-[#021125]">
-      <body className="min-h-[100dvh] bg-[#faf6f0] text-[#021125] antialiased">{children}</body>
+    <html lang={lang} dir={dir} className="bg-[#F8F9FA] text-[#021125]">
+      <body className="min-h-[100dvh] bg-[#F8F9FA] text-[#021125] antialiased">{children}</body>
     </html>
   );
 }
