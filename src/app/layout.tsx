@@ -9,17 +9,34 @@ import './globals.css';
 import { getActiveLang, getCurrentUser } from '@/server/auth/request';
 
 export const metadata: Metadata = {
-  title: 'Betterway Mortgages LLC — Corporate Operating System',
+  title: 'Betterway ONE & OS — Betterway Mortgages LLC',
   description:
-    'Betterway Mortgages LLC institutional operating system for client origination, credit underwriting, conveyancing, treasury, human capital, and regulatory compliance.',
+    'Betterway Mortgages LLC institutional operating system & native mobile app for client origination, credit underwriting, conveyancing, treasury, human capital, and regulatory compliance.',
   manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'Betterway ONE',
+  },
+  formatDetection: {
+    telephone: true,
+  },
   icons: {
-    icon: '/favicon.svg',
+    icon: [
+      { url: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icons/icon-512.png', sizes: '512x512', type: 'image/png' },
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+    ],
+    apple: [{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
   },
 };
 
 export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
   maximumScale: 1,
+  userScalable: false,
+  viewportFit: 'cover',
   themeColor: '#021125',
 };
 

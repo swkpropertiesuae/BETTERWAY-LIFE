@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { createInMemoryDb } from '@/server/db';
 import { ensureCommercialProductionReady, OFFICIAL_BETTERWAY_STAFF } from '@/server/db/seed';
@@ -383,4 +383,33 @@ test('BW-8: Rahaba Azeez HR, Attendance & Company Operations Centre manages HR r
   assert.equal(dash.hrLead.avatarUrl, '/staff/rahaba-azeez.jpg');
   assert.equal(dash.staffRollCall.length, 9);
   assert.ok(dash.requests.length >= 1);
+});
+
+test('BW-9: Android Play Store (TWA/Capacitor) & iOS App Store (PWA/Capacitor) packaging assets exist and validate', () => {
+  const requiredFiles = [
+    'public/manifest.json',
+    'public/sw.js',
+    'public/.well-known/assetlinks.json',
+    'public/icons/icon-192.png',
+    'public/icons/icon-512.png',
+    'public/icons/maskable-512.png',
+    'public/apple-touch-icon.png',
+    'capacitor.config.ts',
+  ];
+
+  for (const rel of requiredFiles) {
+    const abs = path.resolve(process.cwd(), rel);
+    assert.equal(existsSync(abs), true, `Missing mobile store asset: ${rel}`);
+  }
+
+  const manifest = JSON.parse(readFileSync(path.resolve(process.cwd(), 'public/manifest.json'), 'utf8'));
+  assert.equal(manifest.id, 'com.betterwaymortgages.one');
+  assert.equal(manifest.start_url, '/os/mobile');
+  assert.equal(manifest.display, 'standalone');
+  assert.equal(manifest.theme_color, '#021125');
+  assert.ok(Array.isArray(manifest.icons) && manifest.icons.length >= 4);
+  assert.ok(Array.isArray(manifest.shortcuts) && manifest.shortcuts.length >= 4);
+
+  const assetLinks = JSON.parse(readFileSync(path.resolve(process.cwd(), 'public/.well-known/assetlinks.json'), 'utf8'));
+  assert.equal(assetLinks[0].target.package_name, 'com.betterwaymortgages.one');
 });

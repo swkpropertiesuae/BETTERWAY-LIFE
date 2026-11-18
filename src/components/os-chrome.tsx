@@ -239,9 +239,21 @@ export function OsFrame({ pathname, estateKey, canSee, header, sidebarFooter, di
           <LayoutGrid size={18} />
           <span>Apps</span>
         </Link>
-        <Link href="/os" className="swk-mnav-item">
-          <LayoutDashboard size={18} />
-          <span>Overview</span>
+        <Link href="/os/mobile" className="swk-mnav-item">
+          <Landmark size={18} />
+          <span>Mobile OS</span>
+        </Link>
+        <Link href="/os/reception-qr" className="swk-mnav-item">
+          <CalendarCheck size={18} />
+          <span>QR Scan</span>
+        </Link>
+        <Link href="/os/bi-copilot" className="swk-mnav-item">
+          <Calculator size={18} />
+          <span>ChatGPT</span>
+        </Link>
+        <Link href="/os/operations?tab=rahaba-hr" className="swk-mnav-item">
+          <CheckSquare size={18} />
+          <span>Rahaba HR</span>
         </Link>
       </nav>
     </div>

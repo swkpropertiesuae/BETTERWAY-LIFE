@@ -1,18 +1,73 @@
 {
-  "name": "Betterway ONE — Staff & Advisor Mobile OS",
+  "id": "com.betterwaymortgages.one",
+  "name": "Betterway ONE — Mortgage, AI & HR Mobile OS",
   "short_name": "Betterway ONE",
-  "description": "Betterway Mortgages LLC Field & Office Mobile OS: 10:05 AM GST Reception QR Scan, 5m Lead SLA, 24-Bank DBR Calculator, Rahaba HR Desk & Offline Sync Queue.",
+  "description": "Betterway Mortgages LLC iOS & Android App: 10:05 AM GST Reception QR Scan, 5m Lead SLA, 24-Bank DBR Calculator, BetterwayGPT Chat, PDF Studio & Rahaba HR Desk.",
   "start_url": "/os/mobile",
+  "scope": "/",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
   "background_color": "#021125",
   "theme_color": "#021125",
   "orientation": "portrait-primary",
+  "categories": ["finance", "business", "productivity"],
+  "lang": "en-AE",
+  "dir": "ltr",
+  "prefer_related_applications": false,
   "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
     {
       "src": "/brand/favicon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "10:05 AM QR Check-In",
+      "short_name": "QR Check-In",
+      "description": "Scan Office Reception QR Stand on Betterway-Office-5G Wi-Fi",
+      "url": "/os/mobile?tab=qr",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Ask BetterwayGPT",
+      "short_name": "BetterwayGPT",
+      "description": "Open private company ChatGPT & Digital AI Employees",
+      "url": "/os/mobile?tab=gpt",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "DBR & PDF Studio",
+      "short_name": "Calc & PDF",
+      "description": "Mobile CBUAE 50% DBR Calculator & Instant PDF Studio",
+      "url": "/os/mobile?tab=calc",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Rahaba HR Desk",
+      "short_name": "Rahaba HR",
+      "description": "Request Salary Certificate, NOC, Leave or Submit Daily Report",
+      "url": "/os/mobile?tab=hr",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
     }
   ]
 }

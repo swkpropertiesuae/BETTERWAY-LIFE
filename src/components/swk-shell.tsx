@@ -275,8 +275,8 @@ export function OsLayoutFrame({
     return () => window.removeEventListener('keydown', onKey);
   }, []);
 
-  // On /os root, EstateOsHost renders its own frame (same chrome, workspace pages, Assistant).
-  if (pathname === '/os') {
+  // On /os root or /os/mobile, the page renders its own full-screen native frame.
+  if (pathname === '/os' || pathname === '/os/mobile' || pathname.startsWith('/os/mobile/')) {
     return <>{children}</>;
   }
 
